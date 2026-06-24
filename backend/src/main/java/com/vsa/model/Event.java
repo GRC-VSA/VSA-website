@@ -1,25 +1,38 @@
 package com.vsa.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
 @RequiredArgsConstructor
+@Table(name = "events")
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(length = 2000)
     private String description;
-    private String date;
+
+    @Column(nullable = false)
+    private LocalDate date;
+
+    // "sport", "cultural", "club meeting"
+    @Column(nullable = false)
     private String category;
+
     private boolean ongoing;
+
+    // Which VSA generation hosted this event (e.g. "Gen 10", "Gen 11")
     private String vsaGen;
+
 }
