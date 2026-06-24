@@ -15,7 +15,6 @@ public class EventController {
 
     private final List<Event> events = new ArrayList<>();
 
-
     @GetMapping
     public ResponseEntity<List<Event>> getEvents() {
         return ResponseEntity.ok(events);
