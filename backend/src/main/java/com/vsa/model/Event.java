@@ -26,13 +26,13 @@ public class Event {
     @Column(nullable = false)
     private LocalDate date;
 
-    // "sport", "cultural", "club meeting"
+    // "sport", "field trip", "club meeting"
     @Column(nullable = false)
     private String category;
 
     private boolean ongoing;
 
-    // Which VSA generation hosted this event (e.g. "Gen 10", "Gen 11")
+    // Which VSA generation hosted this event (e.g. "Gen 6", "Gen 7")
     private String vsaGen;
 
 }
