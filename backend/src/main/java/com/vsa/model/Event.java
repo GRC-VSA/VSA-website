@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -13,26 +15,44 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Table(name = "events")
 public class Event {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "event_id")
+    private Long eventId;
+
+    @Column(name = "event_name", nullable = false)
+    private String eventName;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 2000)
     private String description;
 
+    @Column(name = "event_date", nullable = false)
+    private LocalDate eventDate;
+
+    @Column(name = "start_time", nullable = false)
+    private LocalTime startTime;
+
     @Column(nullable = false)
-    private LocalDate date;
+    private int capacity;
 
-    // "sport", "field trip", "club meeting"
-    @Column(nullable = false)
-    private String category;
+    @Column(name = "end_time", nullable = false)
+    private LocalTime endTime;
 
-    private boolean ongoing;
+    @Column(name = "min_age", nullable = false)
+    private int minAge = 0;
 
-    // Which VSA generation hosted this event (e.g. "Gen 6", "Gen 7")
-    private String vsaGen;
+    private String location;
 
+    private String status = "upcoming"; // "upcoming", "ongoing", "archived"
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
