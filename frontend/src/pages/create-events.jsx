@@ -33,19 +33,31 @@ function CreateEvents() {
                     <input type="date" name="date" id="date" required/>
                 </label>
 
-                <div>
+                <table>
+                    <tr>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                    <tr>
+                        <td><input type="time" name="startTime" required/></td>
+                        <input type="time" name="endTime" required/>
+
+                    </tr>
+                    
+                </table>
+                {/* <div>
                     <label>
                         Start Time: <br/>
-                        <input type="time" name="startTime" required/>
+                        
                     </label>
                 </div>
                 
                 <div>
                     <label>
                         End Time: <br/>
-                        <input type="time" name="endTime" required/>
+                        
                     </label>
-                </div>
+                </div> */}
                 
                 
                 <br/>
