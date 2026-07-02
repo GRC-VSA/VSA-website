@@ -48,6 +48,9 @@ public class Event {
 
     private String status = "upcoming"; // "upcoming", "ongoing", "archived"
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
