@@ -24,19 +24,14 @@ function CreateEvents() {
         console.log("Capacity: ", Number(formData.get("capacity")));
         console.log("Minimum Age: ", Number(formData.get("minAge")));
         console.log("Status: ", formData.get("status"));
-        console.log("Uploaded image: ", formData.get("eventImage"));
-        //Stop debugging here
+        
 
         let imageToSend = null;
         const imageFile = formData.get("eventImage");
-        
+        console.log("Uploaded image: ", imageFile);
 
         if (imageFile && imageFile.size > 0) {
             imageToSend = imageFile;
-            console.log("Uploaded image: ", imageFile);
-            console.log("Image name: ", imageFile.name);
-            console.log("Image type: ", imageFile.type); 
-            console.log("Image size: ", imageFile.size);
         } 
         else {
             console.log("No image uploaded");
@@ -56,12 +51,9 @@ function CreateEvents() {
             status: formData.get("status"),
         };
  
-
         try {
-            setIsSubmitting(true);
-
             const createdEvent = await createEvent(eventData, imageToSend);
-            
+        
             console.log("Backend response: ", createdEvent);
             console.log("Event created successfully.");
 
@@ -162,9 +154,6 @@ function CreateEvents() {
                     <span>This photo helps desplay the event better on the website homepage</span>
                     <input type="file" name="eventImage" accept="image/*"/>
                 </div>
-                
-
-
                 
             </form>
             
