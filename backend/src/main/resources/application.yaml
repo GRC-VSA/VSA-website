@@ -10,9 +10,9 @@ spring:
     name: backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/vsa_db
-    username: hncta
-    password:
+    url: jdbc:postgresql://localhost:5432/vsa
+    username: postgres
+    password: KSJnie!1992
     driver-class-name: org.postgresql.Driver
 
   jpa:

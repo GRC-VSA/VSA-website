@@ -10,25 +10,27 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
+
 @Service
 public class FileStorageService {
     //Files saved in folder "uploads" in project root
     private final Path uploadDir =  Paths.get("uploads");
 
-    public void init(){
-        try {
-            Files.createDirectories(uploadDir);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not initialize uploads directory");
-        }
-    }
+    // public void init(){
+    //     try {
+    //         Files.createDirectories(uploadDir);
+    //     } catch (IOException e) {
+    //         throw new RuntimeException("Could not initialize uploads directory");
+    //     }
+    // }
 
     public String save(MultipartFile file){
         try{
+            Files.createDirectories(uploadDir);
             String fileName  = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path filePath = uploadDir.resolve(fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            return "/upload/" + fileName;
+            return "/uploads/" + fileName;
         }
         catch (IOException e){
             throw new RuntimeException("Failed to save file: " + e.getMessage());

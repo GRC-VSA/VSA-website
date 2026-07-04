@@ -10,16 +10,17 @@ import java.util.List;
 public interface EventRepository extends JpaRepository<Event, Long> {
 
     // For Ongoing Events page
-    List<Event> findByOngoingTrue();
+    //List<Event> findByOngoingTrue();
+    List<Event> findByStatus(String status);
 
     //For filtering ongoing event by category (sport, field trip, club meeting)
-    List<Event> findByOngoingTrueAndCategory(String category);
+    //List<Event> findByOngoingTrueAndCategory(String category);
 
     //For the archived events page, then filtered by generation
-    List<Event> findByOngoingFalseAndVsaGen(String vsaGen);
+    //List<Event> findByOngoingFalseAndVsaGen(String vsaGen);
 
     //Get all archived events
-    List<Event> findByOngoingFalse();
+    //List<Event> findByOngoingFalse();
 
 
 

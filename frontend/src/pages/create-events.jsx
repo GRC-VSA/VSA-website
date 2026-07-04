@@ -39,10 +39,11 @@ function CreateEvents() {
         }
 
         const eventData = {
+            eventName: formData.get("title"),
             title: formData.get("title"),
             description: formData.get("description"),
-            date: formData.get("date"),
-            timezone: formData.get("timezone"),
+            eventDate: formData.get("date"),
+            //timezone: formData.get("timezone"),
             startTime: formData.get("startTime"),
             endTime: formData.get("endTime"),
             location: formData.get("location"),
@@ -143,9 +144,9 @@ function CreateEvents() {
                     <div className="other-info" style={{ gridArea: "status" }}>
                         <label>Status</label>
                         <select name="status" id="status" required>
-                            <option value="Upcoming">Upcoming</option>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Archived">Old-archived</option>
+                            <option value="upcoming">Upcoming</option>
+                            <option value="ongoing">Ongoing</option>
+                            <option value="archived">Old-archived</option>
                         </select>
                     </div>
                 </div>
