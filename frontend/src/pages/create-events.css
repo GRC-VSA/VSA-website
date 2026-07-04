@@ -1,0 +1,85 @@
+.create-events {
+    display: flex;
+    flex-direction: column;
+}
+#header {
+    display: flex;
+    justify-content: space-between;
+    
+}
+#page-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.form-container {
+    border-color: grey;
+    border-style: solid;
+    border-radius: 20px;
+    box-sizing: border-box;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.last-button-zone {
+    margin-left: auto;
+    display: flex;
+}
+
+#title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.event-title-desc {
+    display: flex;
+    flex-direction: column;
+}
+textarea {
+    height: 200px;
+}
+
+hr {
+    width: 65%;
+    align-self: center;
+}
+
+#time-section {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-areas: 
+    "timelabel . . . . ."
+    "timezone timezone . . . ."
+    "date date start-time end-time . .";
+    column-gap: 20px;
+}
+
+.timeinfo {
+    display: flex;
+    flex-direction: column;
+}
+
+#location-section {
+    display:grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+    "locationlabel . . . . ."
+    "location location capacity min-age status status";
+    column-gap: 20px;
+}
+
+.other-info {
+    display: flex;
+    flex-direction: column;
+}
+
+#cover-photo {
+    display: flex;
+    flex-direction: column;
+}
