@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createEvent } from "../api/Events";
+import { createEvent } from "../api/Events.js";
 import "./create-events.css";
 import blackhorizontallockup from "../assets/black-horizontal-lockup.png";
 
@@ -12,8 +12,6 @@ function CreateEvents() {
         setIsSubmitting(true);
 
         const formData = new FormData(event.target);
-
-
         // Below chunk of code is to debug frontend sending form behavior
 
         console.log("Event Title: ", formData.get("title"));
@@ -32,10 +30,9 @@ function CreateEvents() {
         let imageToSend = null;
         const imageFile = formData.get("eventImage");
         
-        
 
-        
         if (imageFile && imageFile.size > 0) {
+            imageToSend = imageFile;
             console.log("Uploaded image: ", imageFile);
             console.log("Image name: ", imageFile.name);
             console.log("Image type: ", imageFile.type); 

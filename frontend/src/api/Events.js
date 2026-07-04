@@ -18,7 +18,7 @@ export async function createEvent(eventData, imageFile){
        formData.append("image", imageFile);
    }
 
-    const res = await fetch("BASE_URL", {
+    const res = await fetch(BASE_URL, {
         method: "POST",
         body: formData,
     });
