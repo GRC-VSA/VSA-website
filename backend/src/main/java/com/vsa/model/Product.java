@@ -27,5 +27,8 @@ public class Product {
     @Column(nullable = false)
     private int stock;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     private boolean bestSeller;
 }

@@ -18,7 +18,11 @@ export async function createEvent(eventData, imageFile){
        formData.append("image", imageFile);
    }
 
+<<<<<<< HEAD
     const res = await fetch(BASE_URL, {
+=======
+    const res = await fetch("http://localhost:8080/api/events", {
+>>>>>>> origin/Tuan/Image-Upload
         method: "POST",
         body: formData,
     });
