@@ -1,22 +1,42 @@
 .create-events {
-    display: flex;
-    flex-direction: column;
-}
-#header {
-    display: flex;
-    justify-content: space-between;
-    
-}
-#page-name {
+    margin: 40px auto;
+    width: 75%;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
+label, h1, h2, h3, span, p, div {
+    caret-color: transparent;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+#page-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+#page-name > span {
+    font-size: 0.9rem;
+    position: relative;
+    bottom: 7px;
+}
+/* img {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+} */
 .form-container {
-    border-color: grey;
+    border-color: #C1C1C1;
     border-style: solid;
     border-radius: 20px;
+    border-width: 1.5px;
     box-sizing: border-box;
     padding: 25px;
     display: flex;
@@ -24,52 +44,130 @@
     gap: 30px;
 }
 
-.last-button-zone {
-    margin-left: auto;
-    display: flex;
+label {
+    font-weight: 530;
+    font-size: smaller;
+  
+}
+
+input {
+    background-color: #EEEEEE;
+    height: 2.2rem;
+    border: none;
+    border-radius: 7px;
+    padding: 0 0.6rem;
+    caret-color: auto;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+}
+
+textarea {
+    height: 170px;
+    background-color: #EEEEEE;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem;
+    caret-color: auto;
+    resize: none;
+    font-family: inherit;
+}
+
+textarea:focus {
+    outline: none;
+}
+
+select {
+    background-color: #EEEEEE;
+    border: none;
+    border-radius: 7px;
+    height: 2.2rem;
+    padding: 0 0.6rem;
+    padding-right: 1.6rem;
+    font-family: inherit;
+    
+}
+
+select:focus {
+    outline: none;
+}
+
+hr {
+    height: 1.5px;
+    width: 60%;
+    margin: 0.8rem;
+    align-self: center;
+    border: none;
+    background-color: #C1C1C1;
+    opacity: 0.7;
+}
+
+::placeholder {
+    font-family: Poppins;
+    font-weight: 420;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    color: #9D9D9D;
+    margin-left: 12px;
+}
+:focus::placeholder {
+    opacity: 0;
 }
 
 #title-section {
     display: flex;
     flex-direction: column;
-    gap: 7px;
+    gap: 8px;
+}
+
+#title {
+    border-radius: 7px;
 }
 
 .event-title-desc {
     display: flex;
     flex-direction: column;
-}
-textarea {
-    height: 200px;
+    gap: 2.5px;
 }
 
-hr {
-    width: 65%;
-    align-self: center;
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-#time-section {
+#time-box {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: repeat(6, minmax(111.7px, 1fr));
+    grid-template-rows: 1fr 1fr;
     grid-template-areas: 
-    "timelabel . . . . ."
     "timezone timezone . . . ."
     "date date start-time end-time . .";
     column-gap: 20px;
+    row-gap: 8px;
 }
+
 
 .timeinfo {
     display: flex;
     flex-direction: column;
 }
 
-#location-section {
-    display:grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: 1fr 1fr;
-    grid-template-areas:
-    "locationlabel . . . . ."
+/* #location-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 15px;
+} */
+
+#location-box {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(111.7px, 1fr));
+    grid-template-rows: 1fr;
+    grid-template-areas: 
     "location location capacity min-age status status";
     column-gap: 20px;
 }
@@ -82,4 +180,141 @@ hr {
 #cover-photo {
     display: flex;
     flex-direction: column;
+}
+
+#cover-photo > p {
+    font-size: 0.75rem;
+    line-height: 15px;
+    margin-bottom: 10px;
+}
+.upload-button {
+    width: 120px;
+    height: 30px;
+    border-radius: 13px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    background-color: black;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 15px;
+    text-align: center;
+    font-size: small;
+    transition: 80ms ease-in-out;
+}
+
+.upload-button:hover {
+    background-color: #ffffff;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    color:black;
+    cursor: pointer;
+}
+.upload-button:active{
+    width: 110px;
+    height: 27.5px;
+}
+/* 
+.upload-button:hover {
+    width: 140px;
+    height: 35px;
+    border-radius: 15px;
+    position: relative;
+    bottom: 2px;
+    right: 10px;
+    font-size: 0.9rem;
+} */
+
+.last-button-zone {
+    margin-left: auto;
+    margin-top: 10px;
+    display: flex;
+    margin-bottom: 50px;
+}
+
+.last-button-zone > button {
+    width: 150px;
+    height: 40px;
+    border-radius: 13px;
+    border: none;
+    background-image: linear-gradient(40deg, #0F0C29 35%, #302B63 75%, #24243E 95%);
+    color:#ffffff;
+    font-family: inherit;
+    font-weight: 530;
+    font-size: large;
+    transition: 90ms ease-in-out;
+}
+
+.last-button-zone > button:hover {
+    background-image: none;
+    background-color: #C22E2D;
+    border: none;
+    color: #ECE0A6;
+    cursor: pointer;
+}
+
+.last-button-zone > button:active {
+    width: 145px;
+    height: 37px;
+    background-image: none;
+    background-color: #AB3130;
+    border: none;
+    color: #ECE0A6;
+    cursor: pointer;
+}
+
+@media (max-width: 1090px) {
+    #time-box {
+        grid-template-columns: repeat(4, minmax(111.7px, 1fr));
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: 
+        "timezone timezone . ."
+        "date date start-time end-time";
+        row-gap: 8px;
+    }
+    #location-box {
+        grid-template-columns: repeat(4, minmax(111.7px, 1fr));
+        grid-template-rows: 1fr 1fr;
+        grid-template-areas: 
+        "location location capacity min-age"
+        "status status . .";
+        row-gap: 8px;
+    }
+}
+
+@media (max-width: 740px) {
+    #header > img {
+        display: none;
+    }
+    #header {
+        flex-direction: column;
+    }
+    #page-name {
+        align-items: center;
+        text-align: center;
+        padding: 0 15px;
+    }
+
+    #time-box {
+        grid-template-columns: repeat(2, minmax(111.7px, 1fr));
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas: 
+        "timezone timezone"
+        "date date"
+        "start-time end-time";
+        row-gap: 8px;
+    }
+
+    #location-box {
+        grid-template-columns: repeat(2, minmax(111.7px, 1fr));
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas: 
+        "location location"
+        "capacity min-age"
+        "status status";
+        row-gap: 8px;
+    }
 }

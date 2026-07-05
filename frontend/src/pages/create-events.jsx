@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { createEvent } from "../api/Events.js";
 import "./create-events.css";
-import blackhorizontallockup from "../assets/black-horizontal-lockup.png";
+import VSA_blacklogo from "../assets/VSA_blacklogo.png";
 
 
 function CreateEvents() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    
+    function handleEnterKey(event) {
+        if (event.key ==="Enter") {
+            if (event.target.tagName ==="TEXTAREA") {
+                return;
+            }
+            else {
+                event.preventDefault();
+            }
+        }
+    }
     async function handleSubmit(event) {
         event.preventDefault();
         setIsSubmitting(true);
@@ -71,13 +81,13 @@ function CreateEvents() {
         <main className="create-events">
             <div id="header">
                 <div id="page-name">
-                    <h2>Create Events</h2>
+                    <h1>Create Events</h1>
                     <span>Create a new event and publish it on the website</span>
                 </div>
-                <img src={blackhorizontallockup} alt="vsa-logo" width="200"/>
+                <img src={VSA_blacklogo} alt="vsa-logo" width="220" height="52"/>
             </div>
 
-            <form className="form-container" id="form-container" onSubmit={handleSubmit}>
+            <form className="form-container" id="form-container" onSubmit={handleSubmit} onKeyDown={handleEnterKey}>
                 <div id="title-section">
                     <h3>Title</h3>
                     <div className="event-title-desc">
@@ -93,67 +103,71 @@ function CreateEvents() {
 
                 <hr></hr>
             
-                <div id="time-section">
+                <div className="section" id="time-section">
                     <h3 style={{ gridArea: "timelabel" }}>Time</h3>
-                    <div className="timeinfo" style={{ gridArea: "timezone" }}>
-                        <label>Timezone:</label>
-                        <select name="timezone" id="timezone" required>
-                           <option value="Seattle">Seattle</option>
-                           <option value="Chicago">Chicago</option>
-                           <option value="Vietnam">Vietnam</option>
-                        </select>
-                    </div>
-                    <div className="timeinfo" style={{ gridArea: "date" }}>
-                        <label>Date:</label>
-                        <input type="date" name="date" id="date" required/>
-                        <img></img>
-                    </div>
+                    <div className="box" id="time-box">
+                        <div className="timeinfo" style={{ gridArea: "timezone" }}>
+                            <label>Timezone:</label>
+                            <select name="timezone" id="timezone" required>
+                                <option value="Seattle">Seattle</option>
+                                <option value="Chicago">Chicago</option>
+                                <option value="Vietnam">Vietnam</option>
+                            </select>
+                        </div>
+                        <div className="timeinfo" style={{ gridArea: "date" }}>
+                            <label>Date:</label>
+                            <input type="date" name="date" id="date" required/>
+                        </div>
                     
-                    <div className="timeinfo" style={{ gridArea: "start-time" }}>
-                        <label>Start Time:</label>
-                        <input type="time" name="startTime" id="start-time" required/>
-                        <img></img>
+                        <div className="timeinfo" style={{ gridArea: "start-time" }}>
+                            <label>Start Time:</label>
+                            <input type="time" name="startTime" id="start-time" required/>
+                        </div>
+
+                        <div className="timeinfo" style={{ gridArea: "end-time" }}>
+                            <label>End Time:</label>
+                            <input type="time" name="endTime" id="end-time" required/>
+                        </div>
                     </div>
 
-                    <div className="timeinfo" style={{ gridArea: "end-time" }}>
-                        <label>End Time:</label>
-                        <input type="time" name="endTime" id="end-time" required/>
-                        <img></img>
-                    </div>
                 </div>
                 
                 <hr></hr>
 
-                <div id="location-section">
+                <div className="section" id="location-section">
                     <h3 style={{ gridArea: "locationlabel" }}>Location & other info</h3>
-                    <div className="other-info" style={{ gridArea: "location" }}>
-                        <label>Location</label>
-                        <input type="text" name="location" id="location" required/>
-                    </div>
+                    <div className="box" id="location-box">
+                        <div className="other-info" style={{ gridArea: "location" }} id="location-div">
+                            <label>Location</label>
+                            <input type="text" name="location" id="location" required/>
+                        </div>
 
-                    <div className="other-info" style={{ gridArea: "capacity" }}>
-                        <label>Capacity</label>
-                        <input type="number" name="capacity" id="capacity" required/>
-                    </div> 
+                        <div className="other-info" style={{ gridArea: "capacity" }} id="capacity-div">
+                            <label>Capacity</label>
+                            <input type="number" name="capacity" id="capacity" required/>
+                        </div> 
 
-                    <div className="other-info" style={{ gridArea: "min-age" }}>
-                        <label>Min age</label>
-                        <input type="number" name="minAge" id="min-age" required/>
-                    </div>
+                        <div className="other-info" style={{ gridArea: "min-age" }} id="min-age-div">
+                            <label>Min age</label>
+                            <input type="number" name="minAge" id="min-age" required/>
+                        </div>
 
-                    <div className="other-info" style={{ gridArea: "status" }}>
-                        <label>Status</label>
-                        <select name="status" id="status" required>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="archived">Old-archived</option>
-                        </select>
+                        <div className="other-info" style={{ gridArea: "status" }} id="status-div">
+                            <label>Status</label>
+                            <select name="status" id="status" required>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="archived">Archived (old)</option>
+                            </select>
+                        </div>                        
                     </div>
+                    
                 </div>
                 <div id="cover-photo">
                     <h3>Cover Photo</h3>
-                    <span>This photo helps desplay the event better on the website homepage</span>
-                    <input type="file" name="eventImage" accept="image/*"/>
+                    <p>This photo helps desplay the event better on the website homepage</p>
+                    <input type="file" name="eventImage" id="eventImage" accept="image/*" hidden/>
+                    <label htmlFor="eventImage" className="upload-button">Upload a photo</label>
                 </div>
                 
             </form>
@@ -165,5 +179,7 @@ function CreateEvents() {
         </main>
     );
 }
+
+
 
 export default CreateEvents;
