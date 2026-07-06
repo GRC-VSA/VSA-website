@@ -21,7 +21,7 @@ public class EventController {
     private final EventService eventService;
     private final FileStorageService fileStorageService;
 
-    public  EventController(EventService eventService, EventRepository eventRepository, FileStorageService fileStorageService) {
+    public EventController(EventService eventService, EventRepository eventRepository, FileStorageService fileStorageService) {
         this.eventService = eventService;
         this.fileStorageService = fileStorageService;
     }
@@ -31,16 +31,16 @@ public class EventController {
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
-    @GetMapping
-    public ResponseEntity<Event> getEventById(@RequestParam Long id) {
+    @GetMapping({"/{id}"})
+    public ResponseEntity<Event> getEventById(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getEventById(id));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Event> createEvent (@RequestPart("event") Event event,
-                                              @RequestPart(value = "image", required = false) MultipartFile image) {
+    public ResponseEntity<Event> createEvent(@RequestPart("event") Event event,
+                                             @RequestPart(value = "image", required = false) MultipartFile image) {
 
-        if(image != null && !image.isEmpty()) {
+        if (image != null && !image.isEmpty()) {
             String imageUrl = fileStorageService.save(image);
             event.setImageUrl(imageUrl);
         }
@@ -48,4 +48,18 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(eventService.createEvent(event));
     }
+
+    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Event> updateEvent(@PathVariable Long id,
+                                             @RequestPart("event") Event event,
+                                             @RequestPart(value = "image", required = false) MultipartFile image) {
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = fileStorageService.save(image);
+            event.setImageUrl(imageUrl);
+        }
+
+        return ResponseEntity.ok(eventService.updateEvent(id, event));
+    }
+
+
 }
