@@ -21,7 +21,7 @@ public class EventController {
     private final EventService eventService;
     private final FileStorageService fileStorageService;
 
-    public EventController(EventService eventService, EventRepository eventRepository, FileStorageService fileStorageService) {
+    public EventController(EventService eventService, FileStorageService fileStorageService) {
         this.eventService = eventService;
         this.fileStorageService = fileStorageService;
     }
