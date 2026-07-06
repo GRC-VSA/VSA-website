@@ -31,6 +31,11 @@ public class EventController {
         return ResponseEntity.ok(eventService.getAllEvents());
     }
 
+    @GetMapping
+    public ResponseEntity<Event> getEventById(@RequestParam Long id) {
+        return ResponseEntity.ok(eventService.getEventById(id));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Event> createEvent (@RequestPart("event") Event event,
                                               @RequestPart(value = "image", required = false) MultipartFile image) {
