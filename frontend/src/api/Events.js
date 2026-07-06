@@ -8,12 +8,21 @@ export async function getEvents(){
 }
 
 //Post
-export async function createEvent(eventData){
+export async function createEvent(eventData, imageFile){
+   const formData = new FormData();
+
+   formData.append("event", new Blob([JSON.stringify(eventData)],
+       {type: "application/json"}));
+
+   if(imageFile){
+       formData.append("image", imageFile);
+   }
+
     const res = await fetch(BASE_URL, {
-        method: 'POST',
-        headers: {"Content-Type" : "application/json"},
-        body: JSON.stringify(eventData),
+        method: "POST",
+        body: formData,
     });
-    if(!res.ok) throw new Error("Failed to create event");
+
+    if (!res.ok) throw new Error("Failed to create event");
     return res.json();
 }
