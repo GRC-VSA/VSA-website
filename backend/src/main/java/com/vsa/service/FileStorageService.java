@@ -1,5 +1,6 @@
 package com.vsa.service;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,7 @@ public class FileStorageService {
     //Files saved in folder "uploads" in project root
     private final Path uploadDir =  Paths.get("uploads");
 
+    @PostConstruct
     public void init(){
         try {
             Files.createDirectories(uploadDir);
