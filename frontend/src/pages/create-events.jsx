@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createEvent } from "../api/Events.js";
 import "./create-events.css";
 import VSA_blacklogo from "../assets/VSA_blacklogo.png";
@@ -6,8 +6,37 @@ import VSA_blacklogo from "../assets/VSA_blacklogo.png";
 
 function CreateEvents() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [photos, setPhotos] = useState([]);
+    const [urls, setURLS] = useState([]);
+    const addPhotos = (event) => {
+        setPhotos([...photos, ...Array.from(event.target.files)]) //event.target.files is one FileList, without Array.from(), we only add bunch of files as one element.
+        photos.forEach(photo => {
+            setURLS([...urls, URL.createObjectURL(photo)]);
+        });
+    }
     
-    function handleEnterKey(event) {
+    const removePhotos = (index) => {
+        //revoke URLs
+        URL.revokeObjectURL(urls[index]);
+
+        const newURLS = [...urls];
+        newURLS.splice(index, 1);
+        setURLS(newURLS);
+
+        const newPhotos = [...photos];
+        newPhotos.splice(index, 1);
+        setPhotos(newPhotos);
+    }
+    useEffect(() => {
+        return () => {
+            urls.forEach((photoURL) => {
+                URL.revokeObjectURL(photoURL);
+            })
+        };
+    })
+
+    handleEnterKey = (event) => {
         if (event.key ==="Enter") {
             if (event.target.tagName ==="TEXTAREA") {
                 return;
@@ -166,8 +195,19 @@ function CreateEvents() {
                 <div id="cover-photo">
                     <h3>Cover Photo</h3>
                     <p>This photo helps desplay the event better on the website homepage</p>
-                    <input type="file" name="eventImage" id="eventImage" accept="image/*" hidden/>
+                    <input type="file" name="eventImage" id="eventImage" accept="image/*" multiple hidden onChange={addPhotos}/>
                     <label htmlFor="eventImage" className="upload-button">Upload a photo</label>
+
+                    <div className="photo-preview-list">
+                        {
+                            urls.map((photoURL, index) => (
+                                <div key={index}>
+                                    <img src={photoURL} alt={`Preview ${index + 1}`} width="120"/>
+                                    <button type="button" onClick={() => removePhotos(index)} className="photo-remove-button">x</button>
+                                </div>
+                            ))
+                        }
+                    </div>
                 </div>
                 
             </form>
