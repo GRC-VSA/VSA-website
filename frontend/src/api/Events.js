@@ -8,14 +8,16 @@ export async function getEvents(){
 }
 
 //Post
-export async function createEvent(eventData, imageFile){
+export async function createEvent(eventData, imageFiles = []){
    const formData = new FormData();
 
    formData.append("event", new Blob([JSON.stringify(eventData)],
        {type: "application/json"}));
 
-   if(imageFile){
-       formData.append("image", imageFile);
+   if(imageFiles.length > 0){
+        imageFiles.forEach((image) => {
+            formData.append("image", image);
+        });
    }
 
     const res = await fetch(BASE_URL, {

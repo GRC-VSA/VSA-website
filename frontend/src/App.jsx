@@ -1,9 +1,9 @@
-import CreateEvents from "./pages/create-events.jsx";
+import CreateEventPage from "./pages/create-events.jsx";
 
 function App() {
   return (
     <div>
-      <CreateEvents/>
+      <CreateEventPage/>
     </div>
   );
 }
