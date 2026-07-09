@@ -64,11 +64,6 @@ jobs:
         working-directory: ./backend
         run: ./mvnw jacoco:check
 
-
-      - name: Build with Maven
-        working-directory: ./backend
-        run: ./mvnw clean install -DskipTests
-
   #Build React Frontend
   frontend:
     name: Build Frontend
