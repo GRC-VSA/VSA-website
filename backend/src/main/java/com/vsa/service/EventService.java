@@ -1,5 +1,6 @@
 package com.vsa.service;
 
+import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.Event;
 import com.vsa.repository.EventRepository;
 import java.util.List;
@@ -28,7 +29,7 @@ public class EventService {
   public Event getEventById(Long id) {
     return eventRepository
         .findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Event with id " + id + " not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Event", id));
   }
 
   public Event createEvent(Event event) {
@@ -38,9 +39,7 @@ public class EventService {
   @Transactional
   public Event updateEvent(Long id, Event req) {
     Event existing =
-        eventRepository
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Event with id " + id + " not found"));
+        eventRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Event", id));
 
     existing.setEventName(req.getEventName());
     existing.setTitle(req.getTitle());
@@ -60,7 +59,7 @@ public class EventService {
   @Transactional
   public void delete(Long id) {
     if (!eventRepository.existsById(id)) {
-      throw new IllegalArgumentException("Event with id " + id + " not found");
+      throw new ResourceNotFoundException("Event", id);
     }
     eventRepository.deleteById(id);
   }

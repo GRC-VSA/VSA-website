@@ -1,5 +1,3 @@
 package com.vsa.controller;
 
-
-public class EventControllerTest {
-}
+public class EventControllerTest {}
