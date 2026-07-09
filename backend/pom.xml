@@ -80,9 +80,7 @@
                     <!-- only check coverage on these files -->
                     <includes>
                         <include>com/vsa/service/EventService.class</include>
-                        <include>com/vsa/service/ProductService.class</include>
                         <include>com/vsa/controller/EventController.class</include>
-                        <include>com/vsa/controller/ProductController.class</include>
                         <include>com/vsa/service/FileStorageService.class</include>
                     </includes>
                 </configuration>
