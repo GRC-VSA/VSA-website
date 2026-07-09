@@ -33,4 +33,6 @@ public class EventServiceTest {
 
         assertEquals("Club Meeting", result.getTitle());
     }
+
+
 }
