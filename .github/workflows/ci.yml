@@ -10,8 +10,24 @@ on:
 jobs:
   #Build the Spring Boot Backend
   backend:
-    name: Build Backend
+    name: Build & Test Backend
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: vsa_db_test
+          POSTGRES_USER: vsa_user
+          POSTGRES_PASSWORD: vsa_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
 
     steps:
       - name: Checkout code
@@ -22,6 +38,32 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
+      - name: Run tests with coverage
+        working-directory: ./backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
+          SPRING_DATASOURCE_USERNAME: vsa_user
+          SPRING_DATASOURCE_PASSWORD: vsa_password
+        run: ./mvnw verify
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always() # upload even if tests fail
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco/
+
+      - name: Check coverage threshold
+        working-directory: ./backend
+        run: ./mvnw jacoco:check
+
 
       - name: Build with Maven
         working-directory: ./backend
