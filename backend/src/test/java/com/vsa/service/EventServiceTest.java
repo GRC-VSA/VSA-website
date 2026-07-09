@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class EventServiceTest {
+class EventServiceTest {
 
   @Mock private EventRepository eventRepository;
 
@@ -88,14 +88,12 @@ public class EventServiceTest {
   void getEventById_throwsResourceNotFoundException_whenNotFound() {
     when(eventRepository.findById(99L)).thenReturn(Optional.empty());
 
-    ResourceNotFoundException ex = assertThrows(
-            ResourceNotFoundException.class,
-            () -> eventService.getEventById(99L)
-    );
+    ResourceNotFoundException ex =
+        assertThrows(ResourceNotFoundException.class, () -> eventService.getEventById(99L));
     assertEquals("Resource with id 99 not found", ex.getMessage());
   }
 
-  //Create event test
+  // Create event test
   @Test
   void createEvent_savesAndReturnsEvent() {
     when(eventRepository.save(testEvent)).thenReturn(testEvent);
@@ -138,10 +136,7 @@ public class EventServiceTest {
   void updateEvent_throwsResourceNotFoundException_whenNotFound() {
     when(eventRepository.findById(99L)).thenReturn(Optional.empty());
 
-    assertThrows(
-            ResourceNotFoundException.class,
-            () -> eventService.updateEvent(99L, testEvent)
-    );
+    assertThrows(ResourceNotFoundException.class, () -> eventService.updateEvent(99L, testEvent));
 
     verify(eventRepository, never()).save(any());
   }
@@ -158,8 +153,8 @@ public class EventServiceTest {
     req.setCapacity(200);
     req.setMinAge(0);
     req.setLocation("Main Hall");
-    req.setStatus(null);       // null — should keep existing
-    req.setImageUrl(null);     // null — should keep existing
+    req.setStatus(null); // null — should keep existing
+    req.setImageUrl(null); // null — should keep existing
 
     testEvent.setStatus("upcoming");
     testEvent.setImageUrl("/uploads/existing.jpg");
@@ -190,10 +185,7 @@ public class EventServiceTest {
   void delete_throwsResourceNotFoundException_whenNotFound() {
     when(eventRepository.existsById(99L)).thenReturn(false);
 
-    assertThrows(
-            ResourceNotFoundException.class,
-            () -> eventService.delete(99L)
-    );
+    assertThrows(ResourceNotFoundException.class, () -> eventService.delete(99L));
 
     verify(eventRepository, never()).deleteById(any());
   }
