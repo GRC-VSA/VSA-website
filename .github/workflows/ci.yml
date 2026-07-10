@@ -55,7 +55,7 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
           SPRING_DATASOURCE_USERNAME: vsa_user
           SPRING_DATASOURCE_PASSWORD: vsa_password
-        run: ./mvnw clean test
+        run: ./mvnw test
 
 
   #Build React Frontend
