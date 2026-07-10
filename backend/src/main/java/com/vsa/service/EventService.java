@@ -48,7 +48,7 @@ public class EventService {
     existing.setStartTime(req.getStartTime());
     existing.setEndTime(req.getEndTime());
     existing.setCapacity(req.getCapacity());
-    existing.setMinAge(req.getMinAge() != 0 ? req.getMinAge() : existing.getMinAge());
+    existing.setMinAge(req.getMinAge());
     existing.setLocation(req.getLocation());
     existing.setStatus(req.getStatus() != null ? req.getStatus() : existing.getStatus());
     existing.setImageUrl(req.getImageUrl() != null ? req.getImageUrl() : existing.getImageUrl());
