@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
                 "status",
                 404,
                 "error",
-                "Bad Request",
+                "Not Found",
                 "message",
                 ex.getMessage()));
   }

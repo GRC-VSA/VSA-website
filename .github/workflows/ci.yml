@@ -39,9 +39,23 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+
       - name: Build with Maven
         working-directory: ./backend
         run: ./mvnw clean install -DskipTests
+
+      - name: Run tests with Maven
+        working-directory: ./backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
+          SPRING_DATASOURCE_USERNAME: vsa_user
+          SPRING_DATASOURCE_PASSWORD: vsa_password
+        run: ./mvnw clean test
 
 
   #Build React Frontend
