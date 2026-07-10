@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vsa_db
+    username: vsa_user
+    password: vsa_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl:auto: create-drop
+    show-sql: false
