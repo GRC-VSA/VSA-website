@@ -33,8 +33,21 @@ public class User {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+  @Column(nullable = false)
+  private String role = "student"; //student, officer, president
+
+  @Column(name = "email_verified", nullable = false)
+  private boolean emailVerified = false;
+
+  @Column(name = "verification_token")
+  private String verificationToken;
+
+  @Column(name = "reset_token")
+  private String resetToken;
+
+  @Column(name = "reset_token_expiry")
+  private LocalDateTime resetTokenExpiry;
+
   @PrePersist
-  public void prePersist() {
-    createdAt = LocalDateTime.now();
-  }
+  public void prePersist() {this.createdAt = LocalDateTime.now();}
 }
