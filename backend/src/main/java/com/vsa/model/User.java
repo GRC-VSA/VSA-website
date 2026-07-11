@@ -34,7 +34,7 @@ public class User {
   private LocalDateTime createdAt;
 
   @Column(nullable = false)
-  private String role = "student"; //student, officer, president
+  private String role = "student"; // student, officer, president
 
   @Column(name = "email_verified", nullable = false)
   private boolean emailVerified = false;
@@ -49,5 +49,7 @@ public class User {
   private LocalDateTime resetTokenExpiry;
 
   @PrePersist
-  public void prePersist() {this.createdAt = LocalDateTime.now();}
+  public void prePersist() {
+    this.createdAt = LocalDateTime.now();
+  }
 }
