@@ -20,3 +20,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+jwt:
+  secret: "vsa-super-secret-key-that-is-long-enough-for-hs256-algorithm"
+  expiration: 86400000
