@@ -10,9 +10,9 @@ spring:
     name: backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/vsa_db
-    username: hncta
-    password:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,5 +22,5 @@ spring:
     show-sql: true
 
 jwt:
-  secret: "vsa-super-secret-key-that-is-long-enough-for-hs256-algorithm"
+  secret: ${JWT_SECRET}
   expiration: 86400000

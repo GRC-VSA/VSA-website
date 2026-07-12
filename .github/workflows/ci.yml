@@ -17,9 +17,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: vsa_db_test
-          POSTGRES_USER: vsa_user
-          POSTGRES_PASSWORD: vsa_password
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
