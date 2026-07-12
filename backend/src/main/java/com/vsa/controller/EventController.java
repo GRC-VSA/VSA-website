@@ -45,6 +45,12 @@ public class EventController {
     return ResponseEntity.status(HttpStatus.CREATED).body(eventService.createEvent(event));
   }
 
+  //When no image is provided, the event can be created using JSON directly. This endpoint allows for that.
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<Event> createEventJson(@RequestBody Event event) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(eventService.createEvent(event));
+  }
+
   @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Event> updateEvent(
       @PathVariable Long id,
