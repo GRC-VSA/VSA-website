@@ -4,6 +4,8 @@ import com.vsa.model.User;
 import com.vsa.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.vsa.security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,12 @@ public class UserService {
 
   private final BCryptPasswordEncoder passwordEncoder;
 
-  public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+  private final JwtUtil jwtUtil;
+
+  public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,  JwtUtil jwtUtil) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.jwtUtil = jwtUtil;
   }
 
   // Register
@@ -45,11 +50,10 @@ public class UserService {
   }
 
   // Login
-  public User login(String email, String rawPassword) {
-    User user =
-        userRepository
-            .findByEmail(email)
+  public String login(String email, String rawPassword) {
+    User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
     if (!user.isEmailVerified()) {
       throw new IllegalArgumentException("Please verify your email first");
     }
@@ -58,7 +62,7 @@ public class UserService {
       throw new IllegalArgumentException("Invalid email or password");
     }
 
-    return user;
+    return jwtUtil.generateToken(user.getEmail(), user.getRole());
   }
 
   // Forgot Password

@@ -33,9 +33,12 @@ public class UserController {
 
   // POST /api/users/login
   @PostMapping("/login")
-  public ResponseEntity<User> login(@RequestBody Map<String, String> body) {
-    User user = userService.login(body.get("email"), body.get("password"));
-    return ResponseEntity.ok(user);
+  public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> body) {
+    String token = userService.login(body.get("email"), body.get("password"));
+    return ResponseEntity.ok(Map.of(
+            "token", token,
+            "message", "Login successful"
+    ));
   }
 
   // POST /api/users/forgot-password
