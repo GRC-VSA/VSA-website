@@ -7,7 +7,7 @@ import VSA_blacklogo from "../assets/VSA_blacklogo.png";
 const CreateEventPage = () => {
     const [formData, setFormData] = useState({
         eventName: '',
-        title: '', //title is event category right now, fix this later
+        title: '', //title is event category right now, fix this later.
         description: '',
         eventDate: '',
         startTime: '',
@@ -113,7 +113,7 @@ const CreateEventPage = () => {
                     <h1>Create Events</h1>
                     <span>Create a new event and publish it on the website</span>
                 </div>
-                <img src={VSA_blacklogo} alt="vsa-logo" width="220" height="52"/>
+                <img src={VSA_blacklogo} alt="vsa-logo"/>
             </div>
 
             <form className="form-container" id="form-container" onSubmit={handleSubmit} onKeyDown={handleEnterKey}>

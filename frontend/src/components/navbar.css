@@ -1,0 +1,57 @@
+.navbar{
+    width: 100%;
+    height: 65px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1em;
+    color: #ECE0A6;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+.navbar-background {
+    width: 100%;
+    height: 100%;
+    padding: 5px 55px;
+    background-color: #AB3130;
+    opacity: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    width: 100%;
+    height: 45px;
+    object-fit: contain;
+    
+}
+
+.logo-div {
+    width: 1fr;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+.navbar-pages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    width: 1fr;
+    height: 65%;
+    border-radius: 25px;
+    background-color: #AB3130;
+}
+.search-and-signin-section{
+    width: 1fr;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}

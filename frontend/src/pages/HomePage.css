@@ -1,0 +1,184 @@
+.event-carousel {
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+.overlay {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    inset:0;
+    background-image: linear-gradient(to right,  rgb(0, 0, 0, 0.7), rgb(0, 0, 0, 0.3), rgba(255, 255, 255, 0));
+    z-index: 1;
+}
+
+.event-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+.event-content-div {
+    width: 100%;
+    height: 50%;
+    position: absolute;
+    top: 47%;
+    translate: 0 -50%;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.carousel-arrow-left {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+}
+
+.carousel-arrow-right {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+}
+
+.event-text-group {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+.event-name-div {
+    width: 45%;
+    /* background-color: aqua; */
+    box-sizing: content-box;
+}
+.event-name {
+    color: white;
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
+    font-family: inherit;
+    font-size: clamp(5rem, 5.5rem, 6rem);
+    font-weight: 600;
+    text-align: center;
+    text-transform: capitalize;
+    line-height: 1.1;
+}
+ 
+.event-description-div {
+    width: 55%;
+    color:white;
+    text-align: center;
+}
+
+.carousel-arrow-left {
+    background: none;
+    border-color: white;
+    border-style: solid;
+    height: 11%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+	align-items: center;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.carousel-arrow-left > svg {
+    translate: -5% 0;
+    fill: white;
+}
+
+.carousel-arrow-right {
+    background: none;
+    border-color: white;
+    border-style: solid;
+    height: 11%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+	align-items: center;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.carousel-arrow-right > svg {
+    translate: 5% 0;
+    fill: white;
+}
+
+.register-button-div {
+    display: flex;
+    flex-direction: row;
+    gap: 0.8rem;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-from-right {
+    animation: slideInFromRight 0.5s ease-out;
+}
+
+.slide-from-left {
+    animation: slideInFromLeft 0.5s ease-out;
+}
+
+.event-counter-bullets {
+    position: absolute;
+    right: 50%;
+    bottom: 15%;
+    translate: 30%;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    justify-content: space-between;
+    z-index: 3;
+}
+
+.bullet-off {
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background-color: rgb(141, 141, 141);
+    opacity: 0.7;
+}
+
+.bullet-on {
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+}
