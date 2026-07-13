@@ -10,9 +10,9 @@ spring:
     name: backend
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/vsa}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -20,3 +20,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
