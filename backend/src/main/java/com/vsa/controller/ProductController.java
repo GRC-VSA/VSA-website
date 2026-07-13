@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ProductController {
   private final ProductService productService;
   private final FileStorageService fileStorageService;
