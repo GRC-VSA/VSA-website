@@ -116,7 +116,22 @@
 .register-button-div {
     display: flex;
     flex-direction: row;
-    gap: 0.8rem;
+    justify-content: space-evenly;
+    padding: 10px;
+    gap: 0.6rem;
+    width: 190px; 
+    border-radius: 20px;
+    background-color: #C22E2D;
+}
+
+.register-button {
+    all: unset;
+    color: #ECE0A6;
+    font-weight: 500;
+}
+
+.register-button-div > svg {
+    fill: #ECE0A6;
 }
 
 .slider {

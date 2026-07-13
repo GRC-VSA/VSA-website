@@ -1,5 +1,5 @@
 .create-events {
-    margin: 40px auto;
+    margin: 60px auto;
     width: 75vw;
     padding: 20px;
     display: flex;
@@ -89,7 +89,6 @@ select {
     padding: 0 0.6rem;
     padding-right: 1.6rem;
     font-family: inherit;
-    
 }
 
 select:focus {

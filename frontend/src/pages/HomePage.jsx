@@ -1,31 +1,12 @@
 import { useEffect, useState } from "react";
-import { getEvents } from "../api/Events.js";
+import { useEvents } from "../context/EventsContext.jsx"
 import "./HomePage.css";
 
 const HomePage = () => {
-    const [events, setEvents] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+
+    const { events, isLoading, error } = useEvents();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [animationDirection, setAnimationDirection] = useState("right");
-
-    useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                setIsLoading(true);
-                const data = await getEvents();
-                setEvents(data);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to fetch events:", err);
-                setError("Could not load events. Please try again later.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchEvents();
-    }, []);
 
     const handlePrevious = () => {
         setAnimationDirection("left");
