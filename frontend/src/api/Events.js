@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "./config";
-import { getTokenforAuthHeader } from "./authHeaders";
+import { API_BASE_URL } from "./config.js";
+import { getTokenforAuthHeader } from "./authHeaders.js";
 
-const BASE_URL = "http://localhost:8080/api/events";
+const BASE_URL = `${API_BASE_URL}/api/events`;
 
 //Get
 export async function getEvents(){
@@ -25,7 +25,7 @@ export async function createEvent(eventData, imageFiles = []){
 
     const res = await fetch(BASE_URL, {
         method: "POST",
-        header: {
+        headers: {
             ...getTokenforAuthHeader()
         },
         body: formData,
