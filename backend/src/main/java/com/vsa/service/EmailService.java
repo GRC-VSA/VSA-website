@@ -22,7 +22,7 @@ public class EmailService {
     }
 
     //Core Send Method
-    private void  sendEmail(String to, String subject, String htmlBody) {
+    private void sendEmail(String to, String subject, String htmlBody) {
         try{
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
