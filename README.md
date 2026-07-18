@@ -2,7 +2,7 @@
 
 A full-stack web application for the Vietnamese Student Association (VSA) at Green River College. This application provides a comprehensive platform for managing events, products, and user accounts with secure authentication and email notification features.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Project Overview](#project-overview)
 - [Features](#features)
@@ -19,7 +19,7 @@ A full-stack web application for the Vietnamese Student Association (VSA) at Gre
 - [Contributing](#contributing)
 - [License](#license)
 
-## 🎯 Project Overview
+## Project Overview
 
 The VSA Website is designed to streamline operations for the Vietnamese Student Association, providing tools for:
 - Event management and registration
@@ -28,7 +28,7 @@ The VSA Website is designed to streamline operations for the Vietnamese Student 
 - Email notifications and communications
 - File upload and storage capabilities
 
-## ✨ Features
+## Features
 
 ### Authentication & Security
 - JWT-based token authentication
@@ -61,7 +61,7 @@ The VSA Website is designed to streamline operations for the Vietnamese Student 
 - 10MB maximum file size limit
 - Organized file structure
 
-## 🛠 Tech Stack
+## Tech Stack
 
 ### Backend
 - **Framework:** Spring Boot 4.1.0
@@ -84,7 +84,7 @@ The VSA Website is designed to streamline operations for the Vietnamese Student 
 - **Web Server:** Nginx (Frontend)
 - **Database Server:** PostgreSQL
 
-## 📦 Prerequisites
+## Prerequisites
 
 ### Required
 - Docker and Docker Compose (for containerized setup)
@@ -97,7 +97,7 @@ The VSA Website is designed to streamline operations for the Vietnamese Student 
 - Maven 3.6+ (if building backend without Docker)
 - Git for version control
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ### Using Docker Compose (Recommended)
 
@@ -175,7 +175,7 @@ The VSA Website is designed to streamline operations for the Vietnamese Student 
    npm run build
    ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -201,7 +201,7 @@ MAIL_PASSWORD=your_app_specific_password
 - **JWT Secret:** Use a strong, randomly generated secret key
 - **Database:** Ensure PostgreSQL is running and accessible
 
-## 🏃 Running the Application
+## Running the Application
 
 ### Using Docker Compose
 
@@ -225,7 +225,7 @@ docker-compose logs -f
 - **Backend API:** http://localhost:8080
 - **Backend Health Check:** http://localhost:8080/actuator/health
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 VSA-website/
@@ -261,7 +261,7 @@ VSA-website/
 └── docker-compose.yml               # Docker Compose configuration
 ```
 
-## 📡 API Documentation
+## API Documentation
 
 ### Base URL
 ```
@@ -297,7 +297,7 @@ http://localhost:8080/api
 - `POST /files/upload` - Upload file
 - `GET /files/{filename}` - Download file
 
-## 👨‍💻 Development
+## Development
 
 ### Code Quality Standards
 
@@ -335,7 +335,7 @@ npm run lint
 npm run lint -- --fix
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Backend Tests
 
@@ -368,7 +368,7 @@ The project enforces 70% test coverage on key classes:
 - `EventController`
 - `FileStorageService`
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 ### Building Docker Images
 
@@ -399,7 +399,7 @@ docker-compose build frontend
 
 - `uploads_data` - Stores uploaded files for persistence
 
-## 🤝 Contributing
+## Contributing
 
 ### Getting Started
 
@@ -416,13 +416,13 @@ docker-compose build frontend
 - Include tests for new features
 - Update documentation as needed
 
-## 📝 License
+## License
 
 This project is part of the Vietnamese Student Association at Green River College.
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -450,7 +450,7 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
-## 📞 Support
+## Support
 
 For issues or questions, please reach out to the VSA Development Team or create an issue in the repository.
 
