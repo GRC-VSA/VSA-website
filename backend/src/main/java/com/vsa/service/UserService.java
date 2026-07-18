@@ -1,11 +1,13 @@
 package com.vsa.service;
 
+import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.User;
 import com.vsa.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.vsa.security.JwtUtil;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +20,13 @@ public class UserService {
 
   private final JwtUtil jwtUtil;
 
-  public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,  JwtUtil jwtUtil) {
+  private final EmailService emailService;
+
+  public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,  JwtUtil jwtUtil, EmailService emailService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
+    this.emailService = emailService;
   }
 
   // Register
@@ -35,7 +40,11 @@ public class UserService {
     user.setEmailVerified(false);
     user.setRole("student");
 
-    return userRepository.save(user);
+    User saved = userRepository.save(user);
+
+    emailService.sendVerificationEmail(saved.getEmail(), saved.getFirstName(), saved.getVerificationToken());
+
+    return saved;
   }
 
   // Verify email
@@ -76,14 +85,14 @@ public class UserService {
     user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
     userRepository.save(user);
 
-    // TODO: Send email with reset link containing the token, later
+    emailService.sendPasswordResetEmail(user.getEmail(), user.getFirstName(), user.getResetToken());
   }
 
   // Reset Password
   public void resetPassword(String token, String newPassword) {
     User user =
         userRepository
-            .findByVerificationToken(token)
+            .findByResetToken(token)
             .orElseThrow(() -> new IllegalArgumentException("Invalid reset token"));
 
     if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
