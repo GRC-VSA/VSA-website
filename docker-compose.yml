@@ -18,6 +18,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
     volumes:
       - uploads_data:/app/uploads  # persist uploaded images
     restart: unless-stopped

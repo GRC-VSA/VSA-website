@@ -1,6 +1,7 @@
 package com.vsa.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,6 +15,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+  @Value("${frontend.url}")
+  private String frontendUrl;
+
 
   /**
    * Registers resource handlers for static file serving.
@@ -31,8 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
   /**
    * Configures CORS (Cross-Origin Resource Sharing) mappings for API endpoints.
    *
-   * <p>Allows the frontend running on localhost:5173 to make requests to the API. Permits standard
-   * HTTP methods for API operations.
+   * <p>Allows requests from the configured frontend origin (`frontend.url`) to make requests to the
+   * API. Permits standard HTTP methods for API operations.
    *
    * @param registry CorsRegistry to configure
    */
@@ -40,7 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
   public void addCorsMappings(CorsRegistry registry) {
     registry
         .addMapping("/api/**")
-        .allowedOrigins("http://localhost:5173")
+        .allowedOrigins(frontendUrl)
         .allowedMethods("GET", "POST", "PUT", "DELETE");
   }
 }

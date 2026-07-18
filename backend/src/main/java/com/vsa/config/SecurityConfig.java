@@ -3,6 +3,7 @@ package com.vsa.config;
 import com.vsa.security.JwtFilter;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,6 +33,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   // ── Dependencies ──────────────────────────────────────────
   private final JwtFilter jwtFilter;
+
+  @Value("${frontend.url}")
+  private String frontendUrl;
 
   /**
    * Constructs SecurityConfig with required dependencies.
@@ -105,7 +109,7 @@ public class SecurityConfig {
   /**
    * Configures CORS (Cross-Origin Resource Sharing) settings.
    *
-   * <p>Allows requests from localhost:5173 (frontend development server) with standard HTTP methods
+   * <p>Allows requests from the configured frontend origin (`frontend.url`) with standard HTTP methods
    * and credentials.
    *
    * @return CorsConfigurationSource configured for the application
@@ -113,7 +117,7 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of("http://localhost:5173"));
+    config.setAllowedOrigins(List.of(frontendUrl));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("*"));
     config.setAllowCredentials(true);

@@ -25,6 +25,10 @@ public class EmailService {
   @Value("${spring.mail.username}")
   private String fromEmail;
 
+  /** Frontend base URL (configured in application.yaml as frontend.url) */
+  @Value("${frontend.url}")
+  private String frontendUrl;
+
   /**
    * Constructs an EmailService with required dependencies.
    *
@@ -46,7 +50,7 @@ public class EmailService {
    * @param token Verification token to be used in the verification link
    */
   public void sendVerificationEmail(String toEmail, String firstName, String token) {
-    String verifyUrl = "http://localhost:5173/verify?token=" + token;
+    String verifyUrl = buildFrontendUrl("/verify?token=" + token);
 
     String body =
         """
@@ -178,7 +182,7 @@ public class EmailService {
    * @param token Password reset token to be used in the reset link
    */
   public void sendPasswordResetEmail(String toEmail, String firstName, String token) {
-    String resetUrl = "http://localhost:5173/reset-password?token=" + token;
+    String resetUrl = buildFrontendUrl("/reset-password?token=" + token);
 
     String body =
         """
@@ -236,5 +240,17 @@ public class EmailService {
     } catch (MessagingException e) {
       throw new RuntimeException("Failed to send email: " + e.getMessage());
     }
+  }
+
+  /**
+   * Builds a frontend URL by ensuring the base URL does not have a trailing slash and appending
+   * the provided path (which should begin with '/').
+   */
+  private String buildFrontendUrl(String path) {
+    if (frontendUrl == null || frontendUrl.isBlank()) {
+      return path; // fallback, should not happen if property is set
+    }
+    String base = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
+    return base + (path.startsWith("/") ? path : ("/" + path));
   }
 }
