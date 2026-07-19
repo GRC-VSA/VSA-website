@@ -17,13 +17,15 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          # The official postgres image requires POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB
+          # Map existing repository secrets to the expected variables so Postgres can initialize.
+          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: vsa_db_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd pg_isready -U ${{ secrets.DB_USERNAME }} -d vsa_db_test
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -53,8 +55,8 @@ jobs:
         working-directory: ./backend
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
-          SPRING_DATASOURCE_USERNAME: vsa_user
-          SPRING_DATASOURCE_PASSWORD: vsa_password
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: ./mvnw test
 
 
