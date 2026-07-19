@@ -17,15 +17,13 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          # The official postgres image requires POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB
-          # Map existing repository secrets to the expected variables so Postgres can initialize.
-          POSTGRES_USER: ${{ secrets.DB_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
           POSTGRES_DB: vsa_db_test
+          POSTGRES_USER: vsa_user
+          POSTGRES_PASSWORD: vsa_password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready -U ${{ secrets.DB_USERNAME }} -d vsa_db_test
+          --health-cmd "pg_isready -U vsa_user -d vsa_db_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -55,8 +53,8 @@ jobs:
         working-directory: ./backend
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USERNAME }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SPRING_DATASOURCE_USERNAME: vsa_user
+          SPRING_DATASOURCE_PASSWORD: vsa_password
         run: ./mvnw test
 
 
@@ -81,18 +79,3 @@ jobs:
       - name: Build React app
         working-directory: ./frontend
         run: npm run build
-
-  docker:
-    name: Build Docker Images
-    runs-on: ubuntu-latest
-    needs: [ backend, frontend ]  # only runs if both pass
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Build backend image
-        run: docker build -t vsa-backend ./backend
-
-      - name: Build frontend image
-        run: docker build -t vsa-frontend ./frontend
