@@ -1,4 +1,6 @@
-const BASE_URL = "http://localhost:8080/api/events";
+import API_BASE_URL from "./config";
+
+const BASE_URL = `${API_BASE_URL}/api/events`;
 
 //Get
 export async function getEvents(){
