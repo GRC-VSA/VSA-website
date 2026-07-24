@@ -34,27 +34,14 @@ export async function loginUser({ email, password }) {
     return res.json();
 }
 
-export async function registerUser({
-    sid,
-    firstName,
-    lastName,
-    email,
-    phone,
-    passwordHash,
-}) {
+// Likewise, I aint have time to add comment for every of them (@.@)
+export async function registerUser(registerData) {
     const res = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            sid,
-            firstName,
-            lastName,
-            email,
-            phone,
-            passwordHash,
-        }),
+        body: JSON.stringify(registerData),
     });
 
     if (!res.ok) {
@@ -63,4 +50,54 @@ export async function registerUser({
     }
 
     return res.json();
+}
+
+export async function verifyEmailToken(token) {
+    const res = await fetch(`${API_BASE_URL}/api/users/verify?token=${token}`);
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Email verification failed @.@ Bro be a nobody");
+    }
+
+    return res.text();
+}
+
+export async function sendForgotPasswordEmail(email) {
+    const res = await fetch(`${API_BASE_URL}/api/users/forgot-password`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email
+        }),
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Failed to send reset email");
+    }
+
+    return res.text();
+}
+
+export async function resetPassword({ token, newPassword }) {
+    const res = await fetch(`${API_BASE_URL}/api/users/reset-password`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            token,
+            newPassword
+        }),
+    });
+
+    if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || "Password reset failed");
+    }
+
+    return res.text();
 }

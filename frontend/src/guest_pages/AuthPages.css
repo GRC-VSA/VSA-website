@@ -1,0 +1,293 @@
+.sign-in-page,
+.register-page,
+.reset-password-page,
+.verify-email-page,
+.forgot-password-page {
+    min-height: 100vh;
+    padding: 110px 24px 48px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-color: #f8f8f8;
+}
+
+
+.sign-in-form,
+.register-form,
+.reset-password-form,
+.forgot-password-form,
+.verify-email-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 34px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.register-form {
+    max-width: 520px;
+}
+
+
+.sign-in-form h1,
+.register-form h1,
+.reset-password-form h1,
+.forgot-password-form h1,
+.verify-email-card h1 {
+    margin: 0 0 6px;
+    font-size: 32px;
+    font-weight: 700;
+    color: #111111;
+}
+
+
+.sign-in-form label,
+.register-form label,
+.reset-password-form label,
+.forgot-password-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    font-size: 15px;
+    font-weight: 600;
+    color: #222222;
+}
+
+
+.sign-in-form input,
+.register-form input,
+.reset-password-form input,
+.forgot-password-form input {
+    width: 100%;
+    padding: 12px 14px;
+
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+
+    font-size: 15px;
+    color: #111111;
+    background-color: #ffffff;
+
+    outline: none;
+}
+
+.sign-in-form input:focus,
+.register-form input:focus,
+.reset-password-form input:focus,
+.forgot-password-form input:focus {
+    border-color: #ab3130;
+    box-shadow: 0 0 0 3px rgba(171, 49, 48, 0.15);
+}
+
+
+.password-input-row,
+.password-input-div {
+    display: flex;
+    gap: 8px;
+}
+
+.password-input-row input,
+.password-input-div input {
+    flex: 1;
+}
+
+.password-toggle-button,
+.show-password-button {
+    padding: 0 14px;
+
+    border: 1px solid #cccccc;
+    border-radius: 10px;
+
+    background-color: #f0f0f0;
+    color: #222222;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.password-toggle-button:hover,
+.show-password-button:hover {
+    background-color: #e4e4e4;
+}
+
+/* Main submit buttons */
+.sign-in-form button[type="submit"],
+.register-form button[type="submit"],
+.reset-password-form button[type="submit"],
+.forgot-password-form button[type="submit"] {
+    width: 100%;
+    padding: 13px 16px;
+    margin-top: 4px;
+
+    border: none;
+    border-radius: 10px;
+
+    background-color: #ab3130;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.sign-in-form button[type="submit"]:hover,
+.register-form button[type="submit"]:hover,
+.reset-password-form button[type="submit"]:hover,
+.forgot-password-form button[type="submit"]:hover {
+    background-color: #8b2525;
+}
+
+.sign-in-form button:disabled,
+.register-form button:disabled,
+.reset-password-form button:disabled,
+.forgot-password-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+.sign-in-form a,
+.register-form a,
+.reset-password-form a,
+.forgot-password-form a,
+.verify-email-card a {
+    color: #ab3130;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.sign-in-form a:hover,
+.register-form a:hover,
+.reset-password-form a:hover,
+.forgot-password-form a:hover,
+.verify-email-card a:hover {
+    text-decoration: underline;
+}
+
+
+.sign-in-link-text,
+.register-link-text,
+.reset-password-link-text,
+.forgot-password-link-text {
+    margin: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #555555;
+}
+
+.forgot-password-link {
+    align-self: flex-end;
+    font-size: 14px;
+}
+
+
+.forgot-password-description,
+.verify-message {
+    margin: 0;
+    color: #555555;
+    line-height: 1.6;
+}
+
+.register-success,
+.reset-password-success,
+.forgot-password-success,
+.verify-success {
+    margin: 0;
+    padding: 12px 14px;
+
+    border-radius: 10px;
+    background-color: #e8f7ed;
+    color: #19733a;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.sign-in-error,
+.register-error,
+.reset-password-error,
+.forgot-password-error {
+    margin: 0;
+    padding: 12px 14px;
+
+    border-radius: 10px;
+    background-color: #ffecec;
+    color: #b00020;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.verify-email-card {
+    text-align: center;
+}
+
+.verify-link {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 12px 16px;
+
+    border-radius: 10px;
+    background-color: #ab3130;
+    color: #ffffff !important;
+
+    font-weight: 700;
+}
+
+.verify-link:hover {
+    background-color: #8b2525;
+    text-decoration: none !important;
+}
+
+
+@media (max-width: 560px) {
+
+    .sign-in-page,
+    .register-page,
+    .reset-password-page,
+    .verify-email-page,
+    .forgot-password-page {
+        padding: 90px 16px 32px;
+    }
+
+    .sign-in-form,
+    .register-form,
+    .reset-password-form,
+    .forgot-password-form,
+    .verify-email-card {
+        padding: 24px;
+    }
+
+    .sign-in-form h1,
+    .register-form h1,
+    .reset-password-form h1,
+    .forgot-password-form h1,
+    .verify-email-card h1 {
+        font-size: 28px;
+    }
+
+    .password-input-row,
+    .password-input-div {
+        flex-direction: column;
+    }
+
+    .password-toggle-button,
+    .show-password-button {
+        padding: 11px 14px;
+    }
+}

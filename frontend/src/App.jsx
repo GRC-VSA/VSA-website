@@ -13,6 +13,9 @@ import SignInPage from "./guest_pages/SignInPage.jsx";
 import UpcomingEventsPage from "./guest_pages/UpcomingEventsPage.jsx";
 import OldEventsPage from "./guest_pages/OldEventsPage.jsx";
 import RegisterPage from "./guest_pages/RegisterPage.jsx";
+import VerifyEmailPage from "./guest_pages/VerifyEmailPage.jsx";
+import ForgotPasswordPage from "./guest_pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
@@ -32,6 +35,10 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="sign-in" element={<SignInPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="upcoming-events" element={<UpcomingEventsPage />} />
           <Route path="old-events" element={<OldEventsPage />} />
         </Route>

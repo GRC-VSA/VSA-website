@@ -1,6 +1,6 @@
-const ManageEvent = () => {
+const ManageEventPage = () => {
 
 }
 
-export default ManageEvent;
+export default ManageEventPage;
 

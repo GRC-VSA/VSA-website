@@ -4,7 +4,7 @@ Brief:
 - And return the Authentication header "Authorization: `Bearer ${token}" that backend needs
  
 Explain: 
-- After a user logs in, the backend sends a unique jwt token for their account to the frontend.
+- After a user logs in, the backend sends a unique JWT token for their account to the frontend.
 - The token has hashed information such as roles, name, and email of the account.
 - The frontend stores that JWT token in "localStorage" (Should store the token in Cookies instead, for security).
 

@@ -1,141 +1,136 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { registerUser } from "../api/auth";
-import "./RegisterPage.css";
+import { Link } from "react-router-dom";
+import { registerUser } from "../api/auth.js";
+import "./AuthPages.css";
 
-function RegisterPage() {
-  const navigate = useNavigate();
+const RegisterPage = () => {
+    const [formData, setFormData] = useState({
+        sid: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        password: "",
+    });
 
-  const [sid, setSid] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [message, setMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-  const [message, setMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const handleChange = (event) => {
+        const { name, value } = event.target;
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+        setFormData({
+            ...formData,
+            [name]: value,
+        });
+    };
 
-    try {
-      setIsSubmitting(true);
-      setMessage("");
-      setErrorMessage("");
+    const handleEnterKey = (event) => {
+        if (event.key === "Enter") {
+            if (event.target.tagName === "TEXTAREA") {
+                return;
+            } else {
+                event.preventDefault();
+            }
+        }
+    };
 
-      await registerUser({
-        sid,
-        firstName,
-        lastName,
-        email,
-        phone,
-        passwordHash: password,
-      });
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-      setMessage("Account created. Please verify your email before signing in.");
+        try {
+            setIsSubmitting(true);
+            setMessage("");
+            setErrorMessage("");
 
-      setSid("");
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPhone("");
-      setPassword("");
-    } catch (error) {
-      setErrorMessage(error.message || "Registration failed.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+            await registerUser({
+                sid: formData.sid,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                passwordHash: formData.password,
+            });
 
-  return (
-    <main className="register-page">
-      <form className="register-form" onSubmit={handleSubmit}>
-        <h1>Create account</h1>
+            console.log("Account created successfully.");
 
-        {message && <p className="register-success">{message}</p>}
-        {errorMessage && <p className="register-error">{errorMessage}</p>}
+            setFormData({
+                sid: "",
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+                password: "",
+            });
 
-        <label>
-          Student ID
-          <input
-            type="text"
-            value={sid}
-            placeholder="Enter your student ID"
-            onChange={(e) => setSid(e.target.value)}
-            required
-          />
-        </label>
+            setMessage(
+                "Account created. Please check your email and click the verification link before signing in."
+            );
+        } catch (error) {
+            console.error("Failed to register account: ", error);
+            setErrorMessage(error.message || "Registration failed. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
-        <label>
-          First name
-          <input
-            type="text"
-            value={firstName}
-            placeholder="Enter your first name"
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </label>
+    return (
+        <main className="register-page">
+            <form className="register-form" onSubmit={handleSubmit} onKeyDown={handleEnterKey}>
+                <h1>Create Account</h1>
 
-        <label>
-          Last name
-          <input
-            type="text"
-            value={lastName}
-            placeholder="Enter your last name"
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </label>
+                {message && <p className="register-success">{message}</p>}
+                {errorMessage && <p className="register-error">{errorMessage}</p>}
 
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            placeholder="Enter your email"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
+                <label>
+                    Student ID
+                    <input type="text" name="sid" value={formData.sid} placeholder="Enter your student ID" onChange={handleChange} required/>
+                </label>
 
-        <label>
-          Phone
-          <input
-            type="tel"
-            value={phone}
-            placeholder="Enter your phone number"
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </label>
+                <label>
+                    First Name
+                    <input type="text" name="firstName" value={formData.firstName} placeholder="Enter your first name" onChange={handleChange} required/>
+                </label>
 
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            placeholder="Create a password"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+                <label>
+                    Last Name
+                    <input type="text" name="lastName" value={formData.lastName} placeholder="Enter your last name" onChange={handleChange} required/>
+                </label>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating account..." : "Create account"}
-        </button>
+                <label>
+                    Email
+                    <input type="email" name="email" value={formData.email} placeholder="Enter your email" onChange={handleChange} required/>
+                </label>
 
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => navigate("/sign-in")}
-        >
-          Already have an account? Sign in
-        </button>
-      </form>
-    </main>
-  );
-}
+                <label>
+                    Phone
+                    <input type="tel" name="phone" value={formData.phone} placeholder="Enter your phone number" onChange={handleChange}/>
+                </label>
+
+                <label>
+                    Password
+                    <div className="password-input-div">
+                        <input type={showPassword ? "text" : "password"} name="password" value={formData.password} placeholder="Create a password" onChange={handleChange} required/>
+
+                        <button type="button" className="show-password-button" onClick={() => setShowPassword(!showPassword)}>
+                            {showPassword ? "Hide" : "Show"}
+                        </button>
+                    </div>
+                </label>
+
+                <button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Creating account..." : "Create Account"}
+                </button>
+
+                <p className="register-link-text">
+                    Already have an account? <Link to="/sign-in">Sign in</Link>
+                </p>
+
+            </form>
+        </main>
+    );
+};
 
 export default RegisterPage;

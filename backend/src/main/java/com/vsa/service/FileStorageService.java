@@ -10,9 +10,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-<<<<<<< HEAD
-
-=======
 /**
  * Service class for managing file uploads and storage.
  *
@@ -21,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  * @author VSA Development Team
  */
->>>>>>> origin/Tuan/UserEntityAndAuthentication
 @Service
 public class FileStorageService {
   // ── Configuration ──────────────────────────────────────────
