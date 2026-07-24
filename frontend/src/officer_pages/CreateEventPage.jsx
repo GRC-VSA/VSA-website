@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createEvent } from "../api/Events.js";
-import "./create-events.css";
-import VSA_blacklogo from "../assets/VSA_blacklogo.png";
+import "./CreateEventPage.css";
+import VSA_blacklogo from "../assets/officer/VSA_blacklogo.png"
 
 
 const CreateEventPage = () => {

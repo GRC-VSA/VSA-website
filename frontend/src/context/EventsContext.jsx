@@ -1,14 +1,14 @@
 /**************************************************************************************************************************
 Brief:
 - This file creates and stores the context for events.
-- It allows other pages to access 
-- Fetch once, share data together
-P/S: A context is all the data fetched from the backend via certain API.
+- It fetches the events from backend and allows other pages to access. 
+- "Fetch once, share data together."
+P/S: A "context" is all the data fetched from the backend via certain API.
 
 Explain:
 1. Fetch events data from the backend once using "getEvents"  (the helper method is defined in: "../api/Events.js"),
 2. Store the event data into "EventsContext"  
-3. Share the data with other pages that also need events info via "useEvents()"
+3. Share the data with other pages that also need event info through "useEvents()"
 
 ****************************************************************************************************************************/
 

@@ -1,10 +1,11 @@
 .create-events {
-    margin: 60px auto;
+    margin: 25px auto;
     width: 75vw;
     padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    
 }
 
 label, h1, h2, h3, span, p, div {
@@ -31,11 +32,15 @@ label, h1, h2, h3, span, p, div {
     font-size: 0.9rem;
     position: relative;
     bottom: 7px;
+    color: black;
 }
 
 .form-container {
-    border-color: #C1C1C1;
-    border-style: solid;
+    /* border-color: #C1C1C1; */
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+    /* border-style: solid; */
+    border: none;
     border-radius: 20px;
     border-width: 1.5px;
     box-sizing: border-box;
