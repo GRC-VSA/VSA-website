@@ -29,7 +29,7 @@ import AvailabilityPage from "./officer_pages/AvailabilityPage.jsx";
 function App() {
   return (
     <EventsProvider>
-      {/* <NavBar /> */}
+      {/* <Navbar /> */}
       <Routes>
         <Route path="/" element={<GuestLayout />}>
           <Route index element={<HomePage />} />

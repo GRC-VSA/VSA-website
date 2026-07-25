@@ -37,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
    * Configures CORS (Cross-Origin Resource Sharing) mappings for API endpoints.
    *
    * <p>Allows requests from the configured frontend origin (`frontend.url`) to make requests to the
-   * API. Permits standard HTTP methods for API operations.
+   * API. Permits standard HTTP methods for API operations and allows credentials.
    *
    * @param registry CorsRegistry to configure
    */
@@ -46,6 +46,8 @@ public class WebConfig implements WebMvcConfigurer {
     registry
         .addMapping("/api/**")
         .allowedOrigins(frontendUrl)
-        .allowedMethods("GET", "POST", "PUT", "DELETE");
+        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedHeaders("*")
+        .allowCredentials(true);
   }
 }
