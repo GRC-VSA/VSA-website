@@ -5,10 +5,10 @@ import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png"
-import "./NavBar.css";
+import "./Navbar.css";
 
 
-const NavBar = () => {
+const Navbar = () => {
   const { user, logout } = useAuth();
   const [isEventsOpen, setIsEventsOpen] = useState(false);
   const [accountIsClicked, setAccountIsClicked] = useState(false);
@@ -106,4 +106,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default Navbar;

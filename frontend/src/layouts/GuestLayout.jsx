@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import NavBar from "../components/NavBar.jsx";
+import Navbar from "../components/Navbar.jsx";
 import "./GuestLayout.css"
 
 const GuestLayout = () => {
     return (
         <>
-            <NavBar/>
+            <Navbar/>
             <main id="guest-main">
                 <Outlet/>
             </main>
