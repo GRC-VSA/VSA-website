@@ -21,7 +21,7 @@ const ResetPasswordPage = () => {
             setErrorMessage("Reset token is missing.");
             return;
         }
-
+        
         try {
             setIsSubmitting(true);
             setMessage("");
