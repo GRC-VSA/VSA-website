@@ -1,4 +1,4 @@
-// src/pages/dashboard/AvailabilityPage.jsx
+// src/pages/dashboard/AvailabilityListPage.jsx
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

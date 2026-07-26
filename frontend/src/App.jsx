@@ -24,7 +24,9 @@ import TodoPage from "./officer_pages/TodoPage.jsx";
 
 import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
 import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
-import AvailabilityPage from "./officer_pages/AvailabilityPage.jsx";
+import AvailabilityListPage from "./officer_pages/availability/AvailabilityListPage.jsx";
+import AvailabilityDetailPage from "./officer_pages/availability/AvailabilityDetailPage.jsx";
+import CollectAvailabilityFlow from "./officer_pages/availability/CollectAvailabilityFlow.jsx";
 
 function App() {
   return (
@@ -56,7 +58,9 @@ function App() {
           <Route index element={<OverallBoard />} />
           <Route path="dashboard/budget-board" element={<BudgetBoard />} />
           <Route path="dashboard/event-board" element={<EventBoard />} />
-          <Route path="availability" element={<AvailabilityPage />} />
+          <Route path="availability" element={<AvailabilityListPage />} />
+          <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
+          <Route path="availability/:id" element={<AvailabilityDetailPage />} />
           <Route path="todo-list" element={<TodoPage />} />
           <Route path="events/create-event" element={<CreateEventPage />} />
           <Route path="events/manage-event" element={<ManageEventPage />} />
