@@ -85,9 +85,9 @@ const Navbar = () => {
                       </button>
                       {
                         isOfficer && (
-                            <button className="account-dropdown-item" onClick={()=> {navigate("/officer")}}>
-                              To Officer Board
-                            </button>
+                          <button className="account-dropdown-item" onClick={() => { navigate("/officer") }}>
+                            To Officer Board
+                          </button>
                         )
                       }
                     </div>

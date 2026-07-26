@@ -82,6 +82,7 @@ span {
         border-top-right-radius: inherit;
         overflow: hidden;
         flex-shrink: 0;
+        position: relative;
     };
     transition: 200ms;
 }
@@ -93,10 +94,63 @@ span {
     transform: scale(0.99);
 }
 
+.image-placeholder> img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/*.event-date is .image-placeholder's child*/
+.event-date {
+    position: absolute;
+    top: 6%;
+    right: 6%;
+    height: 50px;
+    width: 50px;
+    padding: 3px;
+    border-radius: 4.5px;
+    background-color: var(--logo-main-theme);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
+    gap: 3px;
+    
+    > span:first-child {
+        font-weight: bold;
+        font-size: 1.3rem;
+        color: white;
+        padding: 1px;
+    }
+    > span {
+        text-align: center;
+        line-height: 1.1rem;
+        color: white;
+    }
+}
+
+.event-detail-placeholder {
+    box-sizing: border-box;
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 20px;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+}
+
 .event-main-info-div {
     display: flex;
     flex-direction: row;
     align-items: center;
+    > h3 {
+        font-size: 1.4rem;
+        font-weight: 550;
+    }
 
 }
 .price-div {
@@ -111,30 +165,7 @@ span {
     }
 }
 
-.image-placeholder> img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-.event-detail-placeholder {
-    box-sizing: border-box;
-    padding-top: 15px;
-    padding-left: 15px;
-    padding-right: 15px;
-    padding-bottom: 20px;
-    width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.event-detail-placeholder h3 {
-    font-weight: 550;
-}
 .event-detail-placeholder > p {
-    padding-top: 10px;
     font-size: smaller;
     color: var(--description-text-color);
     flex-grow: 1;
@@ -153,17 +184,18 @@ span {
     > svg {
         fill: black;
         width: 20px;
+        stroke-width: 100px;
     }
 }
 
-.event-date-time-div {
+.event-time-div {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 15px;
 }
 
-.event-date-time-div div {
+.event-time-div div {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -176,8 +208,14 @@ span {
     }
     > svg {
         fill: black;
-        width: 1px;
+        width: 20px;
 
     }
+}
+
+.time-location-div {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
 }
 
