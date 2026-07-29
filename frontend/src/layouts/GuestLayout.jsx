@@ -1,17 +1,29 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
-import "./GuestLayout.css"
+import "./GuestLayout.css";
 
 const GuestLayout = () => {
+    const location = useLocation();
+
+    const authPages = [
+        "/sign-in",
+        "/register",
+        "/forgot-password",
+        "/reset-password",
+        "/verify",
+    ];
+
+    const hideNavbar = authPages.includes(location.pathname);
+
     return (
         <>
-            <Navbar/>
+            {!hideNavbar && <Navbar />}
+
             <main id="guest-main">
-                <Outlet/>
+                <Outlet />
             </main>
         </>
     );
 };
 
 export default GuestLayout;
-

@@ -1,60 +1,363 @@
-/*This one is currently not in used. Will add them later*/
-.sign-in-page {
-    min-height: 100vh;
-    padding-top: 96px;
+/* SignInPage.css */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+.auth-page {
+    --vsa-red: #ab3130;
+    --vsa-red-dark: #8a2726;
+    --vsa-gold: #ece0a6;
+    --vsa-black: #000000;
+    --vsa-white: #ffffff;
+
+    font-family: 'Poppins', sans-serif;
+
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background-color: var(--vsa-white);
+}
+
+.auth-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.auth-card.order-photo-first { flex-direction: row; }
+.auth-card.order-photo-last { flex-direction: row-reverse; }
+
+/* ===========================
+   PHOTO PANEL
+=========================== */
+
+.auth-photo-panel {
+    position: relative;
+    flex: 1 1 48%;
+    overflow: hidden;
+}
+
+.auth-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.auth-photo-placeholder {
+    position: absolute;
+    inset: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-}
-
-.sign-in-form {
-    width: 100%;
-    max-width: 420px;
-    padding: 32px;
-
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-
-    border: 1px solid #ddd;
-    border-radius: 16px;
-    background-color: white;
-}
-
-.sign-in-form h1 {
-    font-size: 32px;
-}
-
-.sign-in-form label {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
+    align-items: center;
+    background: linear-gradient(135deg, #25313d, #101820);
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 1.1rem;
     font-weight: 500;
 }
 
-.sign-in-form input {
-    padding: 12px 14px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
+.auth-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0));
 }
 
-.sign-in-form button {
-    padding: 12px 16px;
+.auth-logo-link {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    z-index: 20;
+
+    display: inline-block;
+}
+
+.auth-logo-image {
+    width: 260px;
+    height: auto;
+
+    display: block;
+
+    transition: transform .2s ease,
+    opacity .2s ease;
+}
+
+.auth-logo-link:hover .auth-logo-image {
+    transform: scale(1.03);
+    opacity: .9;
+}
+
+.auth-logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.auth-logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: inline-block;
+}
+
+/* ===========================
+   FORM PANEL
+=========================== */
+
+.auth-form-panel {
+    flex: 1 1 52%;
+    height: 100%;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: clamp(16px, 3.5dvh, 48px) clamp(28px, 5vw, 80px);
+    box-sizing: border-box;
+}
+
+/* ===========================
+   TOGGLE
+=========================== */
+
+.auth-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: clamp(10px, 2dvh, 22px);
+}
+
+.auth-toggle-wrap {
+    display: flex;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    padding: 0;
+}
+
+.auth-toggle-wrap button {
+    flex: 1;
     border: none;
-    border-radius: 10px;
-
-    background-color: black;
-    color: white;
+    background: transparent;
     cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+
+    height: 32px;
+    padding: 0 18px;
+    border-radius: 0;
+
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #666;
+
+    transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.sign-in-form button:disabled {
-    opacity: 0.6;
+.auth-toggle-wrap button:hover:not(.active) {
+    background: var(--vsa-gold);
+    color: var(--vsa-red-dark);
+}
+
+.auth-toggle-wrap button.active {
+    background: var(--vsa-red);
+    color: var(--vsa-gold);
+    box-shadow: none;
+}
+
+/* ===========================
+   HEADINGS / TEXT
+=========================== */
+
+.auth-form-panel h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3.6dvh, 2.5rem);
+    font-weight: 700;
+    color: var(--vsa-black);
+}
+
+.auth-form-panel h1 span {
+    color: var(--vsa-red);
+}
+
+.auth-tagline {
+    margin: 4px 0 clamp(10px, 2dvh, 20px);
+    color: #777;
+    font-weight: 400;
+    font-size: 0.88rem;
+}
+
+.auth-error {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background-color: #ffecec;
+    color: var(--vsa-red);
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+/* ===========================
+   FORM
+=========================== */
+
+.auth-form {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.6dvh, 16px);
+}
+
+.auth-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: #333;
+}
+
+/* ── Oval / pill inputs ──────────────────────────────────── */
+
+.auth-form input {
+    width: 100%;
+    height: 44px;
+    padding: 0 20px;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    box-sizing: border-box;
+    background-color: #f6f6f6;
+
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.auth-form input:focus {
+    border-color: var(--vsa-red);
+    box-shadow: 0 0 0 3px rgba(171, 49, 48, 0.15);
+    background-color: var(--vsa-white);
+}
+
+.auth-form input::placeholder {
+    color: #aaa;
+}
+
+/* ── Submit button ───────────────────────────────────────── */
+
+.auth-form button[type="submit"] {
+    margin-top: 4px;
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 999px;
+
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--vsa-gold);
+    cursor: pointer;
+
+    background: var(--vsa-red);
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.auth-form button[type="submit"]:hover {
+    background: var(--vsa-red-dark);
+}
+
+.auth-form button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+.auth-form button[type="submit"]:disabled {
+    background: #cccccc;
+    color: #888;
     cursor: not-allowed;
 }
 
-.sign-in-error {
-    color: red;
+/* ===========================
+   DIVIDER / SOCIAL
+=========================== */
+
+.auth-divider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 480px;
+    margin: clamp(12px, 2.4dvh, 24px) 0 clamp(10px, 1.8dvh, 18px);
+}
+
+.auth-divider-line {
+    flex: 1;
+    height: 1px;
+    background: #e2e2e2;
+}
+
+.auth-divider-text {
+    color: #999;
+    font-weight: 400;
+    font-size: 0.76rem;
+    white-space: nowrap;
+}
+
+.auth-social-row {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.auth-social-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #e2e2e2;
+    border-radius: 999px;
+    background: var(--vsa-white);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.15s;
+}
+
+.auth-social-btn:hover {
+    background: var(--vsa-gold);
+}
+
+/* ===========================
+   PAGE TRANSITION
+=========================== */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.32s;
+    animation-timing-function: ease;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 900px) {
+    .auth-page {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .auth-card {
+        flex-direction: column !important;
+        height: auto;
+    }
+
+    .auth-photo-panel {
+        flex: 0 0 28dvh;
+    }
+
+    .auth-form-panel {
+        overflow: visible;
+        padding: 28px 6vw 40px;
+    }
 }
