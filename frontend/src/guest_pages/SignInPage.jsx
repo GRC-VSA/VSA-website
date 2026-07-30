@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";
-import "./SignInPage.css";
+import "./AuthPages.css"
 
 const SignInPage = () => {
     const navigate = useNavigate();
