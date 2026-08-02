@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { EventsProvider } from "./context/EventsContext.jsx";
@@ -28,45 +29,60 @@ import AvailabilityListPage from "./officer_pages/availability/AvailabilityListP
 import AvailabilityDetailPage from "./officer_pages/availability/AvailabilityDetailPage.jsx";
 import CollectAvailabilityFlow from "./officer_pages/availability/CollectAvailabilityFlow.jsx";
 
+import IntroLoader from "./components/IntroLoader.jsx";
+
 function App() {
+  const [appReady, setAppReady] = useState(false);
+
+  useEffect(() => {
+    if (document.readyState === "complete") {
+      setAppReady(true);
+      return;
+    }
+    const handleLoad = () => setAppReady(true);
+    window.addEventListener("load", handleLoad);
+    return () => window.removeEventListener("load", handleLoad);
+  }, []);
+
   return (
-    <EventsProvider>
-      {/* <Navbar /> */}
-      <Routes>
-        <Route path="/" element={<GuestLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="sign-in" element={<SignInPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify" element={<VerifyEmailPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="upcoming-events" element={<UpcomingEventsPage />} />
-          <Route path="old-events" element={<OldEventsPage />} />
-        </Route>
+      <EventsProvider>
+        <IntroLoader ready={appReady} />
+        {/* <Navbar /> */}
+        <Routes>
+          <Route path="/" element={<GuestLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="sign-in" element={<SignInPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="upcoming-events" element={<UpcomingEventsPage />} />
+            <Route path="old-events" element={<OldEventsPage />} />
+          </Route>
 
 
-        <Route
-          path="/officer"
-          element={
-            //Add and configure roles heree ----|------------|
-            //                                  V            V
-            <ProtectedRoute allowedRoles={["officer", "president"]}>
-              <OfficerLayout />
-            </ProtectedRoute>
-          }>
-          <Route index element={<OverallBoard />} />
-          <Route path="dashboard/budget-board" element={<BudgetBoard />} />
-          <Route path="dashboard/event-board" element={<EventBoard />} />
-          <Route path="availability" element={<AvailabilityListPage />} />
-          <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
-          <Route path="availability/:id" element={<AvailabilityDetailPage />} />
-          <Route path="todo-list" element={<TodoPage />} />
-          <Route path="events/create-event" element={<CreateEventPage />} />
-          <Route path="events/manage-event" element={<ManageEventPage />} />
-        </Route>
-      </Routes>
-    </EventsProvider>
+          <Route
+              path="/officer"
+              element={
+                //Add and configure roles heree ----|------------|
+                //                                  V            V
+                <ProtectedRoute allowedRoles={["officer", "president"]}>
+                  <OfficerLayout />
+                </ProtectedRoute>
+              }>
+            <Route index element={<OverallBoard />} />
+            <Route path="dashboard/budget-board" element={<BudgetBoard />} />
+            <Route path="dashboard/event-board" element={<EventBoard />} />
+            <Route path="availability" element={<AvailabilityListPage />} />
+            <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
+            <Route path="availability/:id" element={<AvailabilityDetailPage />} />
+            <Route path="todo-list" element={<TodoPage />} />
+            <Route path="events/create-event" element={<CreateEventPage />} />
+            <Route path="events/manage-event" element={<ManageEventPage />} />
+          </Route>
+        </Routes>
+      </EventsProvider>
   );
 }
 
