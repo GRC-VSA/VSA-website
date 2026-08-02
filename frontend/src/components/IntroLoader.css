@@ -1,0 +1,135 @@
+.vsa-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ab3130;
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
+}
+
+.vsa-intro--wipe {
+    transform: translateY(-100%);
+}
+
+.vsa-intro__topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #1a1a1a;
+}
+
+.vsa-intro__tagline {
+    margin: 6vh 0 0 6vw;
+    color: #4a9fd8;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-size: clamp(0.9rem, 1.4vw, 1.15rem);
+    font-weight: 500;
+    animation: vsa-fade-in 0.6s ease both;
+}
+
+.vsa-intro__content {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 6vw 6vh;
+}
+
+.vsa-intro__wordmark {
+    display: flex;
+    align-items: flex-end;
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    line-height: 0.85;
+}
+
+.vsa-intro__vsa {
+    color: #ece0a6;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 14vw, 9rem);
+    letter-spacing: -0.01em;
+    animation: vsa-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vsa-intro__grc {
+    color: #ece0a6;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 5vw, 3.25rem);
+    padding-bottom: clamp(0.4rem, 1.2vw, 0.9rem);
+    animation: vsa-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.vsa-intro__meter {
+    display: flex;
+    align-items: flex-start;
+    color: #ece0a6;
+    font-variant-numeric: tabular-nums;
+    animation: vsa-fade-in 0.6s ease 0.2s both;
+}
+
+.vsa-intro__count {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 600;
+    min-width: 2.6ch;
+    text-align: right;
+}
+
+.vsa-intro__percent {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    font-weight: 500;
+    margin-left: 0.15em;
+    opacity: 0.75;
+}
+
+.vsa-intro__track {
+    height: 2px;
+    width: 100%;
+    background: rgba(236, 224, 166, 0.2);
+}
+
+.vsa-intro__fill {
+    height: 100%;
+    background: #ece0a6;
+    transition: width 0.05s linear;
+}
+
+@keyframes vsa-rise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vsa-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vsa-intro {
+        transition: opacity 0.4s ease;
+    }
+    .vsa-intro--wipe {
+        transform: none;
+        opacity: 0;
+    }
+    .vsa-intro__vsa,
+    .vsa-intro__grc,
+    .vsa-intro__tagline,
+    .vsa-intro__meter {
+        animation: none;
+    }
+}
