@@ -9,7 +9,7 @@ import OfficerLayout from "./layouts/OfficerLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 
-import HomePage from "./guest_pages/HomePage.jsx";
+import HomePage from "./guest_pages/homepage/HomePage.jsx";
 import SignInPage from "./guest_pages/SignInPage.jsx";
 import UpcomingEventsPage from "./guest_pages/UpcomingEventsPage.jsx";
 import OldEventsPage from "./guest_pages/OldEventsPage.jsx";

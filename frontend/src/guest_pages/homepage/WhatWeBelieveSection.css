@@ -1,0 +1,51 @@
+.what-we-believe {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  padding: 6rem 8vw;
+  background: #fdf6ee;
+}
+
+.what-we-believe__text p {
+  color: #555;
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.what-we-believe__image {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #e8dcd0; /* placeholder tint while real photo loads */
+}
+
+.what-we-believe__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.what-we-believe__badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #c22e2d;
+  color: #ece0a6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .what-we-believe {
+    grid-template-columns: 1fr;
+  }
+}

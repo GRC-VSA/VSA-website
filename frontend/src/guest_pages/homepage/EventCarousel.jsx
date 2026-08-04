@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import { useEvents } from "../context/EventsContext.jsx"
+import { useEvents } from "../../context/EventsContext.jsx";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import "./HomePage.css";
 
 const AUTO_SWIPE_NEXT_TIME_INTERVALS = 10000; //10 seconds
 const TRANSITION_DURATION = 500; //0.5 second
-const HomePage = () => {
 
+const EventCarousel = () => {
     const { events, isLoading, error } = useEvents();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [previousIndex, setPreviousIndex] = useState(null);
@@ -36,7 +37,7 @@ const HomePage = () => {
         cleanupTimerRef.current = setTimeout(() => {
             setPreviousIndex(null);
         }, TRANSITION_DURATION);
-        
+
     };
 
     const handleNext = () => {
@@ -96,9 +97,19 @@ const HomePage = () => {
         };
     }, []);
 
+    // The carousel's height jumps from a small loading state to 100vh once
+    // events arrive, which shifts every section below it. ScrollTrigger
+    // caches trigger positions on mount, so it needs to be told to
+    // recalculate after that jump — otherwise reveal points stay based on
+    // the old (wrong) layout.
+    useEffect(() => {
+        const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+        return () => cancelAnimationFrame(id);
+    }, [isLoading, error, events.length]);
+
     if (isLoading) {
         return <p>Loading events...</p>; //PUT LOADING ANIMATION HEREEE
-    } 
+    }
     if (error) {
         return <p className="error-message">{error}</p>; //PUT ERROR PAGE HEREEE
     }
@@ -119,7 +130,7 @@ const HomePage = () => {
                 <div className="overlay"></div>
                 {
                     showContent && (
-                        <div className="event-content-div">         
+                        <div className="event-content-div">
                             <div className="event-text-group">
                                 <div className="event-name-div">
                                     <h3 className="event-name">{event.eventName}</h3>
@@ -131,7 +142,7 @@ const HomePage = () => {
                                     <div className="icon">
                                         <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
                                     </div>
-                                </button>        
+                                </button>
                             </div>
                         </div>
                     )
@@ -142,7 +153,7 @@ const HomePage = () => {
     }
 
     return (
-        <main className="events-list">
+        <section className="events-list">
             <div className="event-carousel">
                 <button type="button" onClick={handlePrevious} hidden={events.length <= 1} className="carousel-arrow-left" aria-label="Previous event">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
@@ -150,11 +161,11 @@ const HomePage = () => {
 
                 <div className="slider-stack">
                     {previousEvent && //If there is a previous event
-                    (
-                        <div key={`prev-${previousIndex}`} className={`slider exit-slide ${animationDirection === "right" ? "exit-to-left" : "exit-to-right"}`}>
-                            {renderEventContent(previousEvent, false)}
-                        </div> 
-                    )}
+                        (
+                            <div key={`prev-${previousIndex}`} className={`slider exit-slide ${animationDirection === "right" ? "exit-to-left" : "exit-to-right"}`}>
+                                {renderEventContent(previousEvent, false)}
+                            </div>
+                        )}
 
                     <div key={`curr-${currentIndex}`} className={`slider enter-slide ${animationDirection === "right" ? "enter-from-right" : "enter-from-left"}`}>
                         {renderEventContent(currentEvent, true)}
@@ -176,8 +187,8 @@ const HomePage = () => {
                     </div>
                 </div>
             </div>
-        </main>
+        </section>
     );
 };
 
-export default HomePage;
+export default EventCarousel;
