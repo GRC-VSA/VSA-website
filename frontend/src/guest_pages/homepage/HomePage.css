@@ -70,7 +70,7 @@
     text-transform: capitalize;
     line-height: 1.1;
 }
- 
+
 .event-description-div {
     width: 55%;
     color:white;
@@ -157,7 +157,7 @@
 .carousel-arrow-right:active > svg {
     fill: rgba(255, 255, 255, 0.233);
 }
-/* 
+/*
 .register-button-div {
     display: flex;
     flex-direction: row;
@@ -260,7 +260,7 @@
 }
 
 .enter-slide {
-    z-index: 2; 
+    z-index: 2;
 }
 
 .exit-slide {
@@ -268,46 +268,46 @@
 }
 
 @keyframes enterFromRight {
-    from { 
+    from {
         opacity: 0.5;
-        transform: translateX(40px); 
+        transform: translateX(40px);
     }
-    to { 
+    to {
         opacity: 1;
-        transform: translateX(0); 
+        transform: translateX(0);
     }
 }
 
 @keyframes enterFromLeft {
     from {
         opacity: 0.5;
-        transform: translateX(-40px); 
+        transform: translateX(-40px);
     }
-    to { 
+    to {
         opacity: 1;
-        transform: translateX(0); 
+        transform: translateX(0);
     }
 }
 
 @keyframes exitToLeft {
-    from { 
+    from {
         opacity: 1;
-        transform: translateX(0); 
+        transform: translateX(0);
     }
-    to { 
+    to {
         opacity: 0;
-        transform: translateX(-40px); 
+        transform: translateX(-40px);
     }
 }
 
 @keyframes exitToRight {
-    from { 
+    from {
         opacity: 1;
-        transform: translateX(0); 
+        transform: translateX(0);
     }
-    to { 
+    to {
         opacity: 0;
-        transform: translateX(40px); 
+        transform: translateX(40px);
     }
 }
 
@@ -370,20 +370,20 @@
 }
 
 @keyframes growRight {
-    from { 
-        transform: scaleX(0); 
+    from {
+        transform: scaleX(0);
     }
-    to { 
-        transform: scaleX(1); 
+    to {
+        transform: scaleX(1);
     }
 }
 
 @keyframes growLeft {
-    from { 
-        transform: scaleX(0); 
+    from {
+        transform: scaleX(0);
     }
-    to { 
-        transform: scaleX(1); 
+    to {
+        transform: scaleX(1);
     }
 }
 
