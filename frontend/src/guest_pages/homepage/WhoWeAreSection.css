@@ -1,22 +1,44 @@
 .who-we-are {
   padding: 6rem 8vw;
   text-align: center;
-  background: #ffffff;
+  background: #f7f7f7;
 }
 
 .who-we-are__intro {
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
-.who-we-are__text {
-  color: #555;
-  line-height: 1.7;
+/* red underline centered beneath the "Who We Are" heading */
+.who-we-are .section-heading {
+  position: relative;
+  padding-bottom: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.who-we-are__text strong {
+.who-we-are .section-heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 340px;
+  max-width: 60%;
+  height: 2px;
+  background: #c22e2d;
+}
+
+.who-we-are__text {
+  color: #2b2b2b;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+.who-we-are__text .letter-accent,
+.who-we-are__text .text-accent {
   color: #c22e2d;
+  font-weight: 700;
 }
 
 .who-we-are__strip {
@@ -34,7 +56,12 @@
 }
 
 .who-we-are__photo--wide {
-  flex: 2.2;
+  flex: 2.6;
+}
+
+/* extra breathing room before the last cluster of photos */
+.who-we-are__photo--group-start {
+  margin-left: 1.5rem;
 }
 
 .who-we-are__photo img {
@@ -53,5 +80,8 @@
   .who-we-are__photo--wide {
     flex: 1 1 30%;
     height: 120px;
+  }
+  .who-we-are__photo--group-start {
+    margin-left: 0;
   }
 }
