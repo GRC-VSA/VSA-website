@@ -18,35 +18,49 @@ gsap.registerPlugin(ScrollTrigger);
  *   </section>
  */
 export function useScrollReveal(selector = ".reveal") {
-  const containerRef = useRef(null);
+    const containerRef = useRef(null);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
 
-    const targets = container.querySelectorAll(selector);
-    if (targets.length === 0) return;
+        const targets = container.querySelectorAll(selector);
+        if (targets.length === 0) return;
 
-    const ctx = gsap.context(() => {
-      gsap.set(targets, { opacity: 0, y: 40 });
+        const ctx = gsap.context(() => {
+            // 1. Force clear any inline GSAP transforms and reset hidden state
+            gsap.set(targets, { opacity: 0, y: 40 });
 
-      ScrollTrigger.batch(targets, {
-        start: "top 85%",
-        once: true,
-        onEnter: (batch) =>
-          gsap.to(batch, {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            ease: "power2.out",
-            stagger: 0.12,
-            overwrite: true,
-          }),
-      });
-    }, container);
+            ScrollTrigger.batch(targets, {
+                start: "top 85%",
+                once: false, // Changed from true to allow re-triggering when scrolling back up/down
+                onEnter: (batch) =>
+                    gsap.to(batch, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.7,
+                        ease: "power2.out",
+                        stagger: 0.12,
+                        overwrite: true,
+                    }),
+                onLeaveBack: (batch) =>
+                    gsap.to(batch, {
+                        opacity: 0,
+                        y: 40,
+                        duration: 0.3,
+                        ease: "power2.in",
+                        overwrite: true,
+                    }),
+            });
 
-    return () => ctx.revert();
-  }, [selector]);
+            // 2. Force ScrollTrigger to recalculate exact offsets after window scroll resets
+            requestAnimationFrame(() => {
+                ScrollTrigger.refresh();
+            });
+        }, container);
 
-  return containerRef;
+        return () => ctx.revert();
+    }, [selector]);
+
+    return containerRef;
 }
