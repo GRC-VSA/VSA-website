@@ -1,7 +1,7 @@
-import { useScrollReveal } from "../../hooks/useScrollReveal.js";
-import "./HomeFooter.css";
+import { useScrollReveal } from "../hooks/useScrollReveal.js";
+import "./Footer.css";
 
-const HomeFooter = () => {
+const Footer = () => {
   const sectionRef = useScrollReveal();
 
   return (
@@ -92,4 +92,4 @@ const HomeFooter = () => {
   );
 };
 
-export default HomeFooter;
+export default Footer;

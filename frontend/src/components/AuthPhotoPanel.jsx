@@ -1,12 +1,31 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png";
 
-const AuthPhotoPanel = () => {
+// Import your cover photos
+import cover1 from "../assets/guest/BeggingLoginPageCover.png";
+import cover2 from "../assets/guest/CheatingLoginPageCover.png";
+import cover3 from "../assets/guest/SleepingLoginPageCover.png";
+import cover4 from "../assets/guest/TinRegisterPageCover.png";
+
+const coverPhotos = [cover1, cover2, cover3, cover4];
+
+const AuthPhotoPanel = ({ altText = "VSA Cover Photo" }) => {
+    // Pick the random photo synchronously on state initialization
+    const [selectedPhoto] = useState(() => {
+        const randomIndex = Math.floor(Math.random() * coverPhotos.length);
+        return coverPhotos[randomIndex];
+    });
+
     return (
         <div className="auth-photo-panel">
-            <div className="auth-photo-placeholder">
-                <span>Photo</span>
-            </div>
+            {selectedPhoto ? (
+                <img src={selectedPhoto} alt={altText} className="auth-photo" />
+            ) : (
+                <div className="auth-photo-placeholder">
+                    <span>Photo</span>
+                </div>
+            )}
 
             <div className="auth-photo-overlay" />
 
