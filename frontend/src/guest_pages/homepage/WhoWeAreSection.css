@@ -41,35 +41,48 @@
   font-weight: 700;
 }
 
-/* Container hides overflowing photos and handles spacing */
+/* Container padding allows drop shadows to project without clipping */
 .who-we-are__scroll-container {
   width: 100%;
   overflow: hidden;
   position: relative;
-  padding: 16px 0;
+  padding: 20px 0 40px; /* Extra bottom padding for shadow visibility */
 }
 
-/* Track holds both sets side-by-side and handles horizontal movement */
+/* Track running GPU-accelerated marquee */
 .who-we-are__scroll-track {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 18px;
   width: max-content;
-  animation: infiniteScroll 25s linear infinite;
+  will-change: transform;
+  animation: smoothInfiniteScroll 35s linear infinite;
 }
 
-/* Pause scrolling on hover so users can view pictures */
+/* Pause on hover */
 .who-we-are__scroll-container:hover .who-we-are__scroll-track {
   animation-play-state: paused;
 }
 
-/* Card sizing */
+/* Standard Vertical Photo Cards (Matching Figma ratios) */
 .who-we-are__photo-card {
-  width: 320px;
-  height: 220px;
+  width: 180px;
+  height: 250px;
   flex-shrink: 0;
-  border-radius: 16px;
+  border-radius: 6px; /* Match crisp corner radius in Figma */
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background-color: #f0f0f0;
+
+  /* Soft bottom shadow matching your screenshot */
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.22),
+  0 4px 8px -2px rgba(0, 0, 0, 0.12);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Wide Middle Group Photo Card */
+.who-we-are__photo-card--wide {
+  width: 410px; /* Expands to match wide group aspect ratio */
 }
 
 .who-we-are__photo-card img {
@@ -79,13 +92,13 @@
   display: block;
 }
 
-/* Infinite Scroll Keyframes */
-@keyframes infiniteScroll {
+/* GPU-Accelerated Keyframe Animation */
+@keyframes smoothInfiniteScroll {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 

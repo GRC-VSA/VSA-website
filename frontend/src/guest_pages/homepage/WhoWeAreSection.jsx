@@ -11,7 +11,6 @@ import TiffLyBadminton from "../../assets/guest/HomePageWhoWeAre/Tiff&Ly_badmint
 import TinVIFON from "../../assets/guest/HomePageWhoWeAre/TinVIFON.JPG";
 import VSAGroup from "../../assets/guest/HomePageWhoWeAre/VSA group.jpg";
 import VSAKid2 from "../../assets/guest/HomePageWhoWeAre/VSA_kid2.jpg";
-import VSAChamps from "../../assets/guest/HomePageWhoWeAre/[To scale] - VSA CHAMPS 2 PNG.png";
 import ClubMeetingInterview from "../../assets/guest/HomePageWhoWeAre/club-meeting-interview.jpg";
 import EventGen4Gen5 from "../../assets/guest/HomePageWhoWeAre/event_gen4_gen5.jpg";
 import Gen2Gen3 from "../../assets/guest/HomePageWhoWeAre/gen2-gen3.jpg";
@@ -31,7 +30,6 @@ const photos = [
   { src: TinVIFON, alt: "Tin VIFON Event" },
   { src: VSAGroup, alt: "VSA Group" },
   { src: VSAKid2, alt: "VSA Kids" },
-  { src: VSAChamps, alt: "VSA Champs 2" },
   { src: ClubMeetingInterview, alt: "Club Meeting Interview" },
   { src: EventGen4Gen5, alt: "Event Gen4 Gen5" },
   { src: Gen2Gen3, alt: "Gen2 and Gen3" },
@@ -65,19 +63,29 @@ const WhoWeAreSection = () => {
           </button>
         </div>
 
-        {/* Infinite Scrolling Photo Strip */}
-        <div className="who-we-are__scroll-container reveal">
+        {/* Infinite Scrolling Track */}
+        <div className="who-we-are__scroll-container">
           <div className="who-we-are__scroll-track">
-            {/* First set of photos */}
+            {/* Set 1 */}
             {photos.map((photo, i) => (
-                <div key={`set1-${i}`} className="who-we-are__photo-card">
+                <div
+                    key={`set1-${i}`}
+                    className={`who-we-are__photo-card ${
+                        photo.wide ? "who-we-are__photo-card--wide" : ""
+                    }`}
+                >
                   <img src={photo.src} alt={photo.alt} />
                 </div>
             ))}
 
-            {/* Duplicated set for seamless loop */}
+            {/* Duplicated Set 2 for seamless loop */}
             {photos.map((photo, i) => (
-                <div key={`set2-${i}`} className="who-we-are__photo-card">
+                <div
+                    key={`set2-${i}`}
+                    className={`who-we-are__photo-card ${
+                        photo.wide ? "who-we-are__photo-card--wide" : ""
+                    }`}
+                >
                   <img src={photo.src} alt={photo.alt} />
                 </div>
             ))}
