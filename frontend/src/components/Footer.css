@@ -14,7 +14,7 @@
 .home-footer__container {
   position: relative;
   width: 100%;
-  background-color: #ab3130; /* Brand Standard Red */
+  background-color: #AB3130; /* Brand Standard Red */
   border-radius: 40px 40px 0 0;
   padding: 0 5vw 3.5rem;
   color: #ece0a6; /* Brand Standard Yellow */
@@ -146,7 +146,7 @@
 
 .pill-btn--solid {
   background-color: #ece0a6;
-  color: #ab3130;
+  color: #AB3130;
   border: none;
   padding-right: 1.25rem;
 }

@@ -71,45 +71,197 @@
   flex-direction: column-reverse;
 }
 
-/* Card 1 Art Styling */
+/* ==========================================================================
+   CARD 1: CLUB MEETINGS & FLOATING BADGES
+   ========================================================================== */
+
 .activity-card__art--meetings {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  width: 100%;
+  height: 280px;
   margin-bottom: 1rem;
 }
 
-.activity-card__art--meetings img {
-  max-width: 220px;
+.meetings-flyer-img {
+  max-width: 210px;
   height: auto;
-  transform: rotate(-6deg);
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.12));
+  transform: rotate(-12deg);
+  filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.16));
+  z-index: 2;
+  transition: transform 0.3s ease;
 }
 
-/* Card 2 Art Styling with Shadow Base */
+.activity-card:hover .meetings-flyer-img {
+  transform: rotate(-8deg) scale(1.03);
+}
+
+/* Floating Badges Container */
+.floating-badge {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(216, 61, 59, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+}
+
+.badge-icon {
+  font-size: 1.1rem;
+}
+
+.swoosh-tail {
+  position: absolute;
+  width: 70px;
+  height: 40px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Positioning four badges around flyer */
+.badge--top-left {
+  top: 15%;
+  left: 8%;
+}
+.swoosh--tl {
+  right: -40px;
+  top: 10px;
+}
+
+.badge--top-right {
+  top: 10%;
+  right: 12%;
+}
+.swoosh--tr {
+  left: -40px;
+  top: 15px;
+}
+
+.badge--bottom-left {
+  bottom: 12%;
+  left: 18%;
+}
+.swoosh--bl {
+  right: -35px;
+  bottom: 10px;
+}
+
+.badge--bottom-right {
+  bottom: 18%;
+  right: 10%;
+}
+.swoosh--br {
+  left: -35px;
+  top: -10px;
+}
+
+
+/* ==========================================================================
+   CARD 2: LARGE-SCALE EVENTS & STACKED POSTERS
+   ========================================================================== */
+
 .activity-card__art--events {
   position: relative;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: flex-end;
+  height: 280px;
+  width: 100%;
 }
 
-.activity-card__art--events img {
-  max-width: 230px;
-  z-index: 2;
-  position: relative;
-}
-
-.activity-card__shadow-ellipse {
+/* Red 3D Ellipse Platform Base */
+.events-red-platform {
   position: absolute;
-  bottom: -10px;
-  width: 200px;
-  height: 24px;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 60px;
+  background: #c83230;
+  border-radius: 50%;
+  z-index: 1;
+  box-shadow: 0 8px 18px rgba(180, 40, 38, 0.35);
+}
+
+/* Container for stacked posters */
+.poster-stack {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end; /* Keeps all posters aligned to the bottom platform */
+  justify-content: center;
+  margin-bottom: 18px; /* Elevates posters relative to the red disk base */
+}
+
+/* Base style for posters */
+.poster-img {
+  border-radius: 4px;
+  box-shadow: -4px 8px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Front Poster (Tallest & Largest) */
+.poster-1 {
+  width: 175px;
+  height: 245px; /* Explicit height ensures descending steps */
+  z-index: 3;
+  object-fit: cover;
+}
+
+/* Middle Poster (Slightly shorter & shifted closely behind) */
+.poster-2 {
+  width: 155px;
+  height: 215px; /* Shorter height */
+  z-index: 2;
+  margin-left: -85px; /* Tight negative margin brings it closer behind Poster 1 */
+  object-fit: cover;
+  filter: brightness(0.92);
+}
+
+/* Back Poster (Shortest & shifted slightly further right) */
+.poster-3 {
+  width: 140px;
+  height: 190px; /* Shortest height */
+  z-index: 1;
+  margin-left: -80px; /* Tight negative margin brings it closer behind Poster 2 */
+  object-fit: cover;
+  filter: brightness(0.82);
+}
+
+/* Red 3D Ellipse Platform Disk */
+.events-red-platform {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 330px;
+  height: 65px;
   background: #d83d3b;
   border-radius: 50%;
-  opacity: 0.85;
   z-index: 1;
+  box-shadow: 0 10px 22px rgba(216, 61, 59, 0.35);
+}
+
+/* Subtle spread animation on card hover */
+.activity-card:hover .poster-2 {
+  transform: translateX(8px);
+}
+
+.activity-card:hover .poster-3 {
+  transform: translateX(16px);
 }
 
 /* Card 3 Art Styling */

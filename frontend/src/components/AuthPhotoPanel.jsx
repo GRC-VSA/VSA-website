@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png";
 
 // Import your cover photos
-import cover1 from "../assets/guest/Auth/BeggingLoginPageCover.png";
-import cover2 from "../assets/guest/Auth/CheatingLoginPageCover.png";
-import cover3 from "../assets/guest/Auth/SleepingLoginPageCover.png";
-import cover4 from "../assets/guest/Auth/TinRegisterPageCover.png";
+import cover1 from "../assets/guest/auth/BeggingLoginPageCover.png";
+import cover2 from "../assets/guest/auth/CheatingLoginPageCover.png";
+import cover3 from "../assets/guest/auth/SleepingLoginPageCover.png";
+import cover4 from "../assets/guest/auth/TinRegisterPageCover.png";
 
 const coverPhotos = [cover1, cover2, cover3, cover4];
 

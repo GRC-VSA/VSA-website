@@ -2,22 +2,22 @@ import { useScrollReveal } from "../../hooks/useScrollReveal.js";
 import "./WhoWeAreSection.css";
 
 // Import all photos from HomePageWhoWeAre folder
-import Gen4_2 from "../../assets/guest/HomePageWhoWeAre/Gen4_2.jpg";
-import IMG_3507 from "../../assets/guest/HomePageWhoWeAre/IMG_3507.JPG";
-import IMG_9221 from "../../assets/guest/HomePageWhoWeAre/IMG_9221.jpg";
-import P1021944min from "../../assets/guest/HomePageWhoWeAre/P1021944-min.JPG";
-import PhucJaydenDung from "../../assets/guest/HomePageWhoWeAre/Phuc-jayden-Dung_japan.jpg";
-import TiffLyBadminton from "../../assets/guest/HomePageWhoWeAre/Tiff&Ly_badminton.JPG";
-import TinVIFON from "../../assets/guest/HomePageWhoWeAre/TinVIFON.JPG";
-import VSAGroup from "../../assets/guest/HomePageWhoWeAre/VSA group.jpg";
-import VSAKid2 from "../../assets/guest/HomePageWhoWeAre/VSA_kid2.jpg";
-import ClubMeetingInterview from "../../assets/guest/HomePageWhoWeAre/club-meeting-interview.jpg";
-import EventGen4Gen5 from "../../assets/guest/HomePageWhoWeAre/event_gen4_gen5.jpg";
-import Gen2Gen3 from "../../assets/guest/HomePageWhoWeAre/gen2-gen3.jpg";
-import GirlsAtPark from "../../assets/guest/HomePageWhoWeAre/girls at park.jpg";
-import LunarNewYear from "../../assets/guest/HomePageWhoWeAre/lunar-new-year.jpg";
-import VSAInterview from "../../assets/guest/HomePageWhoWeAre/vsa interview.jpg";
-import VSAWithUniform from "../../assets/guest/HomePageWhoWeAre/vsa-with-uniform.jpg";
+import Gen4_2 from "../../assets/guest/homepagewhoweare/Gen4_2.jpg";
+import IMG_3507 from "../../assets/guest/homepagewhoweare/IMG_3507.JPG";
+import IMG_9221 from "../../assets/guest/homepagewhoweare/IMG_9221.jpg";
+import P1021944min from "../../assets/guest/homepagewhoweare/P1021944-min.JPG";
+import PhucJaydenDung from "../../assets/guest/homepagewhoweare/Phuc-jayden-Dung_japan.jpg";
+import TiffLyBadminton from "../../assets/guest/homepagewhoweare/Tiff&Ly_badminton.JPG";
+import TinVIFON from "../../assets/guest/homepagewhoweare/TinVIFON.JPG";
+import VSAGroup from "../../assets/guest/homepagewhoweare/VSA group.jpg";
+import VSAKid2 from "../../assets/guest/homepagewhoweare/VSA_kid2.jpg";
+import ClubMeetingInterview from "../../assets/guest/homepagewhoweare/club-meeting-interview.jpg";
+import EventGen4Gen5 from "../../assets/guest/homepagewhoweare/event_gen4_gen5.jpg";
+import Gen2Gen3 from "../../assets/guest/homepagewhoweare/gen2-gen3.jpg";
+import GirlsAtPark from "../../assets/guest/homepagewhoweare/girls at park.jpg";
+import LunarNewYear from "../../assets/guest/homepagewhoweare/lunar-new-year.jpg";
+import VSAInterview from "../../assets/guest/homepagewhoweare/vsa interview.jpg";
+import VSAWithUniform from "../../assets/guest/homepagewhoweare/vsa-with-uniform.jpg";
 
 
 const photos = [
