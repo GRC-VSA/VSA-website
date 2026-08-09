@@ -1,0 +1,9 @@
+#guest-main {
+    --background-color: #ffffff;
+    /* fffae2 */
+}
+
+#guest-main {
+    background-color: var(--background-color);
+    height: 100%;
+}

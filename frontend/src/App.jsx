@@ -1,122 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import { EventsProvider } from "./context/EventsContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+
+import GuestLayout from "./layouts/GuestLayout.jsx"
+import OfficerLayout from "./layouts/OfficerLayout.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
+
+import HomePage from "./guest_pages/HomePage.jsx";
+import SignInPage from "./guest_pages/SignInPage.jsx";
+import EventsPage from "./guest_pages/EventsPage.jsx";
+// import OldEventsPage from "./guest_pages/OldEventsPage.jsx";
+import RegisterPage from "./guest_pages/RegisterPage.jsx";
+import VerifyEmailPage from "./guest_pages/VerifyEmailPage.jsx";
+import ForgotPasswordPage from "./guest_pages/ForgotPasswordPage.jsx";
+import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
+import ProductsPage from "./guest_pages/ProductsPage.jsx";
+
+import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
+import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
+import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
+import TodoPage from "./officer_pages/TodoPage.jsx";
+
+import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
+import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
+import AvailabilityPage from "./officer_pages/AvailabilityPage.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <EventsProvider>
+      {/* <Navbar /> */}
+      <Routes>
+        <Route path="/" element={<GuestLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path="sign-in" element={<SignInPage />} />
+          <Route path="register" element={<RegisterPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/verify" element={<VerifyEmailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          {/* <Route path="old-events" element={<OldEventsPage />} /> */}
+          <Route path="/products" element={<ProductsPage/>} />
+        </Route>
 
-      <div className="ticks"></div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <Route
+          path="/officer"
+          element={
+            //Add and configure roles heree ----|------------|
+            //                                  V            V
+            <ProtectedRoute allowedRoles={["officer", "president"]}>
+              <OfficerLayout />
+            </ProtectedRoute>
+          }>
+          <Route index element={<OverallBoard />} />
+          <Route path="dashboard/budget-board" element={<BudgetBoard />} />
+          <Route path="dashboard/event-board" element={<EventBoard />} />
+          <Route path="availability" element={<AvailabilityPage />} />
+          <Route path="todo-list" element={<TodoPage />} />
+          <Route path="events/create-event" element={<CreateEventPage />} />
+          <Route path="events/manage-event" element={<ManageEventPage />} />
+        </Route>
+      </Routes>
+    </EventsProvider>
+  );
 }
 
-export default App
+export default App;

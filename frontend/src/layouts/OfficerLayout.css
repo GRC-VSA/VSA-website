@@ -1,0 +1,26 @@
+.officer-layout{
+    background-color: #F5F6F8;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+
+/* .right-content-container {
+    grid-template-rows: auto 1fr;
+}
+
+.top-bar {
+    border-color: grey;
+    border-width: 1px;
+    border-style: solid;
+    padding: 1rem;
+}
+
+h1 {
+    height: 40px;
+    font-size: 550;
+}
+
+h1 + span {
+    font-size: 0.9rem;
+} */
+
