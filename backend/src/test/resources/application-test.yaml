@@ -30,7 +30,7 @@ spring:
             enable: false
 
 jwt:
-  secret: "vsa-super-secret-key-that-is-long-enough-for-hs256-algorithm"
+  secret: "XrvacgnP6R03xIstugi0vnEV+6xPySC7Rf1V7X3r9kM="
   expiration: 86400000
 
 frontend:
