@@ -174,7 +174,7 @@ const WhatWeDoSection = () => {
             </div>
              <div className="activity-card__cta-bottom">
                <h4>Explore Our Events</h4>
-               <button type="button" className="pill-button pill-button--light" onClick={() => navigate("/upcoming-events")}>
+               <button type="button" className="pill-button pill-button--light" onClick={() => navigate("/events")}>
                  Learn more about events
                </button>
              </div>
