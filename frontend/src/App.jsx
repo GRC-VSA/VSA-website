@@ -10,12 +10,13 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 import HomePage from "./guest_pages/HomePage.jsx";
 import SignInPage from "./guest_pages/SignInPage.jsx";
-import UpcomingEventsPage from "./guest_pages/UpcomingEventsPage.jsx";
-import OldEventsPage from "./guest_pages/OldEventsPage.jsx";
+import EventsPage from "./guest_pages/EventsPage.jsx";
+// import OldEventsPage from "./guest_pages/OldEventsPage.jsx";
 import RegisterPage from "./guest_pages/RegisterPage.jsx";
 import VerifyEmailPage from "./guest_pages/VerifyEmailPage.jsx";
 import ForgotPasswordPage from "./guest_pages/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
+import ProductsPage from "./guest_pages/ProductsPage.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
@@ -39,8 +40,9 @@ function App() {
           <Route path="/verify" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="upcoming-events" element={<UpcomingEventsPage />} />
-          <Route path="old-events" element={<OldEventsPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          {/* <Route path="old-events" element={<OldEventsPage />} /> */}
+          <Route path="/products" element={<ProductsPage/>} />
         </Route>
 
 
