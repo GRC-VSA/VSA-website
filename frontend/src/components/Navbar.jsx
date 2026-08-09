@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LuSearch } from "react-icons/lu";
+import { LuSearch, LuMenu, LuX } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
@@ -12,14 +12,18 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [isEventsOpen, setIsEventsOpen] = useState(false);
   const [accountIsClicked, setAccountIsClicked] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navbarBackgroundRef = useRef(null);
   const navbarPagesRef = useRef(null);
 
   const navigate = useNavigate();
   const handleLogOut = () => {
     logout();
+    setIsMobileMenuOpen(false);
     navigate("/");
   }
+
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   let isOfficer = false;
   if (user !== null) {
@@ -66,10 +70,21 @@ const Navbar = () => {
     };
   }, []);
 
+  // Close mobile menu automatically if window is resized back to desktop width
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 return (
   <nav className="navbar">
     <div className="navbar-background" ref={navbarBackgroundRef}>
-      <NavLink to="/" className="logo-div">
+      <NavLink to="/" className="logo-div" onClick={closeMobileMenu}>
         <img src={VSA_coloredlogo} alt={"vsa-logo-red"} className="logo"></img>
       </NavLink>
 
@@ -143,8 +158,60 @@ return (
             </NavLink>
         }
       </div>
+
+      <button
+        type="button"
+        className="mobile-menu-trigger"
+        onClick={() => setIsMobileMenuOpen((open) => !open)}
+        aria-label="Toggle menu"
+      >
+        {isMobileMenuOpen ? <LuX id="mobile-menu-icon" /> : <LuMenu id="mobile-menu-icon" />}
+      </button>
     </div>
 
+    <div className={`mobile-menu ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
+        <NavLink to="/events" className="mobile-nav-link" onClick={closeMobileMenu}>
+          Events
+        </NavLink>
+        <NavLink to="/products" className="mobile-nav-link" onClick={closeMobileMenu}>
+          Products
+        </NavLink>
+        <NavLink to="/officers" className="mobile-nav-link" onClick={closeMobileMenu}>
+          Our Team
+        </NavLink>
+        <NavLink to="/apply" className="mobile-nav-link" onClick={closeMobileMenu}>
+          Apply
+        </NavLink>
+        <NavLink to="/sponsors" className="mobile-nav-link" onClick={closeMobileMenu}>
+          Sponsors
+        </NavLink>
+
+        <div className="mobile-menu-divider" />
+
+        {user ? (
+          <>
+            <NavLink to="/setting" className="mobile-nav-link" onClick={closeMobileMenu}>
+              Setting
+            </NavLink>
+            {isOfficer && (
+              <button
+                type="button"
+                className="mobile-nav-link mobile-nav-button"
+                onClick={() => { closeMobileMenu(); navigate("/officer"); }}
+              >
+                To Officer Board
+              </button>
+            )}
+            <button type="button" className="mobile-nav-link mobile-nav-button" onClick={handleLogOut}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <NavLink to="/sign-in" className="mobile-nav-link" onClick={closeMobileMenu}>
+            Sign-in
+          </NavLink>
+        )}
+    </div>
   </nav>
 );
 };
