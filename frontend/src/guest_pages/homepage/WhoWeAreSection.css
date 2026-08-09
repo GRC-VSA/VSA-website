@@ -1,0 +1,141 @@
+.who-we-are {
+  padding: 6rem 8vw;
+  text-align: center;
+  background: #f7f7f7;
+}
+
+.who-we-are__intro {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* red underline centered beneath the "Who We Are" heading */
+.who-we-are .section-heading {
+  position: relative;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.who-we-are .section-heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 340px;
+  max-width: 60%;
+  height: 2px;
+  background: #c22e2d;
+}
+
+.who-we-are__text {
+  color: #2b2b2b;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+}
+
+.who-we-are__text .letter-accent,
+.who-we-are__text .text-accent {
+  color: #c22e2d;
+  font-weight: 700;
+}
+
+/* Container padding allows drop shadows to project without clipping */
+.who-we-are__scroll-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0 40px; /* Extra bottom padding for shadow visibility */
+}
+
+/* Track running GPU-accelerated marquee */
+.who-we-are__scroll-track {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: max-content;
+  will-change: transform;
+  animation: smoothInfiniteScroll 35s linear infinite;
+}
+
+/* Pause on hover */
+.who-we-are__scroll-container:hover .who-we-are__scroll-track {
+  animation-play-state: paused;
+}
+
+/* Standard Vertical Photo Cards (Matching Figma ratios) */
+.who-we-are__photo-card {
+  width: 180px;
+  height: 250px;
+  flex-shrink: 0;
+  border-radius: 6px; /* Match crisp corner radius in Figma */
+  overflow: hidden;
+  background-color: #f0f0f0;
+
+  /* Soft bottom shadow matching your screenshot */
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.22),
+  0 4px 8px -2px rgba(0, 0, 0, 0.12);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Wide Middle Group Photo Card */
+.who-we-are__photo-card--wide {
+  width: 410px; /* Expands to match wide group aspect ratio */
+}
+
+.who-we-are__photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* GPU-Accelerated Keyframe Animation */
+@keyframes smoothInfiniteScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.who-we-are__photo {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f0dedd; /* placeholder tint while real photos load */
+}
+
+.who-we-are__photo--wide {
+  flex: 2.6;
+}
+
+/* extra breathing room before the last cluster of photos */
+.who-we-are__photo--group-start {
+  margin-left: 1.5rem;
+}
+
+.who-we-are__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .who-we-are__strip {
+    flex-wrap: wrap;
+    height: auto;
+  }
+  .who-we-are__photo,
+  .who-we-are__photo--wide {
+    flex: 1 1 30%;
+    height: 120px;
+  }
+  .who-we-are__photo--group-start {
+    margin-left: 0;
+  }
+}

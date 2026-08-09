@@ -329,18 +329,23 @@ public class EmailService {
                 opacity: 0.95;
             ">%s</p>
         </div>
-        """.formatted(PRIMARY_COLOR, "#8b2525", TEXT_LIGHT, FONT_FAMILY, ACCENT_COLOR, FONT_FAMILY, title);
+        """
+        .formatted(
+            PRIMARY_COLOR, "#8b2525", TEXT_LIGHT, FONT_FAMILY, ACCENT_COLOR, FONT_FAMILY, title);
   }
 
   /**
-   * Builds a frontend URL by ensuring the base URL does not have a trailing slash and appending
-   * the provided path (which should begin with '/').
+   * Builds a frontend URL by ensuring the base URL does not have a trailing slash and appending the
+   * provided path (which should begin with '/').
    */
   private String buildFrontendUrl(String path) {
     if (frontendUrl == null || frontendUrl.isBlank()) {
       return path; // fallback, should not happen if property is set
     }
-    String base = frontendUrl.endsWith("/") ? frontendUrl.substring(0, frontendUrl.length() - 1) : frontendUrl;
+    String base =
+        frontendUrl.endsWith("/")
+            ? frontendUrl.substring(0, frontendUrl.length() - 1)
+            : frontendUrl;
     return base + (path.startsWith("/") ? path : ("/" + path));
   }
 }

@@ -1,128 +1,53 @@
-.register-page {
-  min-height: 100vh;
-  padding: 120px 20px 60px;
-  background-color: #f7f7f7;
+/* RegisterPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 
+/* ── Oval / pill inputs ──────────────────────────────────── */
+.password-input-div {
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
-.register-form {
-  width: 100%;
-  max-width: 480px;
-  padding: 32px;
-  background-color: white;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+.password-input-div input {
+  padding-right: 62px;
 }
 
-.register-form h1 {
-  margin: 0 0 8px;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111;
-}
-
-.register-form label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
-}
-
-.register-form input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid #d2d2d2;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.register-form input:focus {
-  border-color: #ff5757;
-  box-shadow: 0 0 0 3px rgba(255, 87, 87, 0.15);
-}
-
-.register-form input::placeholder {
-  color: #999;
-}
-
-.register-form button {
-  width: 100%;
-  padding: 12px 16px;
+.show-password-button {
+  position: absolute;
+  right: 18px;
   border: none;
-  border-radius: 10px;
-  font-family: inherit;
-  font-size: 0.95rem;
+  background: transparent;
+  color: var(--vsa-red);
   font-weight: 600;
+  font-size: 0.72rem;
   cursor: pointer;
 }
 
-.register-form button[type="submit"] {
-  margin-top: 8px;
-  background-color: #ff5757;
-  color: white;
+/* ===========================
+   DIVIDER / SOCIAL
+=========================== */
+
+.auth-link-text {
+  text-align: center;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #777;
+  margin-top: 6px;
 }
 
-.register-form button[type="submit"]:hover {
-  background-color: #e94747;
+.auth-link-text a {
+  color: var(--vsa-red);
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.register-form button[type="submit"]:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
+/* ===========================
+   MOBILE
+=========================== */
 
-.secondary-button {
-  background-color: transparent;
-  color: #ff5757;
-  border: 1px solid #ff5757 !important;
-}
-
-.secondary-button:hover {
-  background-color: rgba(255, 87, 87, 0.08);
-}
-
-.register-success {
-  margin: 0;
-  padding: 12px;
-  border-radius: 10px;
-  background-color: #e7f8ee;
-  color: #16783a;
-  font-size: 0.9rem;
-}
-
-.register-error {
-  margin: 0;
-  padding: 12px;
-  border-radius: 10px;
-  background-color: #ffecec;
-  color: #c62828;
-  font-size: 0.9rem;
-}
-
-@media (max-width: 600px) {
-  .register-page {
-    padding-top: 90px;
-  }
-
-  .register-form {
-    padding: 24px;
-  }
-
-  .register-form h1 {
-    font-size: 1.7rem;
+@media (max-width: 560px) {
+  .auth-form-row {
+    flex-direction: column;
+    gap: 10px;
   }
 }

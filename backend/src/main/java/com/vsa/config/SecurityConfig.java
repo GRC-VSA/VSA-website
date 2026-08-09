@@ -2,8 +2,8 @@ package com.vsa.config;
 
 import com.vsa.security.JwtFilter;
 import java.util.List;
-import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -109,8 +109,8 @@ public class SecurityConfig {
   /**
    * Configures CORS (Cross-Origin Resource Sharing) settings.
    *
-   * <p>Allows requests from the configured frontend origin (`frontend.url`) with standard HTTP methods
-   * and credentials.
+   * <p>Allows requests from the configured frontend origin (`frontend.url`) with standard HTTP
+   * methods and credentials.
    *
    * @return CorsConfigurationSource configured for the application
    */
@@ -118,8 +118,10 @@ public class SecurityConfig {
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowedOrigins(List.of(frontendUrl));
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
+    config.setExposedHeaders(List.of("*"));
+    config.setMaxAge(3600L);
     config.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
