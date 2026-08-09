@@ -55,6 +55,10 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/vsa_db_test
           DB_USERNAME: vsa_user
           DB_PASSWORD: vsa_password
+          MAIL_USERNAME: test@vsa.com
+          MAIL_PASSWORD: testpassword
+          JWT_SECRET: XrvacgnP6R03xIstugi0vnEV+6xPySC7Rf1V7X3r9kM=
+          FRONTEND_URL: http://localhost:5173
         run: ./mvnw test
 
 
