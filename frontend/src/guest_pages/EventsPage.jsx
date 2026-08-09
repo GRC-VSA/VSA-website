@@ -2,7 +2,7 @@ import { useEvents } from "../context/EventsContext.jsx";
 import { useState } from "react";
 import { motion } from  "framer-motion";    
 import Fuse from "fuse.js";
-import "./UpcomingEventsPage.css";
+import "./EventsPage.css";
 
 import coverPhoto from "../assets/guest/event_coverphoto.JPG";
 import event_of_the_year from "../assets/guest/eventoftheyear.png";
@@ -22,7 +22,7 @@ import makeyourchristmas from "../assets/guest/makeyourchristmas.jpg"
 import doinhay from "../assets/guest/doinhay.jpg";
 import noeventfound from "../assets/guest/noeventfound.png"
 
-const UpcomingEventsPage = () => {
+const EventsPage = () => {
     const { events, isLoading, error } = useEvents();
 
     const upcomingEvents = events.filter((event) => event.status === "upcoming" || event.status === "ongoing");
@@ -620,4 +620,4 @@ const UpcomingEventsPage = () => {
     );
 };
 
-export default UpcomingEventsPage;
+export default EventsPage;
