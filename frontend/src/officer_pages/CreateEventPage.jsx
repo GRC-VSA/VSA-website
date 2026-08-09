@@ -163,7 +163,6 @@ const CreateEventPage = () => {
                             <input type="time" name="endTime" value={formData.endTime} id="end-time" onChange={handleChange} required/>
                         </div>
                     </div>
-
                 </div>
                 
                 <hr></hr>

@@ -75,7 +75,7 @@ const HomePage = () => {
             }
         });
         preloadedImagesRef.current = loadedImages;
-    }, [events])
+    }, [events]);
 
     useEffect(() => {
         if (events.length <= 1) {
