@@ -1,6 +1,7 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { EventsProvider } from "./context/EventsContext.jsx";
+import {useEffect, useState} from "react";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
 import GuestLayout from "./layouts/GuestLayout.jsx"
