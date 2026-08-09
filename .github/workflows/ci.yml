@@ -13,6 +13,22 @@ jobs:
     name: Build & Test Backend
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: vsa_db_test
+          POSTGRES_USER: vsa_user
+          POSTGRES_PASSWORD: vsa_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U vsa_user -d vsa_db_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,10 +51,6 @@ jobs:
 
       - name: Run tests with Maven
         working-directory: ./backend
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
-          SPRING_DATASOURCE_USERNAME: vsa_user
-          SPRING_DATASOURCE_PASSWORD: vsa_password
         run: ./mvnw test
 
 
