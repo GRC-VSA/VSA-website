@@ -51,6 +51,10 @@ jobs:
 
       - name: Run tests with Maven
         working-directory: ./backend
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/vsa_db_test
+          DB_USERNAME: vsa_user
+          DB_PASSWORD: vsa_password
         run: ./mvnw test
 
 
