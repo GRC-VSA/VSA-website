@@ -32,7 +32,7 @@
   font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 1.5rem;
-  font-weight: 400;
+  font-weight: 200;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -81,12 +81,12 @@
   right: 12px;
   width: 68px;
   height: 68px;
-  background: #ab3130;
+  background: #C22E2D;
   border: 3.5px solid #ffffff;
 }
 
 .what-we-believe__badge--top img {
-  width: 42px;
+  width: 70px;
   height: auto;
 }
 

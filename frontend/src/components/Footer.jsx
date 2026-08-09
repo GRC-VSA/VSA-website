@@ -1,19 +1,28 @@
 import { useScrollReveal } from "../hooks/useScrollReveal.js";
+import { useNavigate } from "react-router-dom";
 import "./Footer.css";
+
+import logo from "../assets/guest/footerLogo.png";
 
 const Footer = () => {
   const sectionRef = useScrollReveal();
+  const navigate = useNavigate();
 
   return (
       <footer className="home-footer" ref={sectionRef}>
         <div className="home-footer__container reveal">
-          {/* Floating Brand Header */}
-          <div className="home-footer__brand">
+          {/* Logo floats independently — out of flow, so its size never
+              affects the footer's height */}
+          <div className="home-footer__logo-wrap">
             <img
-                src="/assets/homepage/vsa-logo.svg"
+                src={logo}
                 alt="VSA Conical Hat Logo"
                 className="home-footer__logo"
             />
+          </div>
+
+          {/* Title/subtitle — stays in flow, unaffected by logo size */}
+          <div className="home-footer__brand">
             <h3 className="home-footer__title">VIETNAMESE</h3>
             <p className="home-footer__subtitle">STUDENT ASSOCIATION</p>
           </div>
@@ -51,17 +60,17 @@ const Footer = () => {
 
             {/* Center Column: CTAs & Social Links */}
             <div className="home-footer__col home-footer__col--center">
-              <div className="home-footer__cta-group">
-                <button type="button" className="pill-btn pill-btn--solid">
-                  <span className="pill-btn__icon pill-btn__icon--left">↑</span>
-                  <span>Browse Events</span>
-                </button>
+               <div className="home-footer__cta-group">
+                 <button type="button" className="pill-btn pill-btn--solid" onClick={() => navigate("/upcoming-events")}>
+                   <span className="pill-btn__icon pill-btn__icon--left">↑</span>
+                   <span>Browse Events</span>
+                 </button>
 
-                <button type="button" className="pill-btn pill-btn--outline">
-                  <span>Apply Officer</span>
-                  <span className="pill-btn__icon pill-btn__icon--right">↑</span>
-                </button>
-              </div>
+                 <button type="button" className="pill-btn pill-btn--outline" onClick={() => navigate("/apply")}>
+                   <span>Apply Officer</span>
+                   <span className="pill-btn__icon pill-btn__icon--right">↑</span>
+                 </button>
+               </div>
 
               <div className="home-footer__socials">
                 <a href="#" className="social-btn" aria-label="Instagram">

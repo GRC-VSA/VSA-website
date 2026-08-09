@@ -64,12 +64,9 @@
   pointer-events: none;
 }
 
-/* Club Meetings is the only card with the image up top and text below —
-   flip it with column-reverse rather than reordering the JSX, since the
-   other three cards already read content-then-art top-to-bottom. */
-.what-we-do__grid > .activity-card:first-child {
-  flex-direction: column-reverse;
-}
+/* Card ordering: base .activity-card already stacks children top-to-bottom
+   in DOM order, and Card 1's JSX puts the flyer art before the text, so
+   no reversal is needed here. */
 
 /* ==========================================================================
    CARD 1: CLUB MEETINGS & FLOATING BADGES
@@ -81,14 +78,14 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 280px;
+  height: 240px;
   margin-bottom: 1rem;
 }
 
 .meetings-flyer-img {
-  max-width: 210px;
+  max-width: 130px;
   height: auto;
-  transform: rotate(-12deg);
+  transform: rotate(-30deg);
   filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.16));
   z-index: 2;
   transition: transform 0.3s ease;
@@ -125,10 +122,11 @@
 
 .swoosh-tail {
   position: absolute;
-  width: 70px;
-  height: 40px;
+  width: 80px;
+  height: 55px;
   pointer-events: none;
   z-index: -1;
+  overflow: visible;
 }
 
 /* Positioning four badges around flyer */
@@ -176,24 +174,10 @@
 .activity-card__art--events {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-end;
   height: 280px;
   width: 100%;
-}
-
-/* Red 3D Ellipse Platform Base */
-.events-red-platform {
-  position: absolute;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 320px;
-  height: 60px;
-  background: #c83230;
-  border-radius: 50%;
-  z-index: 1;
-  box-shadow: 0 8px 18px rgba(180, 40, 38, 0.35);
 }
 
 /* Container for stacked posters */
@@ -241,13 +225,13 @@
   filter: brightness(0.82);
 }
 
-/* Red 3D Ellipse Platform Disk */
+/* Red 3D Ellipse Platform Disk — sits under the poster group, which is
+   now left-aligned rather than centered on the card. */
 .events-red-platform {
   position: absolute;
   bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 330px;
+  left: 30px;
+  width: 300px;
   height: 65px;
   background: #d83d3b;
   border-radius: 50%;
@@ -264,17 +248,102 @@
   transform: translateX(16px);
 }
 
-/* Card 3 Art Styling */
+/* small cluster of decorative plus-marks, top-right corner of the card */
+.events-decor {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  width: 90px;
+  height: 90px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.plus-mark {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+}
+
+.plus-mark::before,
+.plus-mark::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.plus-mark::before {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  transform: translateY(-50%);
+}
+
+.plus-mark::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  transform: translateX(-50%);
+}
+
+.plus-mark--1 {
+  top: 0;
+  right: 40px;
+}
+
+.plus-mark--2 {
+  top: 35px;
+  right: 0;
+}
+
+.plus-mark--3 {
+  top: 70px;
+  right: 55px;
+}
+
+/* ==========================================================================
+   CARD 3: FAIR AND PERFORMANCE
+   ========================================================================== */
+
 .activity-card__art--performance {
+  position: relative;
   display: flex;
   justify-content: flex-start;
   align-items: flex-end;
 }
 
-.activity-card__art--performance img {
+/* Sized wrapper so the backdrop below is positioned relative to the
+   photo's own box, not the full-width flex row it sits in. */
+.performance-photo {
+  position: relative;
   width: 100%;
-  max-width: 320px;
-  border-radius: 12px;
+  max-width: 340px;
+}
+
+/* pink card peeking out behind the photo — offset is a % of the photo's
+   own size (~10% right, ~9% down), matching the reference proportions */
+.performance-photo__backdrop {
+  position: absolute;
+  right: -10%;
+  bottom: -9%;
+  width: 100%;
+  height: 100%;
+  background: #f3b6b3;
+  border-radius: 14px;
+  z-index: 0;
+}
+
+.performance-photo__img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 3px solid #ab3130;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
 }
 
@@ -303,7 +372,7 @@
 }
 
 .activity-card__logo img {
-  width: 90px;
+  width: 70px;
   height: auto;
   align-self: flex-end;
   margin-left: auto;

@@ -2,6 +2,8 @@ import { useScrollReveal } from "../../hooks/useScrollReveal.js";
 import "./WhatWeBelieveSection.css";
 import cover from "../../assets/guest/DSCF2500.jpg";
 
+import logo from "../../assets/guest/homepagewhatwedo/whiteLogo.png";
+
 const WhatWeBelieveSection = () => {
   const sectionRef = useScrollReveal();
 
@@ -34,7 +36,7 @@ const WhatWeBelieveSection = () => {
 
           <div className="what-we-believe__image-container reveal">
             <div className="what-we-believe__badge what-we-believe__badge--top">
-              <img src="../../assets/guest/vsa-logo-icon.svg" alt="VSA Emblem" />
+              <img src={logo} alt="VSA Emblem" />
             </div>
 
             <div className="what-we-believe__image-frame">
