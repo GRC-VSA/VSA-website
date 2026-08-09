@@ -95,9 +95,9 @@ return (
         {/* <div className="navbar-dropdown" onMouseEnter={() => setIsEventsOpen(true)} onMouseLeave={() => setIsEventsOpen(false)}>
             <button className="nav-link dropdown-trigger">Events</button>
             {
-              isEventsOpen && (
+                isEventsOpen && (
                 <div className="dropdown-menu">
-                  <NavLink to="/upcoming-events" className="dropdown-item">
+                  <NavLink to="/events" className="dropdown-item">
                     Upcoming Events
                   </NavLink>
                   <NavLink to="/old-events" className="dropdown-item">

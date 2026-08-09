@@ -61,7 +61,7 @@ const Footer = () => {
             {/* Center Column: CTAs & Social Links */}
             <div className="home-footer__col home-footer__col--center">
                <div className="home-footer__cta-group">
-                 <button type="button" className="pill-btn pill-btn--solid" onClick={() => navigate("/upcoming-events")}>
+                 <button type="button" className="pill-btn pill-btn--solid" onClick={() => navigate("/events")}>
                    <span className="pill-btn__icon pill-btn__icon--left">↑</span>
                    <span>Browse Events</span>
                  </button>

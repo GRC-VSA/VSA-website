@@ -48,7 +48,7 @@ function App() {
 
   return (
     <EventsProvider>
-      {/* <Navbar /> */}
+      <IntroLoader ready={appReady} />
       <Routes>
         <Route path="/" element={<GuestLayout />}>
           <Route index element={<HomePage />} />

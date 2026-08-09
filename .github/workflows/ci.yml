@@ -52,9 +52,14 @@ jobs:
       - name: Run tests with Maven
         working-directory: ./backend
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/vsa_db_test
-          SPRING_DATASOURCE_USERNAME: vsa_user
-          SPRING_DATASOURCE_PASSWORD: vsa_password
+          SPRING_PROFILES_ACTIVE: test
+          DB_URL: jdbc:postgresql://localhost:5432/vsa_db_test
+          DB_USERNAME: vsa_user
+          DB_PASSWORD: vsa_password
+          MAIL_USERNAME: test@vsa.com
+          MAIL_PASSWORD: testpassword
+          JWT_SECRET: XrvacgnP6R03xIstugi0vnEV+6xPySC7Rf1V7X3r9kM=
+          FRONTEND_URL: http://localhost:5173
         run: ./mvnw test
 
 
@@ -74,7 +79,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Build React app
         working-directory: ./frontend
