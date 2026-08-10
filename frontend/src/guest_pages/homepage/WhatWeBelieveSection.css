@@ -32,7 +32,7 @@
   font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 1.5rem;
-  font-weight: 200;
+  font-weight: 400;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -77,8 +77,8 @@
 
 /* Top-Right Red Badge with White Ring Halo */
 .what-we-believe__badge--top {
-  top: -12px;
-  right: -5px;
+  top: -2%;
+  right: 2%;
   width: 75px;
   height: 75px;
   background: #C22E2D;
@@ -92,8 +92,8 @@
 
 /* Bottom-Left Yellow Badge */
 .what-we-believe__badge--bottom {
-  bottom: -4px;
-  left: -2px;
+  bottom: -1%;
+  left: 6%;
   width: 46px;
   height: 46px;
   background: #ece0a6;
@@ -104,9 +104,46 @@
   stroke: #ab3130;
 }
 
+@media (max-width: 1024px) {
+  .what-we-believe__badge--top {
+    right: -2%;
+  }
+
+  .what-we-believe__badge--bottom {
+    left: 2%;
+  }
+}
+
+
 @media (max-width: 868px) {
   .what-we-believe__content {
     grid-template-columns: 1fr;
     gap: 3rem;
+  }
+
+  .what-we-believe__badge--top {
+    right: 10%;
+  }
+
+  .what-we-believe__badge--bottom {
+    left: 12%;
+  }
+}
+
+@media (max-width: 440px) {
+
+  .what-we-believe__badge--top {
+    right: -2%;
+  }
+  .what-we-believe__badge--top {
+    width: 65px;
+    height: 65px;
+  }
+  .what-we-believe__badge--top img {
+    width: 50px;
+  }
+
+  .what-we-believe__badge--bottom {
+    left: 0%;
   }
 }
