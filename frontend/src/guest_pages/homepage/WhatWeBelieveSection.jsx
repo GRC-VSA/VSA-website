@@ -30,7 +30,7 @@ const WhatWeBelieveSection = () => {
             <p>
               So whether you are an international student beginning a new life in
               the United States or a Vietnamese American wanting to reconnect
-              with your roots, VSA is more than happy to stand beside you.
+              with your roots, VSA is here to stand beside you.
             </p>
           </div>
 

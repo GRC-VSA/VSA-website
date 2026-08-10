@@ -78,22 +78,22 @@
 /* Top-Right Red Badge with White Ring Halo */
 .what-we-believe__badge--top {
   top: -12px;
-  right: 12px;
-  width: 68px;
-  height: 68px;
+  right: -5px;
+  width: 75px;
+  height: 75px;
   background: #C22E2D;
   border: 3.5px solid #ffffff;
 }
 
 .what-we-believe__badge--top img {
-  width: 70px;
+  width: 58px;
   height: auto;
 }
 
 /* Bottom-Left Yellow Badge */
 .what-we-believe__badge--bottom {
   bottom: -4px;
-  left: 16px;
+  left: -2px;
   width: 46px;
   height: 46px;
   background: #ece0a6;
