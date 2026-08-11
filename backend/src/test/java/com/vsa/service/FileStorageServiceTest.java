@@ -1,120 +1,154 @@
 package com.vsa.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+
+@ExtendWith(MockitoExtension.class)
 class FileStorageServiceTest {
 
-  // @TempDir creates a real temporary folder for each test, then cleans it up automatically
-  @TempDir Path tempDir;
+  @Mock
+  private S3Client s3Client;
 
   private FileStorageService fileStorageService;
 
   @BeforeEach
   void setUp() throws Exception {
-    fileStorageService = new FileStorageService();
+    fileStorageService = new FileStorageService(s3Client);
 
-    // override the private uploadDir field to use our temp folder instead of "uploads/"
-    Field uploadDirField = FileStorageService.class.getDeclaredField("uploadDir");
-    uploadDirField.setAccessible(true);
-    uploadDirField.set(fileStorageService, tempDir);
-
-    fileStorageService.init();
+    // Inject @Value private fields using reflection
+    setField(fileStorageService, "bucketName", "vsa-grc-event-images");
+    setField(fileStorageService, "region", "us-east-2");
   }
 
-  // ── init ──────────────────────────────────────────────────────
-
-  @Test
-  void ssinit_createsUploadDirectory() {
-    assertTrue(Files.exists(tempDir));
-    assertTrue(Files.isDirectory(tempDir));
+  private void setField(Object target, String fieldName, Object value) throws Exception {
+    Field field = target.getClass().getDeclaredField(fieldName);
+    field.setAccessible(true);
+    field.set(target, value);
   }
 
-  // ── save ──────────────────────────────────────────────────────
+  // ── saveFile ──────────────────────────────────────────────────
 
   @Test
-  void save_returnsFilePath_withUploadsPrefix() {
+  void saveFile_returnsFullS3Url_onSuccess() throws Exception {
     MockMultipartFile file =
-        new MockMultipartFile(
-            "image", "nightmarket.jpg", "image/jpeg", "fake-image-content".getBytes());
+            new MockMultipartFile(
+                    "image", "nightmarket.jpg", "image/jpeg", "fake-image-content".getBytes());
 
-    String result = fileStorageService.save(file);
+    String resultUrl = fileStorageService.saveFile(file);
 
-    assertNotNull(result);
-    assertTrue(result.startsWith("/uploads/"));
-    assertTrue(result.endsWith("nightmarket.jpg"));
+    assertNotNull(resultUrl);
+    assertTrue(resultUrl.startsWith("https://vsa-grc-event-images.s3.us-east-2.amazonaws.com/"));
+    assertTrue(resultUrl.endsWith(".jpg"));
+
+    // Verify S3 client putObject call
+    verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
 
   @Test
-  void save_actuallyWritesFileToDisk() {
+  void saveFile_sendsCorrectBucketAndContentTypeToS3() throws Exception {
     MockMultipartFile file =
-        new MockMultipartFile("image", "hoodie.jpg", "image/jpeg", "fake-image-content".getBytes());
+            new MockMultipartFile(
+                    "image", "vsa-banner.png", "image/png", "fake-png-content".getBytes());
 
-    String result = fileStorageService.save(file);
+    fileStorageService.saveFile(file);
 
-    // extract filename from returned path "/uploads/uuid_hoodie.jpg"
-    String fileName = result.replace("/uploads/", "");
-    Path savedFile = tempDir.resolve(fileName);
+    ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
+    verify(s3Client).putObject(captor.capture(), any(RequestBody.class));
 
-    assertTrue(Files.exists(savedFile));
+    PutObjectRequest request = captor.getValue();
+    assertEquals("vsa-grc-event-images", request.bucket());
+    assertEquals("image/png", request.contentType());
+    assertTrue(request.key().endsWith(".png"));
   }
 
   @Test
-  void save_generatesUniqueFilenames_forSameFile() {
+  void saveFile_generatesUniqueKeys_forSameFileName() throws Exception {
     MockMultipartFile file1 =
-        new MockMultipartFile("image", "photo.jpg", "image/jpeg", "content1".getBytes());
+            new MockMultipartFile("image", "photo.jpg", "image/jpeg", "content1".getBytes());
     MockMultipartFile file2 =
-        new MockMultipartFile("image", "photo.jpg", "image/jpeg", "content2".getBytes());
+            new MockMultipartFile("image", "photo.jpg", "image/jpeg", "content2".getBytes());
 
-    String result1 = fileStorageService.save(file1);
-    String result2 = fileStorageService.save(file2);
+    String url1 = fileStorageService.saveFile(file1);
+    String url2 = fileStorageService.saveFile(file2);
 
-    // same filename but UUID prefix should make them different
-    assertNotEquals(result1, result2);
+    // UUID prefixes should make S3 URLs unique
+    assertNotEquals(url1, url2);
   }
 
   @Test
-  void save_preservesOriginalFilename_inReturnedPath() {
-    MockMultipartFile file =
-        new MockMultipartFile(
-            "image", "vsa-banner.png", "image/png", "fake-png-content".getBytes());
-
-    String result = fileStorageService.save(file);
-
-    assertTrue(result.contains("vsa-banner.png"));
-  }
-
-  @Test
-  void save_throwsRuntimeException_whenFileIsEmpty() {
+  void saveFile_throwsIllegalArgumentException_whenFileIsEmpty() {
     MockMultipartFile emptyFile =
-        new MockMultipartFile(
-            "image", "empty.jpg", "image/jpeg", new byte[0] // empty content
-            );
+            new MockMultipartFile("image", "empty.jpg", "image/jpeg", new byte[0]);
 
-    // saving an empty file should still work — it just writes an empty file
-    // this verifies no exception is thrown for empty but valid multipart
-    assertDoesNotThrow(() -> fileStorageService.save(emptyFile));
+    IllegalArgumentException ex =
+            assertThrows(IllegalArgumentException.class, () -> fileStorageService.saveFile(emptyFile));
+
+    assertEquals("Cannot store empty file.", ex.getMessage());
+    verifyNoInteractions(s3Client);
   }
 
   @Test
-  void save_throwsRuntimeException_whenIOExceptionOccurs() throws Exception {
-    // point uploadDir to a non-existent path to force an IOException
-    Field uploadDirField = FileStorageService.class.getDeclaredField("uploadDir");
-    uploadDirField.setAccessible(true);
-    uploadDirField.set(fileStorageService, Path.of("/nonexistent/path/that/cannot/exist"));
-
+  void saveFile_propagatesException_whenS3ClientFails() {
     MockMultipartFile file =
-        new MockMultipartFile("image", "test.jpg", "image/jpeg", "content".getBytes());
+            new MockMultipartFile("image", "test.jpg", "image/jpeg", "content".getBytes());
 
-    RuntimeException ex = assertThrows(RuntimeException.class, () -> fileStorageService.save(file));
+    doThrow(S3Exception.builder().message("Access Denied").build())
+            .when(s3Client)
+            .putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
-    assertTrue(ex.getMessage().startsWith("Failed to save file:"));
+    assertThrows(S3Exception.class, () -> fileStorageService.saveFile(file));
+  }
+
+  // ── deleteFile ────────────────────────────────────────────────
+
+  @Test
+  void deleteFile_extractsKeyFromFullUrl_andCallsDeleteObject() {
+    String fullS3Url = "https://vsa-grc-event-images.s3.us-east-2.amazonaws.com/1234-uuid-nightmarket.jpg";
+
+    fileStorageService.deleteFile(fullS3Url);
+
+    ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+    verify(s3Client).deleteObject(captor.capture());
+
+    DeleteObjectRequest request = captor.getValue();
+    assertEquals("vsa-grc-event-images", request.bucket());
+    assertEquals("1234-uuid-nightmarket.jpg", request.key());
+  }
+
+  @Test
+  void deleteFile_acceptsRawKey_andCallsDeleteObject() {
+    String rawKey = "1234-uuid-nightmarket.jpg";
+
+    fileStorageService.deleteFile(rawKey);
+
+    ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+    verify(s3Client).deleteObject(captor.capture());
+
+    assertEquals("1234-uuid-nightmarket.jpg", captor.getValue().key());
+  }
+
+  @Test
+  void deleteFile_doesNothing_whenFileUrlOrNameNullOrBlank() {
+    fileStorageService.deleteFile(null);
+    fileStorageService.deleteFile("");
+    fileStorageService.deleteFile("   ");
+
+    verifyNoInteractions(s3Client);
   }
 }
