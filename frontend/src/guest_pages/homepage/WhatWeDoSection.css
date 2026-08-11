@@ -1,13 +1,13 @@
 .what-we-do {
   padding: 6rem 8vw;
   text-align: center;
-  background: #fbfbfb;
+  background: #F7F7F7;
 }
 
 .what-we-do__subheading {
   color: #c22e2d;
   font-size: clamp(2rem, 3.5vw, 2.75rem);
-  font-weight: 800;
+  font-weight: 600;
   margin: -0.25rem 0 3.5rem;
   letter-spacing: -0.02em;
 }
@@ -15,7 +15,7 @@
 .what-we-do__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 430px 300px;
+  grid-template-rows: 455px 320px;
   gap: 1.5rem;
   max-width: 1080px;
   margin: 0 auto;
@@ -25,7 +25,7 @@
 /* Base Card Styling */
 .activity-card {
   border-radius: 24px;
-  padding: 2.25rem;
+  padding: 2.25rem 3.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -35,8 +35,8 @@
 }
 
 .activity-card h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 600;
   margin: 0 0 0.5rem;
   color: #1a1a1a;
 }
@@ -46,12 +46,33 @@
   line-height: 1.45;
   color: #555555;
   margin: 0;
-  max-width: 85%;
+  max-width: 95%;
 }
 
 /* Light Cards */
-.activity-card--light {
+/* .activity-card--light {
   background: linear-gradient(145deg, #fce7e5 0%, #f4c3bf 100%);
+} */
+
+#activity-card-1 {
+  background: radial-gradient(ellipse at 100% 100%, #FFAEAC 0%, #F8DEDE 42%, #FFE8E8 72%, #ffe9e9 100%);
+  padding: 3rem 3.5rem 2rem 3.5rem;
+
+  h4 {
+    line-height: 1;
+  }
+}
+
+#activity-card-2 {
+  background: radial-gradient(ellipse at 100% 0%, #FBB8B8 0%, #F9E2E2 40%, #FFE2E2 72%, #FFF9F9 100%);
+}
+
+#activity-card-3 {
+  background: radial-gradient(ellipse at 0% 100%, #EEB7B6 0%, #F7D9D8 42%, #F9D3D3 72%, #FFDFDF 100%);
+
+  p {
+    max-width: 100%;
+  }
 }
 
 /* Background Cross/Plus SVG Pattern overlay */
@@ -74,96 +95,52 @@
 
 .activity-card__art--meetings {
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
   height: 240px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
-.meetings-flyer-img {
-  max-width: 130px;
+/* first child: centered behind */
+#swoosh-effect {
+  width: clamp(300px, 35vw, 390px);
   height: auto;
-  transform: rotate(-30deg);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.16));
+
+
+  z-index: 2;
+}
+
+/* second child: centered on top */
+.meetings-flyer-img {
+  max-width: 140px;
+  height: auto;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-47%, -45%) rotate(-30deg);
+
   filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.16));
   z-index: 2;
   transition: transform 0.3s ease;
 }
 
 .activity-card:hover .meetings-flyer-img {
-  transform: rotate(-8deg) scale(1.03);
+  transform: translate(-47%, -45%) rotate(-10deg) scale(1.08);
 }
 
-/* Floating Badges Container */
-.floating-badge {
+#plus-mark-1 {
   position: absolute;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.badge-circle {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 6px 16px rgba(216, 61, 59, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-}
-
-.badge-icon {
-  font-size: 1.1rem;
-}
-
-.swoosh-tail {
-  position: absolute;
-  width: 80px;
-  height: 55px;
-  pointer-events: none;
-  z-index: -1;
-  overflow: visible;
-}
-
-/* Positioning four badges around flyer */
-.badge--top-left {
-  top: 15%;
-  left: 8%;
-}
-.swoosh--tl {
-  right: -40px;
-  top: 10px;
-}
-
-.badge--top-right {
-  top: 10%;
-  right: 12%;
-}
-.swoosh--tr {
-  left: -40px;
-  top: 15px;
-}
-
-.badge--bottom-left {
-  bottom: 12%;
-  left: 18%;
-}
-.swoosh--bl {
-  right: -35px;
-  bottom: 10px;
-}
-
-.badge--bottom-right {
-  bottom: 18%;
-  right: 10%;
-}
-.swoosh--br {
-  left: -35px;
-  top: -10px;
+  bottom: 0%;
+  right: -2%;
+  width: 140px;
+  height: 140px;
 }
 
 
@@ -174,9 +151,9 @@
 .activity-card__art--events {
   position: relative;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-end;
-  height: 280px;
+  height: 500px;
   width: 100%;
 }
 
@@ -185,54 +162,72 @@
   position: relative;
   z-index: 2;
   display: flex;
-  align-items: flex-end; /* Keeps all posters aligned to the bottom platform */
-  justify-content: center;
-  margin-bottom: 18px; /* Elevates posters relative to the red disk base */
+  margin-top: 7px;
+  /* Elevates posters relative to the red disk base */
 }
+
 
 /* Base style for posters */
 .poster-img {
-  border-radius: 4px;
   box-shadow: -4px 8px 18px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+#poster-frame-1 {
+  width: 175px;
+  height: 245px;
+  z-index: 3;
 }
 
 /* Front Poster (Tallest & Largest) */
 .poster-1 {
-  width: 175px;
-  height: 245px; /* Explicit height ensures descending steps */
-  z-index: 3;
-  object-fit: cover;
+  /* Explicit height ensures descending steps */
 }
 
 /* Middle Poster (Slightly shorter & shifted closely behind) */
-.poster-2 {
+#poster-frame-2 {
   width: 155px;
-  height: 215px; /* Shorter height */
+  height: 205px;
   z-index: 2;
-  margin-left: -85px; /* Tight negative margin brings it closer behind Poster 1 */
+  align-self: center;
+  margin-left: -85px;
+}
+
+.poster-2 {
   object-fit: cover;
+  object-position: center;
+  /* Shorter height */
+  /* Tight negative margin brings it closer behind Poster 1 */
   filter: brightness(0.92);
 }
 
 /* Back Poster (Shortest & shifted slightly further right) */
-.poster-3 {
+#poster-frame-3 {
   width: 140px;
-  height: 190px; /* Shortest height */
+  height: 180px;
+  align-self: center;
+  margin-left: -160px;
   z-index: 1;
-  margin-left: -80px; /* Tight negative margin brings it closer behind Poster 2 */
+}
+
+.poster-3 {
+  /* Shortest height */
+  /* Tight negative margin brings it closer behind Poster 2 */
   object-fit: cover;
-  filter: brightness(0.82);
+  filter: brightness(0.52);
 }
 
 /* Red 3D Ellipse Platform Disk — sits under the poster group, which is
    now left-aligned rather than centered on the card. */
 .events-red-platform {
   position: absolute;
-  bottom: -4px;
-  left: 30px;
+  bottom: -25px;
+  /* left: 60px; */
   width: 300px;
-  height: 65px;
+  height: 75px;
   background: #d83d3b;
   border-radius: 50%;
   z-index: 1;
@@ -241,66 +236,27 @@
 
 /* Subtle spread animation on card hover */
 .activity-card:hover .poster-2 {
-  transform: translateX(8px);
+  transform: translateX(30px);
+  filter: brightness(1);
 }
 
 .activity-card:hover .poster-3 {
-  transform: translateX(16px);
+  transform: translateX(48px);
+  filter: brightness(1);
 }
 
 /* small cluster of decorative plus-marks, top-right corner of the card */
 .events-decor {
   position: absolute;
   top: 1.5rem;
-  right: 1.75rem;
-  width: 90px;
-  height: 90px;
+  right: 0.5rem;
   pointer-events: none;
   z-index: 2;
 }
 
-.plus-mark {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-}
-
-.plus-mark::before,
-.plus-mark::after {
-  content: "";
-  position: absolute;
-  background: rgba(255, 255, 255, 0.55);
-}
-
-.plus-mark::before {
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1.5px;
-  transform: translateY(-50%);
-}
-
-.plus-mark::after {
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1.5px;
-  transform: translateX(-50%);
-}
-
-.plus-mark--1 {
-  top: 0;
-  right: 40px;
-}
-
-.plus-mark--2 {
-  top: 35px;
-  right: 0;
-}
-
-.plus-mark--3 {
-  top: 70px;
-  right: 55px;
+#plus-mark-2 {
+  width: 150px;
+  height: 150px;
 }
 
 /* ==========================================================================
@@ -320,6 +276,7 @@
   position: relative;
   width: 100%;
   max-width: 340px;
+  height: 100%;
 }
 
 /* pink card peeking out behind the photo — offset is a % of the photo's
@@ -328,10 +285,10 @@
   position: absolute;
   right: -10%;
   bottom: -9%;
-  width: 100%;
-  height: 100%;
-  background: #f3b6b3;
-  border-radius: 14px;
+  width: 80%;
+  height: 80%;
+  background: #FAADAD;
+  border-radius: 5px;
   z-index: 0;
 }
 
@@ -339,14 +296,21 @@
   position: relative;
   z-index: 1;
   display: block;
+  /* height: 55%; */
   width: 100%;
   aspect-ratio: 2 / 1;
   object-fit: cover;
-  border-radius: 14px;
-  border: 3px solid #ab3130;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+  border: 2px solid #ab3130;
+  box-shadow: 0 2px 6px 3px rgba(0, 0, 0, 0.25);
 }
-
+#plus-mark-3 {
+  position: absolute;
+  height: 120px;
+  width: 120px;
+  top: 8%;
+  right: 1%;
+}
 /* CTA Card (Card 4) */
 .activity-card--cta {
   background: linear-gradient(135deg, #8b1817 0%, #be2b2a 50%, #d83938 100%);
@@ -360,7 +324,7 @@
   position: absolute;
   inset: 0;
   background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-  linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 30px 30px;
   pointer-events: none;
 }
@@ -372,7 +336,7 @@
 }
 
 .activity-card__logo img {
-  width: 70px;
+  width: 150px;
   height: auto;
   align-self: flex-end;
   margin-left: auto;
@@ -395,13 +359,82 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+@media (max-width: 1100px) {
+  #activity-card-1 {
+    padding-bottom: 1.2rem;
+  }
+
+  .events-decor {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    right: 25%;
+  }
+}
+
 @media (max-width: 768px) {
   .what-we-do__grid {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
     grid-auto-rows: auto;
+    gap: 1.5rem;
   }
 
   .activity-card {
-    min-height: 340px;
+    min-height: auto;
+    height: auto;
   }
+
+  .activity-card__art--events {
+    height: 260px;
+  }
+
+  .activity-card__logo img {
+    width: 120px;
+  }
+
+  #activity-card-1 {
+    padding: 1rem 3.5rem 1.5rem 3.5rem;
+  }
+
+  .activity-card__art--meetings {
+    margin-bottom: 2rem;
+  }
+
+  #swoosh-effect {
+    width: clamp(290px, 300px, 340px);
+  }
+
+  .activity-card--cta {
+    padding: 1.5rem 1.8rem;
+  }
+
+  .activity-card__cta-bottom {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 500px) {
+
+  .activity-card__logo {
+    img {
+      width: 90px;
+
+    }
+  }
+  .events-decor {
+    right: 12%;
+  }
+  #plus-mark-2 {
+    width: 100px;
+    height: 100px;
+  }
+  .activity-card h4 {
+    line-height: 1.2;
+  }
+  #activity-card-3 {
+    p {
+        margin-bottom: 15px;
+    }
+}
 }

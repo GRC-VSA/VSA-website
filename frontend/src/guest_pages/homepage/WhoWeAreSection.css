@@ -1,7 +1,7 @@
 .who-we-are {
-  padding: 6rem 8vw;
+  padding: 6rem 4vw;
   text-align: center;
-  background: #f7f7f7;
+  background: white;
 }
 
 .who-we-are__intro {
@@ -12,7 +12,7 @@
 /* red underline centered beneath the "Who We Are" heading */
 .who-we-are .section-heading {
   position: relative;
-  padding-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
   margin-bottom: 2rem;
 }
 
@@ -22,8 +22,8 @@
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: 340px;
-  max-width: 60%;
+  width: 500px;
+  max-width: 80%;
   height: 2px;
   background: #c22e2d;
 }
@@ -46,7 +46,7 @@
   width: 100%;
   overflow: hidden;
   position: relative;
-  padding: 20px 0 40px; /* Extra bottom padding for shadow visibility */
+  padding: 2.5rem 0 40px; /* Extra bottom padding for shadow visibility */
 }
 
 /* Track running GPU-accelerated marquee */
@@ -66,10 +66,10 @@
 
 /* Standard Vertical Photo Cards (Matching Figma ratios) */
 .who-we-are__photo-card {
-  width: 180px;
+  width: auto;
   height: 250px;
   flex-shrink: 0;
-  border-radius: 6px; /* Match crisp corner radius in Figma */
+  /* border-radius: 6px; Match crisp corner radius in Figma */
   overflow: hidden;
   background-color: #f0f0f0;
 
