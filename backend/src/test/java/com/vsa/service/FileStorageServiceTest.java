@@ -50,7 +50,7 @@ class FileStorageServiceTest {
             new MockMultipartFile(
                     "image", "nightmarket.jpg", "image/jpeg", "fake-image-content".getBytes());
 
-    String resultUrl = fileStorageService.saveFile(file);
+    String resultUrl = fileStorageService.save(file);
 
     assertNotNull(resultUrl);
     assertTrue(resultUrl.startsWith("https://vsa-grc-event-images.s3.us-east-2.amazonaws.com/"));
@@ -66,7 +66,7 @@ class FileStorageServiceTest {
             new MockMultipartFile(
                     "image", "vsa-banner.png", "image/png", "fake-png-content".getBytes());
 
-    fileStorageService.saveFile(file);
+    fileStorageService.save(file);
 
     ArgumentCaptor<PutObjectRequest> captor = ArgumentCaptor.forClass(PutObjectRequest.class);
     verify(s3Client).putObject(captor.capture(), any(RequestBody.class));
@@ -84,8 +84,8 @@ class FileStorageServiceTest {
     MockMultipartFile file2 =
             new MockMultipartFile("image", "photo.jpg", "image/jpeg", "content2".getBytes());
 
-    String url1 = fileStorageService.saveFile(file1);
-    String url2 = fileStorageService.saveFile(file2);
+    String url1 = fileStorageService.save(file1);
+    String url2 = fileStorageService.save(file2);
 
     // UUID prefixes should make S3 URLs unique
     assertNotEquals(url1, url2);
@@ -97,7 +97,7 @@ class FileStorageServiceTest {
             new MockMultipartFile("image", "empty.jpg", "image/jpeg", new byte[0]);
 
     IllegalArgumentException ex =
-            assertThrows(IllegalArgumentException.class, () -> fileStorageService.saveFile(emptyFile));
+            assertThrows(IllegalArgumentException.class, () -> fileStorageService.save(emptyFile));
 
     assertEquals("Cannot store empty file.", ex.getMessage());
     verifyNoInteractions(s3Client);
@@ -112,7 +112,7 @@ class FileStorageServiceTest {
             .when(s3Client)
             .putObject(any(PutObjectRequest.class), any(RequestBody.class));
 
-    assertThrows(S3Exception.class, () -> fileStorageService.saveFile(file));
+    assertThrows(S3Exception.class, () -> fileStorageService.save(file));
   }
 
   // ── deleteFile ────────────────────────────────────────────────

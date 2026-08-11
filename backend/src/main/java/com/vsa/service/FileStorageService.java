@@ -52,4 +52,22 @@ public class FileStorageService {
 
     return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
   }
+
+  public void deleteFile(String fileUrlOrName) {
+    if (fileUrlOrName == null || fileUrlOrName.isBlank()) {
+      return;
+    }
+
+    String fileName = fileUrlOrName;
+    if (fileUrlOrName.contains(".amazonaws.com/")) {
+      fileName = fileUrlOrName.substring(fileUrlOrName.lastIndexOf("/") + 1);
+    }
+
+    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(fileName)
+            .build();
+
+    s3Client.deleteObject(deleteObjectRequest);
+  }
 }
