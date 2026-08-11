@@ -18,10 +18,6 @@ if (typeof window !== 'undefined' && !window.localStorage) {
         };
     })();
 
-    Object.defineProperty(window, 'localStorage', {
-        value: localStorageMock,
-    });
-
     Object.defineProperty(window, 'matchMedia', {
         writable: true,
         value: (query) => ({
@@ -39,5 +35,9 @@ if (typeof window !== 'undefined' && !window.localStorage) {
     Object.defineProperty(window, 'scrollTo', {
         writable: true,
         value: () => {},
+    });
+
+    Object.defineProperty(window, 'localStorage', {
+        value: localStorageMock,
     });
 }

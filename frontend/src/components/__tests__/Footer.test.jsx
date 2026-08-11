@@ -4,6 +4,22 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, vi } from "vitest";
 import Footer from "../Footer";
 
+// Mock GSAP and ScrollTrigger to prevent window.matchMedia initialization errors
+vi.mock("gsap", () => ({
+    default: {
+        registerPlugin: vi.fn(),
+    },
+}));
+
+vi.mock("gsap/ScrollTrigger", () => ({
+    default: {},
+    ScrollTrigger: {},
+}));
+
+vi.mock("../../hooks/useScrollReveal.js", () => ({
+    useScrollReveal: () => ({ current: null }),
+}));
+
 const mockNavigate = vi.fn();
 vi.mock("react-router-dom", async () => {
     const actual = await vi.importActual("react-router-dom");
@@ -12,10 +28,6 @@ vi.mock("react-router-dom", async () => {
         useNavigate: () => mockNavigate,
     };
 });
-
-vi.mock("../hooks/useScrollReveal.js", () => ({
-    useScrollReveal: () => ({ current: null }),
-}));
 
 describe("Footer Component", () => {
     it("renders branding and contact details correctly", () => {
