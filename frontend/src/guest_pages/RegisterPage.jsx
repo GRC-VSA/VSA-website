@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { registerUser } from "../api/auth.js";
 import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";

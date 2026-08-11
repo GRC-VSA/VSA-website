@@ -1,5 +1,5 @@
 import { useEvents } from "../context/EventsContext.jsx";
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from  "framer-motion";    
 import Fuse from "fuse.js";
 import "./EventsPage.css";

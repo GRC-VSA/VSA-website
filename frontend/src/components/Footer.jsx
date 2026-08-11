@@ -1,3 +1,4 @@
+import React from "react";
 import { useScrollReveal } from "../hooks/useScrollReveal.js";
 import { useNavigate } from "react-router-dom";
 import "./Footer.css";

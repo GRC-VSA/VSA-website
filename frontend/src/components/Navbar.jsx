@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { LuSearch, LuMenu, LuX } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";

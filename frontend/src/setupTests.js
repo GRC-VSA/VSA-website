@@ -21,4 +21,18 @@ if (typeof window !== 'undefined' && !window.localStorage) {
     Object.defineProperty(window, 'localStorage', {
         value: localStorageMock,
     });
+
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: (query) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: () => {}, // Deprecated
+            removeListener: () => {}, // Deprecated
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            dispatchEvent: () => false,
+        }),
+    });
 }
