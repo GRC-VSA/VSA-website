@@ -35,4 +35,9 @@ if (typeof window !== 'undefined' && !window.localStorage) {
             dispatchEvent: () => false,
         }),
     });
+
+    Object.defineProperty(window, 'scrollTo', {
+        writable: true,
+        value: () => {},
+    });
 }
