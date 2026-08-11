@@ -36,6 +36,11 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
 
+aws:
+  region: ${AWS_REGION:us-east-2}
+  s3:
+    bucket-name: ${S3_BUCKET_NAME:vsa-grc-event-images}
+
 # Frontend URL used for email links and CORS. Can be overridden with environment variable FRONTEND_URL
 frontend:
   url: ${FRONTEND_URL:http://localhost:5173}
