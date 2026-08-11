@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getEvents, createEvent } from "../events";
+import { getEvents, createEvent } from "../Events";
 
 describe("Events API Services", () => {
     beforeEach(() => {
