@@ -26,8 +26,8 @@ public class FileStorageService {
     this.s3Client = s3Client;
   }
 
-  public String saveFile(MultipartFile file) throws IOException {
-    if (file.isEmpty()) {
+  public String save(MultipartFile file) {
+    if (file == null || file.isEmpty()) {
       throw new IllegalArgumentException("Cannot store empty file.");
     }
 
@@ -44,26 +44,12 @@ public class FileStorageService {
             .contentType(file.getContentType())
             .build();
 
-    s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+    try {
+      s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to store file on S3: " + e.getMessage(), e);
+    }
 
     return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
-  }
-
-  public void deleteFile(String fileUrlOrName) {
-    if (fileUrlOrName == null || fileUrlOrName.isBlank()) {
-      return;
-    }
-
-    String fileName = fileUrlOrName;
-    if (fileUrlOrName.contains(".amazonaws.com/")) {
-      fileName = fileUrlOrName.substring(fileUrlOrName.lastIndexOf("/") + 1);
-    }
-
-    DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
-            .bucket(bucketName)
-            .key(fileName)
-            .build();
-
-    s3Client.deleteObject(deleteObjectRequest);
   }
 }
