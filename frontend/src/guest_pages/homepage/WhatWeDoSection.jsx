@@ -89,10 +89,10 @@ const WhatWeDoSection = () => {
               <div className="badge-circle">
                 <span className="badge-icon">🎵</span>
               </div>
-            </div> */}  
+            </div> */}
 
             {/* Central Flyer */}
-            <img src={swoosh} id="swoosh-effect"/>
+            <img src={swoosh} id="swoosh-effect" />
             <img
               src={meetingsFlyer}
               alt="VSA Club Meeting Flyer"
@@ -107,7 +107,7 @@ const WhatWeDoSection = () => {
               and have fun.
             </p>
           </div>
-          <img src={plusMark1} id="plus-mark-1"/>
+          <img src={plusMark1} id="plus-mark-1" />
         </div>
 
         {/* Card 2: Large-scale Events */}
@@ -116,7 +116,7 @@ const WhatWeDoSection = () => {
             {/* <span className="plus-mark plus-mark--1" />
             <span className="plus-mark plus-mark--2" />
             <span className="plus-mark plus-mark--3" /> */}
-            <img src={plusMark2} id="plus-mark-2"/>
+            <img src={plusMark2} id="plus-mark-2" />
           </div>
 
           <div className="activity-card__content">
@@ -176,7 +176,7 @@ const WhatWeDoSection = () => {
               />
             </div>
           </div>
-          <img src={plusMark3} id="plus-mark-3"/>
+          <img src={plusMark3} id="plus-mark-3" />
         </div>
 
         {/* Card 4: CTA */}
@@ -186,13 +186,19 @@ const WhatWeDoSection = () => {
           </div>
           <div className="activity-card__cta-bottom">
             <h4>And So Much More!</h4>
-            <button type="button" className="pill-button pill-button--light" onClick={() => navigate("/events")}>
+            <button type="button" className="pill-button pill-button--light"
+              onClick={() => {
+                navigate("/events");
+                setTimeout(() => {
+                  window.scrollTo(0, 0); //Scroll the top of the event page
+                }, 0);
+              }}>
               Learn About Events
             </button>
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 
