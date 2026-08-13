@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* Main Wrapper - Aligns seamlessly with the above section */
+.home-footer {
+  width: 100%;
+  background-color: #fdfaf3; /* Light cream background matching 'What We Believe' */
+  padding: 5rem 0 0;
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Red Outer Card Container */
+.home-footer__container {
+  position: relative;
+  width: 100%;
+  background-color: #AB3130; /* Brand Standard Red */
+  border-radius: 40px 40px 0 0;
+  padding: 0 5vw 3.5rem;
+  color: #ece0a6; /* Brand Standard Yellow */
+  box-sizing: border-box;
+  display: flow-root; /* Stops the brand's negative top margin from
+                          collapsing with (and dragging up) this container's
+                          own top edge — without clipping the logo like
+                          overflow:hidden would. */
+}
+
+/* Floating Central Logo & Header */
+/* Logo floats independently of document flow — growing it never changes
+   the footer's height. top:0 + translate(-50%,-50%) centers the logo's
+   own vertical midpoint exactly on the container's top edge, which keeps
+   it perfectly half-in/half-out automatically at any size. */
+.home-footer__logo-wrap {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.home-footer__logo {
+  width: 300px;
+  height: auto;
+  display: block;
+}
+
+/* Title/subtitle text — independent of the logo now, so its position is
+   unaffected by however large the logo is set to. */
+.home-footer__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 68px; /* same visual gap the old -65px margin produced */
+  margin-bottom: 2.5rem;
+}
+
+.home-footer__title {
+  margin: 0.5rem 0 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ece0a6;
+  line-height: 1;
+  font-family: 'Poppins', sans-serif;
+}
+
+.home-footer__subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ece0a6;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* 3-Column Grid Layout */
+.home-footer__content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Column Headings */
+.home-footer__heading {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #ece0a6;
+  margin: 0 0 1.25rem;
+  display: inline-block;
+  border-bottom: 2px solid #ece0a6;
+  padding-bottom: 3px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.home-footer__heading--motto {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.motto-underline {
+  border-bottom: 2px solid #ece0a6;
+  padding-bottom: 3px;
+}
+
+/* Contact Column */
+.home-footer__contact-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ece0a6;
+  margin: 0 0 0.6rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.home-footer__contact-item {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #ece0a6;
+  margin: 0.45rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.brand-icon {
+  flex-shrink: 0;
+  fill: #ece0a6;
+}
+
+/* Center Action Buttons & Social Links */
+.home-footer__col--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-footer__cta-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 50px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease,
+  border-color 0.2s ease;
+}
+
+.pill-btn:hover {
+  transform: translateY(-2px);
+}
+
+.pill-btn--solid {
+  background-color: #ece0a6;
+  color: #ab3130 !important;
+  border: none;
+  padding-right: 1.25rem;
+}
+
+.pill-btn--solid span {
+  color: #ab3130 !important;
+}
+
+.pill-btn--solid:hover {
+  background-color: #f6edc8;
+}
+
+.pill-btn__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pill-btn__icon--left {
+  background-color: #ab3130;
+  color: #ece0a6;
+}
+
+.pill-btn--outline {
+  background-color: transparent;
+  color: #ece0a6 !important;
+  border: 1px solid #ece0a6;
+  padding-left: 1.25rem;
+}
+
+.pill-btn--outline span {
+  color: #ece0a6 !important;
+}
+
+.pill-btn--outline:hover {
+  background-color: #ece0a6;
+  color: #ab3130 !important;
+  border-color: #ece0a6;
+}
+
+.pill-btn--outline:hover span {
+  color: #ab3130 !important;
+}
+
+.pill-btn__icon--right {
+  background-color: #ece0a6;
+  color: #ab3130;
+}
+
+.pill-btn--outline:hover .pill-btn__icon--right {
+  background-color: #ab3130;
+  color: #ece0a6;
+}
+
+/* Social Buttons */
+.home-footer__socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1.5px solid #ece0a6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.social-btn:hover {
+  background-color: #ece0a6;
+  transform: translateY(-2px);
+}
+
+.social-btn:hover svg {
+  stroke: #ab3130;
+}
+
+/* Right Column: Motto */
+.home-footer__col--right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.home-footer__motto-text {
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #ece0a6;
+  max-width: 290px;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Ensure the underlined span in the heading strictly uses brand yellow */
+.home-footer__heading .motto-underline,
+.motto-underline {
+  color: #ece0a6 !important;
+  border-bottom: 2px solid #ece0a6;
+  padding-bottom: 3px;
+}
+
+/* Ensure contact info text, labels, and nested spans strictly use brand yellow */
+.home-footer__contact-details,
+.home-footer__contact-name,
+.home-footer__contact-item,
+.home-footer__contact-item span {
+  color: #ece0a6 !important;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+  .home-footer__content {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    text-align: center;
+  }
+
+  .home-footer__col--right {
+    text-align: center;
+    align-items: center;
+  }
+
+  .home-footer__motto-text {
+    max-width: 100%;
+  }
+
+  .home-footer__contact-item {
+    justify-content: center;
+  }
+}

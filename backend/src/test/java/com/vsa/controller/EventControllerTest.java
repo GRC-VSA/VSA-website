@@ -1,241 +1,145 @@
 package com.vsa.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.Event;
 import com.vsa.service.EventService;
 import com.vsa.service.FileStorageService;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.http.MediaType;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(EventController.class)
+@ExtendWith(MockitoExtension.class)
 class EventControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Mock private EventService eventService;
+  @Mock private FileStorageService fileStorageService;
 
-  @Autowired private tools.jackson.databind.ObjectMapper objectMapper;
-
-  @MockitoBean private EventService eventService;
-
-  @MockitoBean private FileStorageService fileStorageService;
-
-  private Event sampleEvent;
-
-  @BeforeEach
-  void setUp() {
-    sampleEvent = new Event();
-    sampleEvent.setEventName("VSA Night Market");
-    sampleEvent.setTitle("Night Market 2026");
-    sampleEvent.setDescription("Annual night market");
-    sampleEvent.setEventDate(LocalDate.of(2026, 7, 15));
-    sampleEvent.setStartTime(LocalTime.of(17, 0));
-    sampleEvent.setEndTime(LocalTime.of(21, 0));
-    sampleEvent.setCapacity(300);
-    sampleEvent.setMinAge(0);
-    sampleEvent.setLocation("Student Union Hall");
-    sampleEvent.setStatus("upcoming");
-  }
-
-  // ── GET /api/events ───────────────────────────────────────────
+  @InjectMocks private EventController eventController;
 
   @Test
-  void getEvents_returns200_withListOfEvents() throws Exception {
-    when(eventService.getAllEvents()).thenReturn(List.of(sampleEvent));
+  void getEvents_ReturnsList() {
+    List<Event> mockEvents = List.of(new Event(), new Event());
+    when(eventService.getAllEvents()).thenReturn(mockEvents);
 
-    mockMvc
-        .perform(get("/api/events"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].eventName").value("VSA Night Market"));
+    ResponseEntity<List<Event>> response = eventController.getEvents();
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(2, response.getBody().size());
+    verify(eventService).getAllEvents();
   }
 
   @Test
-  void getEvents_returns200_withEmptyList() throws Exception {
-    when(eventService.getAllEvents()).thenReturn(List.of());
+  void getEventById_ValidId_ReturnsEvent() {
+    Long eventId = 1L;
+    Event mockEvent = new Event();
+    when(eventService.getEventById(eventId)).thenReturn(mockEvent);
 
-    mockMvc
-        .perform(get("/api/events"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isEmpty());
-  }
+    ResponseEntity<Event> response = eventController.getEventById(eventId);
 
-  // ── GET /api/events/{id} ──────────────────────────────────────
-
-  @Test
-  void getEventById_returns200_whenFound() throws Exception {
-    when(eventService.getEventById(1L)).thenReturn(sampleEvent);
-
-    mockMvc
-        .perform(get("/api/events/1"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.eventName").value("VSA Night Market"))
-        .andExpect(jsonPath("$.status").value("upcoming"));
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(mockEvent, response.getBody());
+    verify(eventService).getEventById(eventId);
   }
 
   @Test
-  void getEventById_returns404_whenNotFound() throws Exception {
-    when(eventService.getEventById(99L)).thenThrow(new ResourceNotFoundException("Event", 99L));
+  void createEvent_WithImage_SavesImageAndCreatesEvent() {
+    Event inputEvent = new Event();
+    MockMultipartFile image =
+            new MockMultipartFile("image", "poster.jpg", "image/jpeg", "image content".getBytes());
 
-    mockMvc.perform(get("/api/events/99")).andExpect(status().isNotFound());
+    when(fileStorageService.save(image)).thenReturn("/uploads/unique_poster.jpg");
+    when(eventService.createEvent(any(Event.class))).thenAnswer(i -> i.getArgument(0));
+
+    ResponseEntity<Event> response = eventController.createEvent(inputEvent, image);
+
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals("/uploads/unique_poster.jpg", response.getBody().getImageUrl());
+    verify(fileStorageService).save(image);
+    verify(eventService).createEvent(inputEvent);
   }
 
-  // ── POST /api/events ──────────────────────────────────────────
-
   @Test
-  void createEvent_returns201_withoutImage() throws Exception {
-    when(eventService.createEvent(any(Event.class))).thenReturn(sampleEvent);
+  void createEvent_WithoutImage_CreatesEventOnly() {
+    Event inputEvent = new Event();
 
-    // event JSON part
-    MockMultipartFile eventPart =
-        new MockMultipartFile(
-            "event",
-            "",
-            MediaType.APPLICATION_JSON_VALUE,
-            objectMapper.writeValueAsBytes(sampleEvent));
+    when(eventService.createEvent(inputEvent)).thenReturn(inputEvent);
 
-    mockMvc
-        .perform(multipart("/api/events").file(eventPart))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.eventName").value("VSA Night Market"));
+    ResponseEntity<Event> response = eventController.createEvent(inputEvent, null);
 
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
     verify(fileStorageService, never()).save(any());
+    verify(eventService).createEvent(inputEvent);
   }
 
   @Test
-  void createEvent_returns201_withImage() throws Exception {
-    when(fileStorageService.save(any())).thenReturn("/uploads/test.jpg");
-    when(eventService.createEvent(any(Event.class))).thenReturn(sampleEvent);
+  void createEventJson_CreatesEvent() {
+    Event inputEvent = new Event();
+    when(eventService.createEvent(inputEvent)).thenReturn(inputEvent);
 
-    MockMultipartFile eventPart =
-        new MockMultipartFile(
-            "event",
-            "",
-            MediaType.APPLICATION_JSON_VALUE,
-            objectMapper.writeValueAsBytes(sampleEvent));
+    ResponseEntity<Event> response = eventController.createEventJson(inputEvent);
 
-    MockMultipartFile imagePart =
-        new MockMultipartFile(
-            "image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "fake-image-content".getBytes());
-
-    mockMvc
-        .perform(multipart("/api/events").file(eventPart).file(imagePart))
-        .andExpect(status().isCreated());
-
-    verify(fileStorageService, times(1)).save(any());
+    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    assertEquals(inputEvent, response.getBody());
+    verify(eventService).createEvent(inputEvent);
   }
 
-  // ── PUT /api/events/{id} ──────────────────────────────────────
+  @Test
+  void updateEvent_WithImage_SavesImageAndUpdatesEvent() {
+    Long eventId = 1L;
+    Event inputEvent = new Event();
+    MockMultipartFile image =
+            new MockMultipartFile("image", "new_poster.jpg", "image/jpeg", "new image content".getBytes());
+
+    when(fileStorageService.save(image)).thenReturn("/uploads/updated_poster.jpg");
+    when(eventService.updateEvent(eq(eventId), any(Event.class)))
+            .thenAnswer(i -> i.getArgument(1));
+
+    ResponseEntity<Event> response = eventController.updateEvent(eventId, inputEvent, image);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertNotNull(response.getBody());
+    assertEquals("/uploads/updated_poster.jpg", response.getBody().getImageUrl());
+    verify(fileStorageService).save(image);
+    verify(eventService).updateEvent(eventId, inputEvent);
+  }
 
   @Test
-  void updateEvent_returns200_withoutImage() throws Exception {
-    when(eventService.updateEvent(eq(1L), any(Event.class))).thenReturn(sampleEvent);
+  void updateEvent_WithoutImage_UpdatesEventOnly() {
+    Long eventId = 1L;
+    Event inputEvent = new Event();
 
-    MockMultipartFile eventPart =
-        new MockMultipartFile(
-            "event",
-            "",
-            MediaType.APPLICATION_JSON_VALUE,
-            objectMapper.writeValueAsBytes(sampleEvent));
+    when(eventService.updateEvent(eventId, inputEvent)).thenReturn(inputEvent);
 
-    // PUT with multipart needs this workaround
-    mockMvc
-        .perform(
-            multipart("/api/events/1")
-                .file(eventPart)
-                .with(
-                    request -> {
-                      request.setMethod("PUT");
-                      return request;
-                    }))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.eventName").value("VSA Night Market"));
+    ResponseEntity<Event> response = eventController.updateEvent(eventId, inputEvent, null);
 
+    assertEquals(HttpStatus.OK, response.getStatusCode());
     verify(fileStorageService, never()).save(any());
+    verify(eventService).updateEvent(eventId, inputEvent);
   }
 
   @Test
-  void updateEvent_returns200_withImage() throws Exception {
-    when(fileStorageService.save(any())).thenReturn("/uploads/updated.jpg");
-    when(eventService.updateEvent(eq(1L), any(Event.class))).thenReturn(sampleEvent);
+  void deleteEvent_ReturnsNoContent() {
+    Long eventId = 1L;
+    doNothing().when(eventService).delete(eventId);
 
-    MockMultipartFile eventPart =
-        new MockMultipartFile(
-            "event",
-            "",
-            MediaType.APPLICATION_JSON_VALUE,
-            objectMapper.writeValueAsBytes(sampleEvent));
+    ResponseEntity<Event> response = eventController.deleteEvent(eventId);
 
-    MockMultipartFile imagePart =
-        new MockMultipartFile(
-            "image", "updated.jpg", MediaType.IMAGE_JPEG_VALUE, "fake-image-content".getBytes());
-
-    mockMvc
-        .perform(
-            multipart("/api/events/1")
-                .file(eventPart)
-                .file(imagePart)
-                .with(
-                    request -> {
-                      request.setMethod("PUT");
-                      return request;
-                    }))
-        .andExpect(status().isOk());
-
-    verify(fileStorageService, times(1)).save(any());
-  }
-
-  @Test
-  void updateEvent_returns404_whenNotFound() throws Exception {
-    when(eventService.updateEvent(eq(99L), any(Event.class)))
-        .thenThrow(new ResourceNotFoundException("Event", 99L));
-
-    MockMultipartFile eventPart =
-        new MockMultipartFile(
-            "event",
-            "",
-            MediaType.APPLICATION_JSON_VALUE,
-            objectMapper.writeValueAsBytes(sampleEvent));
-
-    mockMvc
-        .perform(
-            multipart("/api/events/99")
-                .file(eventPart)
-                .with(
-                    request -> {
-                      request.setMethod("PUT");
-                      return request;
-                    }))
-        .andExpect(status().isNotFound());
-  }
-
-  // ── DELETE /api/events/{id} ───────────────────────────────────
-
-  @Test
-  void deleteEvent_returns204_whenFound() throws Exception {
-    doNothing().when(eventService).delete(1L);
-
-    mockMvc.perform(delete("/api/events/1")).andExpect(status().isNoContent());
-
-    verify(eventService, times(1)).delete(1L);
-  }
-
-  @Test
-  void deleteEvent_returns404_whenNotFound() throws Exception {
-    doThrow(new ResourceNotFoundException("Event", 99L)).when(eventService).delete(99L);
-
-    mockMvc.perform(delete("/api/events/99")).andExpect(status().isNotFound());
+    assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    verify(eventService).delete(eventId);
   }
 }

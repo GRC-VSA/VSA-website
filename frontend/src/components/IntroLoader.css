@@ -1,0 +1,98 @@
+.vsa-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #ab3130;
+    font-family: 'Poppins', sans-serif;
+    transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+    will-change: transform;
+}
+
+.vsa-intro--wipe {
+    transform: translateY(-100%);
+}
+
+/* Positions below are converted from a 1440 x 810 Figma frame.
+   left/width/height use vw (scale with frame width), top uses vh
+   (tracks vertical position). Nudge font-size if the glyph fit
+   doesn't look flush against the box — box size/position is exact,
+   font-size is an eyeballed match. */
+
+.vsa-intro__tagline {
+    position: absolute;
+    left: 6.32vw;
+    top: 9.26vh;
+    width: 25vw;
+    height: 3.33vw;
+    margin: 0;
+    color: #ece0a6;
+    font-size: 1.5vw;
+    font-weight: 500;
+    animation: vsa-fade-in 0.6s ease both;
+}
+
+.vsa-intro__vsa {
+    position: absolute;
+    left: 5vw;
+    top: 38.02vh;
+    width: 54.44vw;
+    height: 31.32vw;
+    display: flex;
+    align-items: flex-end;
+    color: #ece0a6;
+    font-weight: 800;
+    font-size: 30vw;
+    line-height: 0.85;
+    letter-spacing: -0.01em;
+    animation: vsa-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.vsa-intro__grc {
+    position: absolute;
+    left: 72vw;
+    top: 74.81vh;
+    width: 22.29vw;
+    height: 9.86vw;
+    display: flex;
+    align-items: flex-end;
+    color: #ece0a6;
+    font-weight: 500;
+    font-size: 9.4vw;
+    line-height: 0.85;
+    animation: vsa-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+@keyframes vsa-rise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vsa-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vsa-intro {
+        transition: opacity 0.4s ease;
+    }
+    .vsa-intro--wipe {
+        transform: none;
+        opacity: 0;
+    }
+    .vsa-intro__vsa,
+    .vsa-intro__grc,
+    .vsa-intro__tagline {
+        animation: none;
+    }
+}

@@ -1,0 +1,53 @@
+/* RegisterPage.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ── Oval / pill inputs ──────────────────────────────────── */
+.password-input-div {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-div input {
+  padding-right: 62px;
+}
+
+.show-password-button {
+  position: absolute;
+  right: 18px;
+  border: none;
+  background: transparent;
+  color: var(--vsa-red);
+  font-weight: 600;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+/* ===========================
+   DIVIDER / SOCIAL
+=========================== */
+
+.auth-link-text {
+  text-align: center;
+  font-weight: 400;
+  font-size: 0.82rem;
+  color: #777;
+  margin-top: 6px;
+}
+
+.auth-link-text a {
+  color: var(--vsa-red);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ===========================
+   MOBILE
+=========================== */
+
+@media (max-width: 560px) {
+  .auth-form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
