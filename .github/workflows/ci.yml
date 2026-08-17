@@ -59,6 +59,9 @@ jobs:
           MAIL_PASSWORD: testpassword
           JWT_SECRET: XrvacgnP6R03xIstugi0vnEV+6xPySC7Rf1V7X3r9kM=
           FRONTEND_URL: http://localhost:5173
+          AWS_REGION: us-east-2
+          S3_BUCKET_NAME: test-vsa-event-images
+          CLOUDFRONT_DOMAIN: https://images.example.com
         run: ./mvnw test
 
   # Build & Test React Frontend

@@ -33,5 +33,11 @@ jwt:
   secret: "XrvacgnP6R03xIstugi0vnEV+6xPySC7Rf1V7X3r9kM="
   expiration: 86400000
 
+aws:
+  region: ${AWS_REGION:us-east-2}
+  s3:
+    bucket-name: ${S3_BUCKET_NAME:test-vsa-event-images}
+  cloudfront:
+    domain: ${CLOUDFRONT_DOMAIN:https://images.example.com}
 frontend:
   url: http://localhost:5173

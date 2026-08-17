@@ -33,7 +33,7 @@ class FileStorageServiceTest {
 
     // Inject @Value private fields using reflection
     setField(fileStorageService, "bucketName", "vsa-grc-event-images");
-    setField(fileStorageService, "region", "us-east-2");
+    setField(fileStorageService, "cloudFrontDomain", "https://images.example.com");
   }
 
   private void setField(Object target, String fieldName, Object value) throws Exception {
@@ -45,19 +45,20 @@ class FileStorageServiceTest {
   // ── saveFile ──────────────────────────────────────────────────
 
   @Test
-  void saveFile_returnsFullS3Url_onSuccess() throws Exception {
+  void saveFile_returnsCloudFrontUrl_onSuccess() throws Exception {
     MockMultipartFile file =
-            new MockMultipartFile(
-                    "image", "nightmarket.jpg", "image/jpeg", "fake-image-content".getBytes());
+        new MockMultipartFile("image", "nightmarket.jpg", "image/jpeg", "fake-image-content".getBytes());
 
     String resultUrl = fileStorageService.save(file);
-
     assertNotNull(resultUrl);
-    assertTrue(resultUrl.startsWith("https://vsa-grc-event-images.s3.us-east-2.amazonaws.com/"));
+    assertTrue(resultUrl.startsWith("https://images.example.com/"));
     assertTrue(resultUrl.endsWith(".jpg"));
 
-    // Verify S3 client putObject call
-    verify(s3Client, times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    verify(s3Client, times(1))
+        .putObject(
+          any(PutObjectRequest.class),
+          any(RequestBody.class)
+        );
   }
 
   @Test
@@ -87,7 +88,7 @@ class FileStorageServiceTest {
     String url1 = fileStorageService.save(file1);
     String url2 = fileStorageService.save(file2);
 
-    // UUID prefixes should make S3 URLs unique
+    // UUID prefixes should make CloudFront URLs unique
     assertNotEquals(url1, url2);
   }
 
@@ -117,6 +118,18 @@ class FileStorageServiceTest {
 
   // ── deleteFile ────────────────────────────────────────────────
 
+  @Test
+  void deleteFile_extractsKeyFromCloudFrontUrl_andCallsDeleteObject() {
+    String cloudFrontUrl ="https://images.example.com/1234-uuid-nightmarket.jpg";
+
+    fileStorageService.deleteFile(cloudFrontUrl);
+    ArgumentCaptor<DeleteObjectRequest> captor = ArgumentCaptor.forClass(DeleteObjectRequest.class);
+    verify(s3Client).deleteObject(captor.capture());
+    DeleteObjectRequest request = captor.getValue();
+
+    assertEquals("vsa-grc-event-images", request.bucket());
+    assertEquals("1234-uuid-nightmarket.jpg", request.key());
+}
   @Test
   void deleteFile_extractsKeyFromFullUrl_andCallsDeleteObject() {
     String fullS3Url = "https://vsa-grc-event-images.s3.us-east-2.amazonaws.com/1234-uuid-nightmarket.jpg";
