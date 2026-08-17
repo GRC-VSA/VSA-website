@@ -131,7 +131,7 @@ jobs:
             # Root Docker Compose changes can affect the
             # entire deployment.
             if echo "$CHANGED_FILES" | grep -qE \
-              '^(docker-compose\.yml|docker-compose\.yaml|compose\.yml|compose\.yaml)$'; then
+              '^( \.dockerignore|docker-compose\.yml|docker-compose\.yaml|compose\.yml|compose\.yaml)$'; then
 
               REBUILD_ALL=true
             fi
