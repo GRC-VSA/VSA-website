@@ -182,10 +182,6 @@
   z-index: 3;
 }
 
-/* Front Poster (Tallest & Largest) */
-.poster-1 {
-  /* Explicit height ensures descending steps */
-}
 
 /* Middle Poster (Slightly shorter & shifted closely behind) */
 #poster-frame-2 {

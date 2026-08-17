@@ -125,7 +125,7 @@ const EventCarousel = () => {
         return(
             <>
                 {event.imageUrl && (
-                    (<img src={`http://localhost:8080${event.imageUrl}`} /*alt={currentEvent.eventName}*/ className="event-image"/>)
+                    (<img src={event.imageUrl} /*alt={currentEvent.eventName}*/ className="event-image"/>)
                 )}
                 <div className="overlay"></div>
                 {
