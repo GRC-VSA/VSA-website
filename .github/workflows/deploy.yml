@@ -1,0 +1,375 @@
+name: VSA Website CD
+
+on:
+  workflow_run:
+    workflows:
+      - "VSA Website CI"
+    types:
+      - completed
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Deploy only when:
+    # 1. CI passed
+    # 2. CI was triggered by a push
+    # 3. The push that triggered CI was to main
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main'
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          command_timeout: 15m
+
+          script: |
+            set -Eeuo pipefail
+
+            echo "========================================"
+            echo "Starting VSA production deployment"
+            echo "========================================"
+
+            cd /home/ec2-user/VSA-website
+
+            # --------------------------------------------------
+            # 1. Find last successfully deployed commit
+            # --------------------------------------------------
+
+            if [ -f .deployed-sha ]; then
+              OLD_SHA=$(cat .deployed-sha)
+
+              echo "Last successfully deployed commit:"
+              echo "$OLD_SHA"
+            else
+              # First time using the deployment marker.
+              # Treat the server's current commit as the current
+              # known-good production version.
+              OLD_SHA=$(git rev-parse HEAD)
+
+              echo "No .deployed-sha found."
+              echo "Initializing deployment state from current HEAD:"
+              echo "$OLD_SHA"
+
+              echo "$OLD_SHA" > .deployed-sha
+            fi
+
+
+            # --------------------------------------------------
+            # 2. Fetch latest main
+            # --------------------------------------------------
+
+            echo ""
+            echo "Fetching latest main..."
+
+            git fetch origin main
+
+            NEW_SHA=$(git rev-parse origin/main)
+
+            echo "Latest main commit:"
+            echo "$NEW_SHA"
+
+
+            # --------------------------------------------------
+            # 3. Stop if this commit is already deployed
+            # --------------------------------------------------
+
+            if [ "$OLD_SHA" = "$NEW_SHA" ]; then
+              echo ""
+              echo "Production is already running the latest"
+              echo "successfully deployed commit."
+
+              exit 0
+            fi
+
+
+            # --------------------------------------------------
+            # 4. Find ALL changes since last successful deploy
+            # --------------------------------------------------
+
+            echo ""
+            echo "Changes since last successful deployment:"
+            echo ""
+
+            CHANGED_FILES=$(git diff --name-only "$OLD_SHA" "$NEW_SHA")
+
+            echo "$CHANGED_FILES"
+
+
+            # --------------------------------------------------
+            # 5. Update EC2 working copy to latest main
+            # --------------------------------------------------
+
+            echo ""
+            echo "Updating repository to latest main..."
+
+            git reset --hard "$NEW_SHA"
+
+
+            # --------------------------------------------------
+            # 6. Determine what needs rebuilding
+            # --------------------------------------------------
+
+            REBUILD_ALL=false
+            REBUILD_FRONTEND=false
+            REBUILD_BACKEND=false
+
+
+            # Root Docker Compose changes can affect the
+            # entire deployment.
+            if echo "$CHANGED_FILES" | grep -qE \
+              '^( \.dockerignore|docker-compose\.yml|docker-compose\.yaml|compose\.yml|compose\.yaml)$'; then
+
+              REBUILD_ALL=true
+            fi
+
+
+            # Includes:
+            # frontend/src/*
+            # frontend/nginx.conf
+            # frontend/Dockerfile
+            # frontend/package.json
+            # etc.
+            if echo "$CHANGED_FILES" | grep -q '^frontend/'; then
+              REBUILD_FRONTEND=true
+            fi
+
+
+            # Includes:
+            # backend/src/*
+            # backend/Dockerfile
+            # backend/pom.xml
+            # etc.
+            if echo "$CHANGED_FILES" | grep -q '^backend/'; then
+              REBUILD_BACKEND=true
+            fi
+
+
+            echo ""
+            echo "Deployment plan:"
+            echo "  Rebuild all:      $REBUILD_ALL"
+            echo "  Rebuild frontend: $REBUILD_FRONTEND"
+            echo "  Rebuild backend:  $REBUILD_BACKEND"
+
+
+            # --------------------------------------------------
+            # 7. Rebuild changed services
+            # --------------------------------------------------
+
+            if [ "$REBUILD_ALL" = true ]; then
+
+              echo ""
+              echo "Docker Compose configuration changed."
+              echo "Rebuilding entire application..."
+
+              docker compose build
+              docker compose up -d
+
+            else
+
+              if [ "$REBUILD_FRONTEND" = true ]; then
+
+                echo ""
+                echo "Frontend changed."
+                echo "Rebuilding frontend..."
+
+                docker compose build frontend
+                docker compose up -d --no-deps frontend
+              fi
+
+
+              if [ "$REBUILD_BACKEND" = true ]; then
+
+                echo ""
+                echo "Backend changed."
+                echo "Rebuilding backend..."
+
+                docker compose build backend
+                docker compose up -d --no-deps backend
+              fi
+
+            fi
+
+
+            # --------------------------------------------------
+            # 8. Show current container state
+            # --------------------------------------------------
+
+            echo ""
+            echo "Container status:"
+
+            docker compose ps
+
+
+            # --------------------------------------------------
+            # 9. Frontend health check
+            # --------------------------------------------------
+
+            if [ "$REBUILD_ALL" = true ] || [ "$REBUILD_FRONTEND" = true ]; then
+
+              echo ""
+              echo "Waiting for frontend to respond..."
+
+              FRONTEND_HEALTHY=false
+
+              for i in $(seq 1 10); do
+
+                if curl -sf \
+                  http://127.0.0.1:8081/ \
+                  > /dev/null; then
+
+                  echo "Frontend is healthy."
+
+                  FRONTEND_HEALTHY=true
+                  break
+                fi
+
+                echo "Attempt $i/10: frontend not ready. Retrying in 3 seconds..."
+
+                sleep 3
+              done
+
+
+              if [ "$FRONTEND_HEALTHY" = false ]; then
+
+                echo ""
+                echo "========================================"
+                echo "FRONTEND DEPLOYMENT FAILED"
+                echo "========================================"
+
+                docker compose logs frontend --tail=100
+
+                echo ""
+                echo ".deployed-sha remains:"
+                echo "$OLD_SHA"
+
+                echo "This deployment will NOT be marked successful."
+
+                exit 1
+              fi
+
+            fi
+
+
+            # --------------------------------------------------
+            # 10. Backend health check
+            # --------------------------------------------------
+            #
+            # Backend is internal-only.
+            #
+            # This checks:
+            #
+            # EC2 :8081
+            #     ↓
+            # frontend Nginx
+            #     ↓
+            # /api/events
+            #     ↓
+            # backend:8080
+
+            if [ "$REBUILD_ALL" = true ] || [ "$REBUILD_BACKEND" = true ]; then
+
+              echo ""
+              echo "Waiting for backend to respond..."
+
+              BACKEND_HEALTHY=false
+
+              for i in $(seq 1 15); do
+
+                if curl -sf \
+                  http://127.0.0.1:8081/api/events \
+                  > /dev/null; then
+
+                  echo "Backend is healthy."
+
+                  BACKEND_HEALTHY=true
+                  break
+                fi
+
+                echo "Attempt $i/15: backend not ready. Retrying in 3 seconds..."
+
+                sleep 3
+              done
+
+
+              if [ "$BACKEND_HEALTHY" = false ]; then
+
+                echo ""
+                echo "========================================"
+                echo "BACKEND DEPLOYMENT FAILED"
+                echo "========================================"
+
+                echo ""
+                echo "Backend logs:"
+                docker compose logs backend --tail=100
+
+                echo ""
+                echo "Frontend logs:"
+                docker compose logs frontend --tail=50
+
+                echo ""
+                echo ".deployed-sha remains:"
+                echo "$OLD_SHA"
+
+                echo "This deployment will NOT be marked successful."
+
+                exit 1
+              fi
+
+            fi
+
+
+            # --------------------------------------------------
+            # 11. Mark this commit as successfully deployed
+            # --------------------------------------------------
+            # Ts is kinda peak
+            # .deployed-sha is updated only after all required
+            # builds and health checks succeed.
+
+            echo ""
+            echo "Recording successful deployment..."
+
+            echo "$NEW_SHA" > .deployed-sha
+
+            echo "Successfully deployed SHA:"
+            cat .deployed-sha
+
+
+            # --------------------------------------------------
+            # 12. Clean dangling Docker images
+            # --------------------------------------------------
+
+            echo ""
+            echo "Cleaning dangling Docker images..."
+
+            docker image prune -f
+
+
+            # --------------------------------------------------
+            # 13. Complete
+            # --------------------------------------------------
+
+            echo ""
+            echo "========================================"
+            echo "Deployment completed successfully"
+            echo "========================================"
+
+            echo "Previous successful commit:"
+            echo "$OLD_SHA"
+
+            echo ""
+            echo "Current successful commit:"
+            echo "$NEW_SHA"

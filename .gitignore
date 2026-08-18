@@ -15,7 +15,8 @@
 # Logs
 *.log
 
-# Certificates and private keys after deploying. Not needed right now
 certs/
 *.pem
 *.key
+
+.deployed-sha

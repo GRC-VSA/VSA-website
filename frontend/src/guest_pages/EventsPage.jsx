@@ -329,7 +329,7 @@ const EventsPage = () => {
                 {filteredEvents.map((event) => (
                     <div key={event.eventId} className="event-card">
                         <div className="image-placeholder">
-                            <img src={`http://localhost:8080${event.imageUrl}`} />
+                            <img src={event.imageUrl} />
                             <div className="event-date">
                                 <span>{new Date(event.eventDate).toLocaleDateString('en-US', { day: 'numeric', timezone: 'UTC' })}</span>
                                 <span>{displayEventMonth(event.eventDate)}</span>
