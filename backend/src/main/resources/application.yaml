@@ -39,7 +39,7 @@ jwt:
 aws:
   region: ${AWS_REGION:us-east-2}
   s3:
-    bucket-name: ${S3_BUCKET_NAME:vsa-grc-event-images}
+    bucket-name: ${S3_BUCKET_NAME}
   cloudfront:
     domain: ${CLOUDFRONT_DOMAIN}
 
