@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import GuestLayout from "./layouts/GuestLayout.jsx"
 import OfficerLayout from "./layouts/OfficerLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 
 import HomePage from "./guest_pages/homepage/HomePage.jsx";
@@ -49,6 +50,7 @@ function App() {
   return (
     <EventsProvider>
       <IntroLoader ready={appReady} />
+      <ScrollToTop/>
       <Routes>
         <Route path="/" element={<GuestLayout />}>
           <Route index element={<HomePage />} />
