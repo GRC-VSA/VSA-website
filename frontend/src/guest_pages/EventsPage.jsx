@@ -203,7 +203,7 @@ const EventsPage = () => {
     const suggestedEvent = hideSuggestion ? null : didYouMean();
 
     return (
-        <main id="event-page-main">
+        <main id="event-page-main" className="page-footer-space">
             <div id="cover-photo-container">
                 <img src={coverPhoto} id="cover-photo"></img>
                 <div id="overlay"></div>

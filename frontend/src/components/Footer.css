@@ -1,311 +1,623 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
-/* Main Wrapper - Aligns seamlessly with the above section */
+
+/* =========================================================
+   FOOTER OUTER AREA
+   ========================================================= */
+
 .home-footer {
+  position: relative;
+
   width: 100%;
-  background-color: #fdfaf3; /* Light cream background matching 'What We Believe' */
-  padding: 5rem 0 0;
+
+  /*
+   * IMPORTANT:
+   * Do not put the red background here.
+   * The background behind the rounded corners needs to remain visible.
+   */
+  background: transparent;
+
+  /*
+   * Space above the red footer for the floating emblem.
+   */
+  padding-top: 70px;
+
   font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
-  overflow: hidden;
+
+  /*
+   * Logo extends outside the red footer.
+   */
+  overflow: visible;
 }
 
-/* Red Outer Card Container */
+
+/* =========================================================
+   RED FOOTER
+   ========================================================= */
+
 .home-footer__container {
   position: relative;
+
   width: 100%;
-  background-color: #AB3130; /* Brand Standard Red */
-  border-radius: 40px 40px 0 0;
-  padding: 0 5vw 3.5rem;
-  color: #ece0a6; /* Brand Standard Yellow */
   box-sizing: border-box;
-  display: flow-root; /* Stops the brand's negative top margin from
-                          collapsing with (and dragging up) this container's
-                          own top edge — without clipping the logo like
-                          overflow:hidden would. */
+
+  background-color: #AB3130;
+
+  /*
+   * These create the two curved edges from your prototype.
+   */
+  border-radius: 40px 40px 0 0;
+
+  padding: 0 5vw 3.5rem;
+
+  color: #ece0a6;
+
+  /*
+   * Important:
+   * don't use overflow:hidden because the logo extends
+   * above the red container.
+   */
+  overflow: visible;
+
+  display: flow-root;
+
+  /*
+   * Optional subtle shadow like your prototype.
+   */
+  box-shadow:
+    0 -5px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* Floating Central Logo & Header */
-/* Logo floats independently of document flow — growing it never changes
-   the footer's height. top:0 + translate(-50%,-50%) centers the logo's
-   own vertical midpoint exactly on the container's top edge, which keeps
-   it perfectly half-in/half-out automatically at any size. */
+
+/* =========================================================
+   FLOATING EMBLEM
+   ========================================================= */
+
 .home-footer__logo-wrap {
   position: absolute;
+
   top: 0;
   left: 50%;
+
+  /*
+   * Half of the logo sits above the footer,
+   * half overlaps the red footer.
+   */
   transform: translate(-50%, -50%);
-  z-index: 5;
+
+  z-index: 10;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  pointer-events: none;
 }
+
 
 .home-footer__logo {
-  width: 300px;
+  width: 370px;
   height: auto;
+  translate: 0 -7%;
   display: block;
+
+  object-fit: contain;
 }
 
-/* Title/subtitle text — independent of the logo now, so its position is
-   unaffected by however large the logo is set to. */
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
 .home-footer__brand {
   display: flex;
   flex-direction: column;
   align-items: center;
+
   text-align: center;
-  padding-top: 68px; /* same visual gap the old -65px margin produced */
-  margin-bottom: 2.5rem;
+
+  /*
+   * Creates room under the floating emblem.
+   */
+  padding-top: 55px;
+
+  margin-bottom: 2rem;
 }
+
 
 .home-footer__title {
   margin: 0.5rem 0 0;
+
   font-size: 1.75rem;
   font-weight: 800;
+
   letter-spacing: 0.05em;
-  color: #ece0a6;
   line-height: 1;
+
+  color: #ece0a6;
+
   font-family: 'Poppins', sans-serif;
 }
+
 
 .home-footer__subtitle {
   margin: 0.35rem 0 0;
+
   font-size: 0.85rem;
   font-weight: 700;
+
   letter-spacing: 0.12em;
+
   color: #ece0a6;
+
   font-family: 'Poppins', sans-serif;
 }
 
-/* 3-Column Grid Layout */
+
+/* =========================================================
+   THREE COLUMN CONTENT
+   ========================================================= */
+
 .home-footer__content {
   display: grid;
+
   grid-template-columns: 1fr 1.2fr 1fr;
+
   gap: 2rem;
+
   align-items: flex-start;
+
+  width: 100%;
   max-width: 1200px;
+
   margin: 0 auto;
 }
 
-/* Column Headings */
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
 .home-footer__heading {
+  display: inline-block;
+
+  margin: 0 0 1.25rem;
+
+  padding-bottom: 3px;
+
   font-size: 1.05rem;
   font-weight: 700;
+
   letter-spacing: 0.05em;
+
   color: #ece0a6;
-  margin: 0 0 1.25rem;
-  display: inline-block;
+
   border-bottom: 2px solid #ece0a6;
-  padding-bottom: 3px;
+
   font-family: 'Poppins', sans-serif;
 }
+
 
 .home-footer__heading--motto {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.motto-underline {
+
+.home-footer__heading {
+  color: #ece0a6 !important;
+
   border-bottom: 2px solid #ece0a6;
+
   padding-bottom: 3px;
 }
 
-/* Contact Column */
-.home-footer__contact-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ece0a6;
-  margin: 0 0 0.6rem;
+
+/* =========================================================
+   CONTACT
+   ========================================================= */
+
+.home-footer__contact-details,
+.home-footer__contact-name,
+.home-footer__contact-item,
+.home-footer__contact-item span {
+  color: #ece0a6 !important;
+
   font-family: 'Poppins', sans-serif;
 }
 
+
+.home-footer__contact-name {
+  margin: 0 0 0.6rem;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+
 .home-footer__contact-item {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #ece0a6;
-  margin: 0.45rem 0;
   display: flex;
   align-items: center;
+
   gap: 0.6rem;
-  font-family: 'Poppins', sans-serif;
+
+  margin: 0.45rem 0;
+
+  font-size: 0.82rem;
+  font-weight: 500;
 }
+
 
 .brand-icon {
   flex-shrink: 0;
   fill: #ece0a6;
 }
 
-/* Center Action Buttons & Social Links */
+
+/* =========================================================
+   CENTER COLUMN
+   ========================================================= */
+
 .home-footer__col--center {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+
 .home-footer__cta-group {
   display: flex;
+  align-items: center;
+  justify-content: center;
+
   gap: 1rem;
+
   margin-bottom: 2rem;
 }
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 .pill-btn {
   display: inline-flex;
   align-items: center;
+
   gap: 0.6rem;
+
   border-radius: 50px;
+
   padding: 0.35rem 0.5rem;
+
   font-size: 0.85rem;
   font-weight: 700;
+
   font-family: 'Poppins', sans-serif;
+
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease,
-  border-color 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
+
 
 .pill-btn:hover {
   transform: translateY(-2px);
 }
 
+
 .pill-btn--solid {
   background-color: #ece0a6;
+
   color: #ab3130 !important;
+
   border: none;
+
   padding-right: 1.25rem;
 }
+
 
 .pill-btn--solid span {
   color: #ab3130 !important;
 }
 
+
 .pill-btn--solid:hover {
   background-color: #f6edc8;
 }
 
+
 .pill-btn__icon {
   width: 28px;
   height: 28px;
+
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  flex-shrink: 0;
+
   font-size: 0.9rem;
   font-weight: 700;
-  transition: background-color 0.2s ease, color 0.2s ease;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
+
 
 .pill-btn__icon--left {
   background-color: #ab3130;
   color: #ece0a6;
 }
 
+
 .pill-btn--outline {
   background-color: transparent;
+
   color: #ece0a6 !important;
+
   border: 1px solid #ece0a6;
+
   padding-left: 1.25rem;
 }
+
 
 .pill-btn--outline span {
   color: #ece0a6 !important;
 }
 
+
 .pill-btn--outline:hover {
   background-color: #ece0a6;
+
   color: #ab3130 !important;
+
   border-color: #ece0a6;
 }
+
 
 .pill-btn--outline:hover span {
   color: #ab3130 !important;
 }
+
 
 .pill-btn__icon--right {
   background-color: #ece0a6;
   color: #ab3130;
 }
 
+
 .pill-btn--outline:hover .pill-btn__icon--right {
   background-color: #ab3130;
   color: #ece0a6;
 }
 
-/* Social Buttons */
+
+/* =========================================================
+   SOCIAL BUTTONS
+   ========================================================= */
+
 .home-footer__socials {
   display: flex;
   gap: 1rem;
 }
 
+
 .social-btn {
   width: 42px;
   height: 42px;
+
   border-radius: 50%;
+
   border: 1.5px solid #ece0a6;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  flex-shrink: 0;
+
   text-decoration: none;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
+
 
 .social-btn:hover {
   background-color: #ece0a6;
+
   transform: translateY(-2px);
 }
+
 
 .social-btn:hover svg {
   stroke: #ab3130;
 }
 
-/* Right Column: Motto */
+
+/* =========================================================
+   RIGHT COLUMN
+   ========================================================= */
+
 .home-footer__col--right {
-  text-align: right;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+
+  text-align: right;
 }
+
 
 .home-footer__motto-text {
+  max-width: 290px;
+
+  margin: 0;
+
   font-size: 0.82rem;
   font-weight: 500;
+
   line-height: 1.6;
+
   color: #ece0a6;
-  max-width: 290px;
-  margin: 0;
+
   font-family: 'Poppins', sans-serif;
 }
 
-/* Ensure the underlined span in the heading strictly uses brand yellow */
-.home-footer__heading .motto-underline,
-.motto-underline {
-  color: #ece0a6 !important;
-  border-bottom: 2px solid #ece0a6;
-  padding-bottom: 3px;
-}
 
-/* Ensure contact info text, labels, and nested spans strictly use brand yellow */
-.home-footer__contact-details,
-.home-footer__contact-name,
-.home-footer__contact-item,
-.home-footer__contact-item span {
-  color: #ece0a6 !important;
-  font-family: 'Poppins', sans-serif;
-}
+/* =========================================================
+   TABLET
+   ========================================================= */
 
-/* Responsive Adjustments */
 @media (max-width: 900px) {
+
+  .home-footer {
+    padding-top: 65px;
+  }
+
+  .home-footer__container {
+    border-radius: 36px 36px 0 0;
+
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
   .home-footer__content {
     grid-template-columns: 1fr;
+
     gap: 2.5rem;
+
     text-align: center;
   }
 
-  .home-footer__col--right {
+  .home-footer__col--left {
     text-align: center;
-    align-items: center;
-  }
-
-  .home-footer__motto-text {
-    max-width: 100%;
   }
 
   .home-footer__contact-item {
     justify-content: center;
+  }
+
+  .home-footer__col--right {
+    align-items: center;
+
+    text-align: center;
+  }
+
+  .home-footer__motto-text {
+    max-width: 600px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .home-footer {
+    padding-top: 55px;
+  }
+
+  .home-footer__container {
+    /*
+     * Keep the corner curves on mobile.
+     */
+    border-radius: 28px 28px 0 0;
+
+    padding: 0 1.25rem 2.5rem;
+  }
+
+  .home-footer__logo {
+    width: 190px;
+    max-width: 45vw;
+  }
+
+  .home-footer__brand {
+    padding-top: 33px;
+
+    margin-bottom: 2rem;
+  }
+
+  .home-footer__title {
+    font-size: 1.4rem;
+  }
+
+  .home-footer__subtitle {
+    font-size: 0.72rem;
+
+    letter-spacing: 0.1em;
+  }
+
+  .home-footer__content {
+    gap: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-footer__col--center {
+    display: contents;
+  }
+
+  .home-footer__cta-group {
+    order: 1;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+
+    gap: 0.8rem;
+    margin-bottom: 0;
+  }
+
+  .pill-btn {
+    justify-content: center;
+
+    width: min(100%, 240px);
+
+    box-sizing: border-box;
+  }
+
+  .home-footer__socials {
+    order: 4;
+
+    justify-content: center;
+  }
+
+  .home-footer__contact-item {
+    justify-content: center;
+
+    font-size: 0.78rem;
+
+    flex-wrap: wrap;
+  }
+
+  .home-footer__col--right {
+    align-items: center;
+    order: 3;
+
+    width: 100%;
+    text-align: center;
+  }
+
+  .home-footer__col--left {
+    order: 2;
+  }
+
+  .home-footer__motto-text {
+    max-width: 70%;
+    order: 3;
+    font-size: 0.78rem;
   }
 }

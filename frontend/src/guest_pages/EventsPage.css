@@ -6,6 +6,7 @@
     --event-card-border-color: rgb(213, 213, 213);
     --accolade-card-border-color: #9D9D9D;
     overflow-x: hidden;
+    padding-bottom: 18;
 }
 
 
@@ -920,10 +921,10 @@ in this case: "VSA EVENTS"
     height: 550px; */
     margin-top: 200px;
     position: relative;
-    height: 550px;
+    height: 600px;
     background-color: #EFEFEF;
     overflow: visible;
-    padding: 0 30px;
+    padding: 0 30px -10px 30px;
 
 }
 

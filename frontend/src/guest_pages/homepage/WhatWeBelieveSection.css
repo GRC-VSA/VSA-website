@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 .what-we-believe {
-  padding: 5rem 8vw 6rem;
+  padding: 5rem 8vw 360px;
   background-color: #fdfaf3;
   color: #000000;
   font-family: 'Poppins', sans-serif;
@@ -38,84 +38,118 @@
 
 /* Image Container Frame & Shadows */
 .what-we-believe__image-container {
-  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 1rem;
 }
 
-/* White polaroid border around photo */
+
+/* White polaroid border around main photo */
 .what-we-believe__image-frame {
-  background: #ffffff;
-  padding: 12px;
-  border-radius: 6px;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+
   width: 100%;
   max-width: 520px;
+
+  padding: 12px;
+
+  background: #ffffff;
+  border-radius: 6px;
+
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.what-we-believe__image-frame img {
+
+/* Main group photo only */
+.what-we-believe__main-image {
   width: 100%;
   height: auto;
+
   aspect-ratio: 4 / 3;
   object-fit: cover;
+
   display: block;
+
   border-radius: 2px;
 }
 
-/* Circular Floating Badges */
+
+/* =========================
+   Floating Badges
+   ========================= */
+
 .what-we-believe__badge {
   position: absolute;
+
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  padding: 0;
+
   z-index: 3;
+
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Top-Right Red Badge with White Ring Halo */
+
+/* Top-right red badge */
 .what-we-believe__badge--top {
-  top: -2%;
-  right: 2%;
+  top: -7%;
+  right: -5%;
+
   width: 75px;
   height: 75px;
-  background: #C22E2D;
+
+  background: #c22e2d;
+
   border: 3.5px solid #ffffff;
 }
 
-.what-we-believe__badge--top img {
-  width: 58px;
+
+/* VSA emblem inside top badge */
+.what-we-believe__badge-logo {
+  width: 50px;
   height: auto;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+
+  display: block;
 }
 
-/* Bottom-Left Yellow Badge */
+
+/* Bottom-left yellow badge */
 .what-we-believe__badge--bottom {
-  bottom: -1%;
-  left: 6%;
+  bottom: -5%;
+  left: -2%;
+
   width: 46px;
   height: 46px;
+
   background: #ece0a6;
+
   border: 2.5px solid #ffffff;
 }
+
 
 .what-we-believe__badge--bottom svg {
   stroke: #ab3130;
 }
 
-@media (max-width: 1024px) {
-  .what-we-believe__badge--top {
-    right: -2%;
-  }
-
-  .what-we-believe__badge--bottom {
-    left: 2%;
-  }
+.page-footer-space {
+  padding-bottom: 120px;
 }
 
-
 @media (max-width: 868px) {
+
   .what-we-believe__content {
     grid-template-columns: 1fr;
     gap: 3rem;
@@ -130,20 +164,45 @@
   }
 }
 
+
 @media (max-width: 440px) {
 
-  .what-we-believe__badge--top {
-    right: -2%;
+  .what-we-believe {
+    padding: 5rem 8vw 320px;
   }
+  .what-we-believe__image-container {
+    padding: 1rem;
+  }
+
+  .what-we-believe__image-frame {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .what-we-believe__main-image {
+    width: 100%;
+    height: auto;
+  }
+
   .what-we-believe__badge--top {
+    top: -7%;
+    right: -7%;
+
     width: 65px;
     height: 65px;
   }
-  .what-we-believe__badge--top img {
-    width: 50px;
+
+  .what-we-believe__badge-logo {
+    width: 45px;
+    height: auto;
+
+    object-fit: contain;
   }
 
   .what-we-believe__badge--bottom {
-    left: 0%;
+    left: -4%;
+
+    width: 46px;
+    height: 46px;
   }
 }

@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 import "./GuestLayout.css";
 
 const GuestLayout = () => {
@@ -22,6 +23,8 @@ const GuestLayout = () => {
             <main id="guest-main">
                 <Outlet />
             </main>
+
+            {!hideNavbar && <Footer />}
         </>
     );
 };

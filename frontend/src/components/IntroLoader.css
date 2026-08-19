@@ -67,6 +67,7 @@
         opacity: 0;
         transform: translateY(16px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -77,6 +78,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -86,13 +88,32 @@
     .vsa-intro {
         transition: opacity 0.4s ease;
     }
+
     .vsa-intro--wipe {
         transform: none;
         opacity: 0;
     }
+
     .vsa-intro__vsa,
     .vsa-intro__grc,
     .vsa-intro__tagline {
         animation: none;
+    }
+}
+
+@media (max-width: 450px) {
+    .vsa-intro__tagline {
+        position: absolute;
+        left: 5%;
+        top: 33%;
+        font-size: 18px;
+        width: 65.29vw;
+    }
+    .vsa-intro__vsa{
+        top: 41.50vh;
+    }
+    .vsa-intro__grc {
+        top: 51.50vh;
+
     }
 }

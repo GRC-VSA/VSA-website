@@ -4,7 +4,6 @@ import EventCarousel from "./EventCarousel.jsx";
 import WhoWeAreSection from "./WhoWeAreSection.jsx";
 import WhatWeDoSection from "./WhatWeDoSection.jsx";
 import WhatWeBelieveSection from "./WhatWeBelieveSection.jsx";
-import Footer from "../../components/Footer.jsx";
 import "./HomeSections.css";
 
 const HomePage = () => {
@@ -31,7 +30,6 @@ const HomePage = () => {
             <WhoWeAreSection />
             <WhatWeDoSection />
             <WhatWeBelieveSection />
-            <Footer />
         </main>
     );
 };
