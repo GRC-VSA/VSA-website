@@ -64,12 +64,16 @@ const Footer = () => {
           <div className="home-footer__col home-footer__col--center">
             <div className="home-footer__cta-group">
               <button type="button" className="pill-btn pill-btn--solid" onClick={() => navigate("/events")}>
-                <FaArrowUp />
+                <div className="arrow-icon-circle circle-fill">
+                  <FaArrowUp className="arrow arrow-yellow" />
+                </div>
                 <span>Browse Events</span>
               </button>
               <button type="button" className="pill-btn pill-btn--outline" onClick={() => navigate("/apply")}>
                 <span>Apply Officer</span>
-                <FaArrowUp />
+                <div className="arrow-icon-circle circle-border">
+                  <FaArrowUp className="arrow arrow-red" />
+                </div>
               </button>
             </div>
 
@@ -89,11 +93,10 @@ const Footer = () => {
           {/* Right Column: Motto */}
           <div className="home-footer__col home-footer__col--right">
             <h4 className="home-footer__heading home-footer__heading--motto">
-              HIP HOP NEVA DIESS
+              THIS IS VSA GRC
             </h4>
             <p className="home-footer__motto-text">
-              Building a strong Vietnamese community on campus through culture,
-              connection, and opportunities for growth and leadership.
+              A little piece of Vietnam, right here on campus. Bringing people together through the culture we love, the food we share, and the memories we make along the way.
             </p>
           </div>
         </div>

@@ -154,14 +154,6 @@
     grid-template-columns: 1fr;
     gap: 3rem;
   }
-
-  .what-we-believe__badge--top {
-    right: 10%;
-  }
-
-  .what-we-believe__badge--bottom {
-    left: 12%;
-  }
 }
 
 
