@@ -8,10 +8,9 @@ import java.util.List;
 @Getter
 @Setter
 public class RegistrationRequest {
-    private String questionText;
-    private Long questionTypeId;
-    private boolean required;
-    private List<String> options;
-    private int displayOrder;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private List<AnswerRequest> answers;
 }
 
