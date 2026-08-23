@@ -69,6 +69,24 @@ public class Event {
   /** Current status of the event: "upcoming", "ongoing", or "archived" (default: "upcoming") */
   private String status = "upcoming";
 
+  // ── Registration Settings ───────────────────────────────────
+  /**
+   * How guests register for this event: "NONE" (no registration needed — default), "INTERNAL"
+   * (registers through the VSA website's own registration flow), or "EXTERNAL" (registers via an
+   * outside link, e.g. a Green River College ticketing page).
+   */
+  @Column(name = "registration_type", nullable = false)
+  private String registrationType = "NONE";
+
+  /**
+   * External registration link, only set/used when {@code registrationType} is "EXTERNAL" (e.g.
+   * an outside ticketing page officers paste in when they don't want to use the internal
+   * registration flow).
+   */
+  @Column(name = "external_registration_url")
+  private String externalRegistrationUrl;
+
+
   // ── Media & Metadata ───────────────────────────────────────
   /** URL to the event's image/poster */
   @Column(name = "image_url")

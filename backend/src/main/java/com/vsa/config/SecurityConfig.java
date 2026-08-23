@@ -1,7 +1,11 @@
 package com.vsa.config;
 
 import com.vsa.security.JwtFilter;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +29,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * <p>Authorization levels: - Public endpoints: Registration, login, verification, password reset,
  * uploads, GET requests - Officer+ only: POST, PUT, DELETE on events and products - Authenticated:
  * All other requests
+ *
+ * <p>Note on rule ordering: Spring evaluates {@code authorizeHttpRequests} matchers in the order
+ * they're declared and stops at the first match. The broad {@code /api/events/**} rules below
+ * would otherwise also catch the new nested question/registration routes in the wrong way (e.g.
+ * making the registrant list public, or requiring officer role to register) — so the specific
+ * overrides for those cases are declared first.
  *
  * @author VSA Development Team
  */
@@ -71,38 +81,58 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            auth ->
-                auth
-                    // ── Fully public endpoints ────────────────────────
-                    .requestMatchers(
-                        "/api/users/register",
-                        "/api/users/login",
-                        "/api/users/verify",
-                        "/api/users/forgot-password",
-                        "/api/users/reset-password",
-                        "/uploads/**")
-                    .permitAll()
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(
+                    session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(
+                    auth ->
+                            auth
+                                    // ── Fully public endpoints ────────────────────────
+                                    .requestMatchers(
+                                            "/api/users/register",
+                                            "/api/users/login",
+                                            "/api/users/verify",
+                                            "/api/users/forgot-password",
+                                            "/api/users/reset-password",
+                                            "/uploads/**")
+                                    .permitAll()
 
-                    // ── Read-only endpoints (anyone can browse) ──────
-                    .requestMatchers(HttpMethod.GET, "/api/events/**", "/api/products/**")
-                    .permitAll()
+                                    // ── Question type lookup (read-only, used by both
+                                    //    officers building questions and guests answering
+                                    //    them) ────────────────────────────────────────
+                                    .requestMatchers(HttpMethod.GET, "/api/question-types/**")
+                                    .permitAll()
 
-                    // ── Write endpoints (officers and presidents only) ─
-                    .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**")
-                    .hasAnyAuthority("officer", "president")
-                    .requestMatchers(HttpMethod.PUT, "/api/events/**", "/api/products/**")
-                    .hasAnyAuthority("officer", "president")
-                    .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**")
-                    .hasAnyAuthority("officer", "president")
+                                    // ── Registration overrides — must precede the broad
+                                    //    /api/events/** rules below. GET .../registrations
+                                    //    must stay officer-only (it would otherwise become
+                                    //    public); POST .../registrations must only require
+                                    //    login, not an officer role (it would otherwise be
+                                    //    blocked for regular students) ──────────────────
+                                    .requestMatchers(HttpMethod.GET, "/api/events/*/registrations")
+                                    .hasAnyAuthority("officer", "president")
+                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations")
+                                    .authenticated()
 
-                    // ── Everything else requires authentication ─────
-                    .anyRequest()
-                    .authenticated())
-        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                                    // ── Read-only endpoints (anyone can browse) ──────
+                                    // Also covers GET .../questions, which guests need to
+                                    // render the registration form.
+                                    .requestMatchers(HttpMethod.GET, "/api/events/**", "/api/products/**")
+                                    .permitAll()
+
+                                    // ── Write endpoints (officers and presidents only) ─
+                                    // Also covers POST/PUT/DELETE .../questions.
+                                    .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**")
+                                    .hasAnyAuthority("officer", "president")
+                                    .requestMatchers(HttpMethod.PUT, "/api/events/**", "/api/products/**")
+                                    .hasAnyAuthority("officer", "president")
+                                    .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**")
+                                    .hasAnyAuthority("officer", "president")
+
+                                    // ── Everything else requires authentication ─────
+                                    .anyRequest()
+                                    .authenticated())
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
@@ -117,7 +147,7 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of(frontendUrl));
+    config.setAllowedOrigins(parseAllowedOrigins());
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
     config.setExposedHeaders(List.of("*"));
@@ -128,4 +158,12 @@ public class SecurityConfig {
     source.registerCorsConfiguration("/**", config);
     return source;
   }
+
+  private List<String> parseAllowedOrigins() {
+    return Arrays.stream(frontendUrl.split(","))
+            .map(String::trim)
+            .filter(origin -> !origin.isEmpty())
+            .collect(Collectors.toList());
+  }
+
 }
