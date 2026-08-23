@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
-    List<Question> findByEventId_EventIdOrderByDisplayOrderAsc(Long EventId);
+    List<Question> findByEvent_EventIdOrderByDisplayOrderAsc(Long eventId);
 }

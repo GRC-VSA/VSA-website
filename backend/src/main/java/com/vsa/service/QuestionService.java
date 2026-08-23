@@ -29,7 +29,7 @@ public class QuestionService {
     //READ Operations
     public List<Question> getQuestionsForEvent(Long eventId) {
         eventService.getEventById(eventId);
-        return questionRepository.findByEventId_EventIdOrderByDisplayOrderAsc(eventId);
+        return questionRepository.findByEvent_EventIdOrderByDisplayOrderAsc(eventId);
     }
 
     //CREATE Operations
