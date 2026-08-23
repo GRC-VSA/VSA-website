@@ -1,7 +1,11 @@
 package com.vsa.config;
 
 import com.vsa.security.JwtFilter;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -143,7 +147,7 @@ public class SecurityConfig {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of(frontendUrl));
+    config.setAllowedOrigins(parseAllowedOrigins());
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
     config.setAllowedHeaders(List.of("*"));
     config.setExposedHeaders(List.of("*"));
@@ -154,4 +158,12 @@ public class SecurityConfig {
     source.registerCorsConfiguration("/**", config);
     return source;
   }
+
+  private List<String> parseAllowedOrigins() {
+    return Arrays.stream(frontendUrl.split(","))
+            .map(String::trim)
+            .filter(origin -> !origin.isEmpty())
+            .collect(Collectors.toList());
+  }
+
 }
