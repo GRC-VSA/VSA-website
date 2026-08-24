@@ -1,7 +1,10 @@
 package com.vsa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -41,6 +44,11 @@ public class User {
 
   /** User's phone number (optional) */
   private String phone;
+
+  /** Officer applications submitted by this user. */
+  @JsonIgnore
+  @OneToMany(mappedBy = "user")
+  private List<Applicant> applicants = new ArrayList<>();
 
   // ── Authentication & Security ─────────────────────────────
   /** Hashed password (never stored in plain text) */

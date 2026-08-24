@@ -1,7 +1,9 @@
 package com.vsa.controller;
 
 import com.vsa.model.User;
+import com.vsa.repository.UserRepository;
 import com.vsa.service.UserService;
+import java.security.Principal;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +24,32 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   // ── Dependencies ──────────────────────────────────────────
   private final UserService userService;
+  private final UserRepository userRepository;
 
   /**
    * Constructs a UserController with required dependencies.
    *
    * @param userService Service for user operations
    */
-  public UserController(UserService userService) {
+  public UserController(UserService userService, UserRepository userRepository) {
     this.userService = userService;
+    this.userRepository = userRepository;
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<ApplicationDtos.UserProfileResponse> getCurrentUser(Principal principal) {
+    User user =
+        userRepository
+            .findByEmail(principal.getName())
+            .orElseThrow(() -> new IllegalArgumentException("Authenticated user was not found"));
+    return ResponseEntity.ok(
+        new ApplicationDtos.UserProfileResponse(
+            user.getSid(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getPhone(),
+            user.getRole()));
   }
 
   // ── Registration & Verification ────────────────────────────
