@@ -19,11 +19,11 @@ public class ApplicationSection {
   @Column(name = "section_id")
   private Long sectionId;
 
-  @Column(nullable = false)
-  private String title;
+  @Column(name = "section_heading", nullable = false)
+  private String sectionHeading;
 
-  @Column(columnDefinition = "TEXT")
-  private String description;
+  @Column(name = "section_description", columnDefinition = "TEXT")
+  private String sectionDescription;
 
   @Column(name = "section_number", nullable = false)
   private int sectionNumber;

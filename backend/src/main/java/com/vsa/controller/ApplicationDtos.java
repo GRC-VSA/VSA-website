@@ -28,15 +28,24 @@ public final class ApplicationDtos {
       @NotNull QuestionResponseType responseType) {}
 
   public record SectionRequest(
-      @NotBlank @Size(max = 150) String title,
-      @Size(max = 2000) String description,
+      @NotBlank @Size(max = 150) String sectionHeading,
+      @Size(max = 2000) String sectionDescription,
       @NotNull List<@Valid QuestionRequest> questions) {}
 
   public record SaveRoleRequest(
       @NotBlank @Size(max = 120) String name,
       @Size(max = 3000) String description,
       boolean recruiting,
-      @NotNull List<@Valid SectionRequest> sections) {}
+      List<@Valid SectionRequest> sections) {}
+
+  public record SaveSectionRequest(
+      @NotBlank @Size(max = 150) String sectionHeading,
+      @Size(max = 2000) String sectionDescription) {}
+
+  public record SaveQuestionRequest(
+      @NotBlank @Size(max = 2000) String prompt,
+      boolean required,
+      @NotNull QuestionResponseType responseType) {}
 
   public record QuestionResponse(
       Long questionId,
@@ -48,8 +57,8 @@ public final class ApplicationDtos {
   public record SectionResponse(
       Long sectionId,
       int sectionNumber,
-      String title,
-      String description,
+      String sectionHeading,
+      String sectionDescription,
       List<QuestionResponse> questions) {}
 
   public record RoleResponse(

@@ -53,9 +53,8 @@ public class ApplicationService {
 
   public RoleResponse saveRole(Long roleId, SaveRoleRequest request) {
     ApplicationRole role = roleId == null ? new ApplicationRole() : requireRole(roleId);
-    if (roleId != null && applicantRepository.existsByApplicationRoleApplicationRoleId(roleId)) {
-      throw new IllegalArgumentException(
-          "A role cannot be changed after applications have been submitted for it");
+    if (roleId != null) {
+      ensureRoleMutable(role);
     }
     String name = request.name().trim();
     boolean nameChanged = role.getName() == null || !role.getName().equalsIgnoreCase(name);
@@ -70,10 +69,11 @@ public class ApplicationService {
     role.getSections().clear();
 
     int sectionNumber = 1;
-    for (SectionRequest sectionRequest : request.sections()) {
+    for (SectionRequest sectionRequest :
+        request.sections() == null ? List.<SectionRequest>of() : request.sections()) {
       ApplicationSection section = new ApplicationSection();
-      section.setTitle(sectionRequest.title().trim());
-      section.setDescription(trimToNull(sectionRequest.description()));
+      section.setSectionHeading(sectionRequest.sectionHeading().trim());
+      section.setSectionDescription(trimToNull(sectionRequest.sectionDescription()));
       section.setSectionNumber(sectionNumber++);
       section.setApplicationRole(role);
 
@@ -94,11 +94,86 @@ public class ApplicationService {
 
   public void deleteRole(Long roleId) {
     ApplicationRole role = requireRole(roleId);
-    if (applicantRepository.existsByApplicationRoleApplicationRoleId(roleId)) {
-      throw new IllegalArgumentException(
-          "A role cannot be deleted after applications have been submitted for it");
-    }
+    ensureRoleMutable(role);
     roleRepository.delete(role);
+  }
+
+  public SectionResponse getSection(Long sectionId) {
+    return toSectionResponse(requireSection(sectionId));
+  }
+
+  public SectionResponse createSection(Long roleId, SaveSectionRequest request) {
+    ApplicationRole role = requireRole(roleId);
+    ensureRoleMutable(role);
+    ApplicationSection section = new ApplicationSection();
+    section.setSectionHeading(request.sectionHeading().trim());
+    section.setSectionDescription(trimToNull(request.sectionDescription()));
+    section.setSectionNumber(role.getSections().size() + 1);
+    section.setApplicationRole(role);
+    role.getSections().add(section);
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    roleRepository.save(role);
+    return toSectionResponse(section);
+  }
+
+  public SectionResponse updateSection(Long sectionId, SaveSectionRequest request) {
+    ApplicationSection section = requireSection(sectionId);
+    ApplicationRole role = section.getApplicationRole();
+    ensureRoleMutable(role);
+    section.setSectionHeading(request.sectionHeading().trim());
+    section.setSectionDescription(trimToNull(request.sectionDescription()));
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    roleRepository.save(role);
+    return toSectionResponse(section);
+  }
+
+  public void deleteSection(Long sectionId) {
+    ApplicationSection section = requireSection(sectionId);
+    ApplicationRole role = section.getApplicationRole();
+    ensureRoleMutable(role);
+    role.getSections().remove(section);
+    renumberSections(role);
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    roleRepository.save(role);
+  }
+
+  public QuestionResponse getQuestion(Long questionId) {
+    return toQuestionResponse(requireQuestion(questionId));
+  }
+
+  public QuestionResponse createQuestion(Long sectionId, SaveQuestionRequest request) {
+    ApplicationSection section = requireSection(sectionId);
+    ApplicationRole role = section.getApplicationRole();
+    ensureRoleMutable(role);
+    ApplicationQuestion question = new ApplicationQuestion();
+    applyQuestion(question, request);
+    question.setQuestionNumber(section.getQuestions().size() + 1);
+    question.setSection(section);
+    section.getQuestions().add(question);
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    roleRepository.save(role);
+    return toQuestionResponse(question);
+  }
+
+  public QuestionResponse updateQuestion(Long questionId, SaveQuestionRequest request) {
+    ApplicationQuestion question = requireQuestion(questionId);
+    ApplicationRole role = question.getSection().getApplicationRole();
+    ensureRoleMutable(role);
+    applyQuestion(question, request);
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    questionRepository.save(question);
+    return toQuestionResponse(question);
+  }
+
+  public void deleteQuestion(Long questionId) {
+    ApplicationQuestion question = requireQuestion(questionId);
+    ApplicationSection section = question.getSection();
+    ApplicationRole role = section.getApplicationRole();
+    ensureRoleMutable(role);
+    section.getQuestions().remove(question);
+    renumberQuestions(section);
+    role.setStatus(ApplicationRoleStatus.UNFINISHED);
+    roleRepository.save(role);
   }
 
   public List<RoleResponse> publishRecruitment() {
@@ -289,6 +364,33 @@ public class ApplicationService {
     }
   }
 
+  private void ensureRoleMutable(ApplicationRole role) {
+    if (role.getApplicationRoleId() != null
+        && applicantRepository.existsByApplicationRoleApplicationRoleId(
+            role.getApplicationRoleId())) {
+      throw new IllegalArgumentException(
+          "A role cannot be changed after applications have been submitted for it");
+    }
+  }
+
+  private void applyQuestion(ApplicationQuestion question, SaveQuestionRequest request) {
+    question.setPrompt(request.prompt().trim());
+    question.setRequired(request.required());
+    question.setResponseType(request.responseType());
+  }
+
+  private void renumberSections(ApplicationRole role) {
+    for (int index = 0; index < role.getSections().size(); index++) {
+      role.getSections().get(index).setSectionNumber(index + 1);
+    }
+  }
+
+  private void renumberQuestions(ApplicationSection section) {
+    for (int index = 0; index < section.getQuestions().size(); index++) {
+      section.getQuestions().get(index).setQuestionNumber(index + 1);
+    }
+  }
+
   private <T> void ensureDistinct(List<T> values, String message) {
     if (new HashSet<>(values).size() != values.size()) {
       throw new IllegalArgumentException(message);
@@ -307,6 +409,23 @@ public class ApplicationService {
         .orElseThrow(() -> new IllegalArgumentException("Authenticated user was not found"));
   }
 
+  private ApplicationSection requireSection(Long sectionId) {
+    ApplicationRole role =
+        roleRepository
+            .findBySectionsSectionId(sectionId)
+            .orElseThrow(() -> new ResourceNotFoundException("Application section", sectionId));
+    return role.getSections().stream()
+        .filter(section -> Objects.equals(section.getSectionId(), sectionId))
+        .findFirst()
+        .orElseThrow(() -> new ResourceNotFoundException("Application section", sectionId));
+  }
+
+  private ApplicationQuestion requireQuestion(Long questionId) {
+    return questionRepository
+        .findById(questionId)
+        .orElseThrow(() -> new ResourceNotFoundException("Application question", questionId));
+  }
+
   private Applicant requireOwnedApplication(String email, Long applicantId) {
     return applicantRepository
         .findByApplicantIdAndUserEmail(applicantId, email)
@@ -321,25 +440,7 @@ public class ApplicationService {
 
   private RoleResponse toRoleResponse(ApplicationRole role) {
     List<SectionResponse> sections =
-        role.getSections().stream()
-            .map(
-                section ->
-                    new SectionResponse(
-                        section.getSectionId(),
-                        section.getSectionNumber(),
-                        section.getTitle(),
-                        section.getDescription(),
-                        section.getQuestions().stream()
-                            .map(
-                                question ->
-                                    new QuestionResponse(
-                                        question.getQuestionId(),
-                                        question.getQuestionNumber(),
-                                        question.getPrompt(),
-                                        question.isRequired(),
-                                        question.getResponseType()))
-                            .toList()))
-            .toList();
+        role.getSections().stream().map(this::toSectionResponse).toList();
     return new RoleResponse(
         role.getApplicationRoleId(),
         role.getName(),
@@ -349,6 +450,24 @@ public class ApplicationService {
         sections,
         role.getCreatedAt(),
         role.getUpdatedAt());
+  }
+
+  private SectionResponse toSectionResponse(ApplicationSection section) {
+    return new SectionResponse(
+        section.getSectionId(),
+        section.getSectionNumber(),
+        section.getSectionHeading(),
+        section.getSectionDescription(),
+        section.getQuestions().stream().map(this::toQuestionResponse).toList());
+  }
+
+  private QuestionResponse toQuestionResponse(ApplicationQuestion question) {
+    return new QuestionResponse(
+        question.getQuestionId(),
+        question.getQuestionNumber(),
+        question.getPrompt(),
+        question.isRequired(),
+        question.getResponseType());
   }
 
   private SubmittedApplicationResponse toApplicationResponse(Applicant applicant) {
