@@ -1,5 +1,6 @@
 package com.vsa.service;
 
+import com.vsa.controller.ApplicationDtos;
 import com.vsa.model.User;
 import com.vsa.repository.UserRepository;
 import com.vsa.security.JwtUtil;
@@ -41,6 +42,29 @@ public class UserService {
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
     this.emailService = emailService;
+  }
+
+  // ── Profile ──────────────────────────────────────────────────
+
+  /**
+   * Retrieves the profile of an authenticated user.
+   *
+   * @param email The authenticated user's email
+   * @return The user's profile
+   * @throws IllegalArgumentException If no user with the given email exists
+   */
+  public ApplicationDtos.UserProfileResponse getProfile(String email) {
+    User user =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Authenticated user was not found"));
+    return new ApplicationDtos.UserProfileResponse(
+        user.getSid(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getEmail(),
+        user.getPhone(),
+        user.getRole());
   }
 
   // ── Registration & Verification ────────────────────────────
