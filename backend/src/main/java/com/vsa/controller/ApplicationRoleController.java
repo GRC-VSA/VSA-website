@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/application-roles")
-public class ApplicationRoleController {
+public class    ApplicationRoleController {
   private final ApplicationService applicationService;
 
   public ApplicationRoleController(ApplicationService applicationService) {
