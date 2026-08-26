@@ -35,7 +35,8 @@ npm test          # vitest (add `-- path/to/file.test.jsx` for a single file, or
 ```bash
 docker-compose up --build
 ```
-Frontend on `http://localhost` (nginx, proxies to backend), backend on `http://localhost:8080`.
++Frontend on `http://localhost:8081` (nginx, proxies to the backend).
++The backend is reachable directly only inside the Compose network unless a host port mapping is added.
 
 ## Environment configuration
 
