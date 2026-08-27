@@ -2,7 +2,7 @@ package com.vsa.dto.request;
 
 import java.util.List;
 
-import com.vsa.dto.AnswerRequest;
+import com.vsa.dto.request.AnswerRequest;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,6 +1,7 @@
 package com.vsa.controller;
 
 import com.vsa.dto.request.RegistrationRequest;
+import com.vsa.dto.response.RegistrationFormResponse;
 import com.vsa.model.Registration;
 import com.vsa.service.RegistrationService;
 import org.springframework.http.HttpStatus;
@@ -26,5 +27,10 @@ public class RegistrationController {
     @PostMapping
     public ResponseEntity<Registration> register(@PathVariable Long eventId, @RequestBody RegistrationRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(registrationService.register(eventId, request));
+    }
+
+    @GetMapping("/form")
+    public ResponseEntity<RegistrationFormResponse> getRegistrationForm(@PathVariable Long eventId) {
+        return ResponseEntity.ok(registrationService.getRegistrationForm(eventId));
     }
 }

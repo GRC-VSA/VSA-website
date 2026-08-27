@@ -241,8 +241,9 @@ hr {
 }
 
 .last-button-zone > button {
-    width: 150px;
+    /* width: 150px; */
     height: 40px;
+    padding: 2px 15px;
     border-radius: 13px;
     border: none;
     background-image: linear-gradient(40deg, #0F0C29 35%, #302B63 75%, #24243E 95%);
@@ -262,8 +263,7 @@ hr {
 }
 
 .last-button-zone > button:active {
-    width: 145px;
-    height: 37px;
+    scale: 1.07;
     background-image: none;
     background-color: #AB3130;
     border: none;

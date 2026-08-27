@@ -1,10 +1,12 @@
 package com.vsa.service;
 
 import com.vsa.dto.QuestionRequest;
+import com.vsa.dto.QuestionOptionRequest;
 import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.Event;
 import com.vsa.model.Question;
 import com.vsa.model.QuestionType;
+import com.vsa.model.QuestionOption;
 import com.vsa.repository.QuestionRepository;
 import com.vsa.repository.QuestionTypeRepository;
 import jakarta.transaction.Transactional;
@@ -79,6 +81,18 @@ public class QuestionService {
         question.setQuestionText(req.getQuestionText());
         question.setRequired(question.isRequired());
         question.setDisplayOrder(req.getDisplayOrder());
+
+        if (req.getOptions() != null) {
+            for (QuestionOptionRequest optionRequest : req.getOptions()) {
+                QuestionOption option = new QuestionOption();
+                option.setQuestion(question);
+                option.setOptionText(optionRequest.getOptionText());
+                option.setDisplayOrder(optionRequest.getDisplayOrder());
+
+                question.getOptions().add(option);
+            }
+        }
+
         return question;
     }
 }

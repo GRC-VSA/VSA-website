@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Entity representing a custom registration question attached to an Event.
  *
@@ -65,4 +68,8 @@ public class Question {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<QuestionOption> options = new ArrayList<>();
 }

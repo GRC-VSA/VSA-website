@@ -3,6 +3,7 @@ package com.vsa.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 /**
  * Request payload for creating or updating an event question.
  *
@@ -27,4 +28,6 @@ public class QuestionRequest {
 
     /** Display order of the question within the event's question list */
     private int displayOrder;
+
+    private List<QuestionOptionRequest> options;
 }

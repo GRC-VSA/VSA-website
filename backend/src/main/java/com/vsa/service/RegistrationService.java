@@ -1,7 +1,10 @@
 package com.vsa.service;
 
-import com.vsa.dto.AnswerRequest;
+import com.vsa.dto.request.AnswerRequest;
 import com.vsa.dto.request.RegistrationRequest;
+import com.vsa.dto.response.QuestionOptionResponse;
+import com.vsa.dto.response.RegistrationFormResponse;
+import com.vsa.dto.response.RegistrationQuestionResponse;
 import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.*;
 import com.vsa.repository.QuestionRepository;
@@ -53,6 +56,9 @@ public class RegistrationService {
     @Transactional
     public Registration register(Long eventId, RegistrationRequest req) {
         Event event = eventService.getEventById(eventId);
+        if (!"INTERNAL".equals(event.getRegistrationType())) {
+            throw new IllegalStateException("This event does not use internal registration.");
+        }
         User user = getCurrentUser();
 
         if (registrationRepository.existsByEvent_EventIdAndUser_Sid(eventId, user.getSid())) {
@@ -91,6 +97,33 @@ public class RegistrationService {
         return saved;
     }
 
+    @Transactional
+    public RegistrationFormResponse getRegistrationForm(Long eventId) {
+
+        Event event = eventService.getEventById(eventId);
+
+        if (!"INTERNAL".equals(event.getRegistrationType())) {
+            throw new IllegalStateException("This event does not use internal registration.");
+        }
+
+        List<Question> questions = questionRepository.findByEvent_EventIdAndIsActiveTrueOrderByDisplayOrderAsc(eventId);
+
+        RegistrationFormResponse response = new RegistrationFormResponse();
+
+        response.setEventId(event.getEventId());
+        response.setEventName(event.getEventName());
+        response.setTitle(event.getTitle());
+
+        List<RegistrationQuestionResponse> questionResponses =
+                                questions.stream()
+                                .map(this::buildQuestionResponse)
+                                .collect(Collectors.toList());
+
+         response.setQuestions(questionResponses);
+
+        return response;
+}
+
     //Helper
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -115,6 +148,35 @@ public class RegistrationService {
         answer.setQuestion(question);
         answer.setAnswerValue(req.getAnswerText());
         return answer;
+    }
+
+    private RegistrationQuestionResponse buildQuestionResponse(Question question) {
+
+        RegistrationQuestionResponse response = new RegistrationQuestionResponse();
+        response.setQuestionId(question.getQuestionId());
+        response.setQuestionText(question.getQuestionText());
+        response.setRequired(question.isRequired());
+        response.setDisplayOrder(question.getDisplayOrder());
+        response.setQuestionTypeId(question.getQuestionType().getQuestionTypeId());
+        response.setTypeName(question.getQuestionType().getTypeName());
+
+        List<QuestionOptionResponse> optionResponses =
+                            question.getOptions()
+                            .stream()
+                            .map(this::buildOptionResponse)
+                            .collect(Collectors.toList());
+
+        response.setOptions(optionResponses);
+        return response;
+    }
+
+    private QuestionOptionResponse buildOptionResponse(QuestionOption option) {
+
+        QuestionOptionResponse response = new QuestionOptionResponse();
+        response.setOptionId(option.getOptionId());
+        response.setOptionText(option.getOptionText());
+        response.setDisplayOrder(option.getDisplayOrder());
+        return response;
     }
 
 }
