@@ -25,9 +25,9 @@ public class User {
   // ── Primary Key ────────────────────────────────────────────
   /** Student ID (sid) - unique identifier and primary key */
   @Id
-  @Column(name = "sid")
+  @Column(name = "uid")
   @GeneratedValue(strategy = GenerationType.UUID)
-  private String sid;
+  private String uid;
 
   // ── Profile Information ────────────────────────────────────
   /** User's first name */
