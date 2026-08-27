@@ -1,6 +1,7 @@
 package com.vsa.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.vsa.model.User;
@@ -18,18 +19,18 @@ class UserRepositoryTest {
 
     @Test
     void findByEmail_ReturnsUser() {
-        User user = createUser("SID123", "test@vsa.com");
+        User user = createUser("test@vsa.com");
         userRepository.save(user);
 
         Optional<User> found = userRepository.findByEmail("test@vsa.com");
 
         assertTrue(found.isPresent());
-        assertEquals("SID123", found.get().getSid());
+        assertNotNull(found.get().getUid());
     }
 
     @Test
     void findByVerificationToken_ReturnsUser() {
-        User user = createUser("SID124", "verify@vsa.com");
+        User user = createUser("verify@vsa.com");
         user.setVerificationToken("vToken123");
         userRepository.save(user);
 
@@ -41,7 +42,7 @@ class UserRepositoryTest {
 
     @Test
     void findByResetToken_ReturnsUser() {
-        User user = createUser("SID125", "reset@vsa.com");
+        User user = createUser("reset@vsa.com");
         user.setResetToken("rToken123");
         userRepository.save(user);
 
@@ -53,15 +54,14 @@ class UserRepositoryTest {
 
     @Test
     void existsByEmail_ReturnsTrueWhenExists() {
-        User user = createUser("SID126", "exists@vsa.com");
+        User user = createUser("exists@vsa.com");
         userRepository.save(user);
 
         assertTrue(userRepository.existsByEmail("exists@vsa.com"));
     }
 
-    private User createUser(String sid, String email) {
+    private User createUser(String email) {
         User user = new User();
-        user.setSid(sid);
         user.setFirstName("First");
         user.setLastName("Last");
         user.setEmail(email);

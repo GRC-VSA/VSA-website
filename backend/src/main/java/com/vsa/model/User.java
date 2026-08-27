@@ -23,7 +23,7 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
   // ── Primary Key ────────────────────────────────────────────
-  /** Student ID (sid) - unique identifier and primary key */
+  /** Auto-generated unique identifier and primary key */
   @Id
   @Column(name = "uid")
   @GeneratedValue(strategy = GenerationType.UUID)
