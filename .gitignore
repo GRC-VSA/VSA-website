@@ -20,3 +20,4 @@ certs/
 *.key
 
 .deployed-sha
+/node_modules/
