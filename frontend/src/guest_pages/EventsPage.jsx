@@ -1,6 +1,6 @@
 import { useEvents } from "../context/EventsContext.jsx";
+import { useScrollReveal } from "../hooks/useScrollReveal.js";
 import React, { useState } from "react";
-import { motion } from  "framer-motion";    
 import Fuse from "fuse.js";
 import "./EventsPage.css";
 
@@ -71,6 +71,12 @@ const EventsPage = () => {
 
         return matchesName && matchesTitle && matchesQuarter;
     });
+
+    // Same scroll-reveal pattern as the homepage sections. The extra deps are
+    // needed here (unlike HomePage) because this page returns a loading state
+    // before <main> exists, and because filtering swaps out the event cards —
+    // both change which .reveal elements are in the DOM.
+    const sectionRef = useScrollReveal(".reveal", [isLoading, error, filteredEvents.length]);
 
     const didYouMean = () => {
         const searchedName = normalizeText(appliedSearch.eventNameSearch);
@@ -161,7 +167,7 @@ const EventsPage = () => {
         if (location.length >= 25) {
             let newLocation;
             if (location.includes("-")) {
-                //If we have "Holman Library - Green River College", split("-") gives "Holman Library " and " Green River College". 
+                //If we have "Holman Library - Green River College", split("-") gives "Holman Library " and " Green River College".
                 // Map and trim is to remove the space of each element.
                 newLocation = location.split("-").map(word => word.trim());
                 for (let i = 0; i < 2; i++) {
@@ -196,22 +202,22 @@ const EventsPage = () => {
         }
 
         return description;
-    };  
+    };
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
 
     const suggestedEvent = hideSuggestion ? null : didYouMean();
 
     return (
-        <main id="event-page-main">
+        <main id="event-page-main" ref={sectionRef}>
             <div id="cover-photo-container">
                 <img src={coverPhoto} id="cover-photo"></img>
                 <div id="overlay"></div>
-                <motion.div 
-                className="cover-photo-text"
-                initial={{ opacity: 0, x: -60 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{duration: 0.8, ease: "easeOut"}}>
+                <motion.div
+                    className="cover-photo-text"
+                    initial={{ opacity: 0, x: -60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{duration: 0.8, ease: "easeOut"}}>
                     <span>VSA EVENTS</span>
                     <h1>Discover Events <br />that Bring
                         <span id="highlight-header"> Excitement</span>
@@ -313,21 +319,17 @@ const EventsPage = () => {
                     </div>
                 </div>
             </div>
-            <motion.div 
-            id="upcoming-events-title"
-            className="section-title-container"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            viewport={{ once: true, amount: 0.2 }}>
+            <div
+                id="upcoming-events-title"
+                className="section-title-container reveal">
                 <h3 className="section-title">Upcoming Events</h3>
                 <p className="section-description">Click and sign up for the closest events comming up.</p>
                 <div className="horizontal-divider"></div>
-            </motion.div>
+            </div>
             <div className="event-card-container">
                 {/* <h1>Upcoming Events</h1> */}
                 {filteredEvents.map((event) => (
-                    <div key={event.eventId} className="event-card">
+                    <div key={event.eventId} className="event-card reveal">
                         <div className="image-placeholder">
                             <img src={event.imageUrl} />
                             <div className="event-date">
@@ -362,38 +364,38 @@ const EventsPage = () => {
                     </div>
                 ))}
                 {filteredEvents.length === 0 && (
-                    <div id="no-event-found-container">
+                    <div id="no-event-found-container" className="reveal">
                         <img id="no-event-found-img" src={noeventfound} />
-                        <div id="no-event-all-text-container">  
+                        <div id="no-event-all-text-container">
                             <h3 id="no-event-found-header">Oops! No Event Found.</h3>
                             <div id="no-event-found-description-container">
                                 <p id="no-event-found-description">
                                     We can't find the event that you're looking for. Probably the filters you applied are getting out of hand.
                                 </p>
-                                
+
                                 {suggestedEvent && (
                                     <div id="suggestion-container">
                                         <p>Did you mean: {suggestedEvent}?</p>
                                         <div className="suggestion-button-div">
                                             <button type="button" id="accept-button"
-                                                onClick={() => {
-                                                    setFilterInput({
-                                                        eventNameSearch: suggestedEvent,
-                                                        titleSearch: "all",
-                                                        quarterSearch: "all"
-                                                    });
-                                                    setAppliedSearch({
-                                                        eventNameSearch: suggestedEvent,
-                                                        titleSearch: "all",
-                                                        quarterSearch: "all"
-                                                    });
-                                                }}>
+                                                    onClick={() => {
+                                                        setFilterInput({
+                                                            eventNameSearch: suggestedEvent,
+                                                            titleSearch: "all",
+                                                            quarterSearch: "all"
+                                                        });
+                                                        setAppliedSearch({
+                                                            eventNameSearch: suggestedEvent,
+                                                            titleSearch: "all",
+                                                            quarterSearch: "all"
+                                                        });
+                                                    }}>
                                                 Yup! This is what I meant
                                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
                                             </button>
                                             <button type="button" id="refuse-button" onClick={() => { setHideSuggestion(true) }}>
                                                 Hell nah, bro!
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>  
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
                                             </button>
                                         </div>
                                     </div>
@@ -406,40 +408,40 @@ const EventsPage = () => {
 
             <div id="red-banner">
                 <div className="achievement-div">
-                    <div className="achievement">
+                    <div className="achievement reveal">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M40-160v-160q0-34 23.5-57t56.5-23h131q20 0 38 10t29 27q29 39 71.5 61t90.5 22q49 0 91.5-22t70.5-61q13-17 30.5-27t36.5-10h131q34 0 57 23t23 57v160H640v-91q-35 25-75.5 38T480-200q-43 0-84-13.5T320-252v92H40Zm440-160q-38 0-72-17.5T351-386q-17-25-42.5-39.5T253-440q22-37 93-58.5T480-520q63 0 134 21.5t93 58.5q-29 0-55 14.5T609-386q-22 32-56 49t-73 17ZM160-440q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T280-560q0 50-34.5 85T160-440Zm640 0q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T920-560q0 50-34.5 85T800-440ZM480-560q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-680q0 50-34.5 85T480-560Z" /></svg>
                         <h3>250+</h3>
                         <p>CONCURRENT PARTICIPANTS</p>
                         <span>We promise to bring new experience of joy through our events</span>
                     </div>
                     <div className="vertical-divider" id="first-div ider"></div>
-                    <div className="achievement">
+                    <div className="achievement reveal">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-80 120-436l200-244h320l200 244L480-80ZM183-680l-85-85 57-56 85 85-57 56Zm257-80v-120h80v120h-80Zm335 80-57-57 85-85 57 57-85 85ZM480-192l210-208H270l210 208ZM358-600l-99 120h442l-99-120H358Z" /></svg>
                         <h3>80%</h3>
                         <p>CHANCE OF WINNING PRIZE</p>
                         <span>Most of the students go home with an awesome prize</span>
                     </div>
                     <div className="vertical-divider" id="second-divider"></div>
-                    <div className="achievement">
+                    <div className="achievement reveal">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-800v-80h320v80H120Zm120 280v-160H120v-80h320v80H320v160h-80ZM548-96l-56-56 312-312 56 56L548-96Zm-11-241q-17-17-17-43t17-43q17-17 43-17t43 17q17 17 17 43t-17 43q-17 17-43 17t-43-17Zm200 200q-17-17-17-43t17-43q17-17 43-17t43 17q17 17 17 43t-17 43q-17 17-43 17t-43-17ZM549.5-549.5Q520-579 520-620t29.5-71.5Q579-722 620-722q12 0 21.5 1.5T660-716v-124q0-17 11.5-28.5T700-880h140v80H720v180q0 41-29.5 70.5T620-520q-41 0-70.5-29.5ZM220-80q-41 0-70.5-30.5T120-182q0-18 7.5-36.5T150-252l42-42-14-14q-15-15-22.5-32.5T148-378q0-41 29.5-70.5T248-478q41 0 70.5 29.5T348-378q0 20-6.5 37.5T320-308l-14 14 28 28 56-56 56 58-56 56 56 56-56 56-56-56-42 42q-15 15-33.5 22.5T220-80Zm28-270 14-14q3-3 4.5-6t1.5-8q0-9-6-14.5t-14-5.5q-8 0-14 5.5t-6 14.5q0 3 1.5 7t4.5 7l14 14Zm-30 190q3 0 8-1.5t8-4.5l44-42-28-28-44 42q-3 3-4.5 7t-1.5 9q0 8 5 13t13 5Z" /></svg>
                         <h3>+3</h3>
                         <p>EVENTS PER QUARTER</p>
                         <span>Excited to surprise you with a versatile of events</span>
                     </div>
                     <div className="vertical-divider" id="third-divider"></div>
-                    <div className="achievement">
+                    <div className="achievement reveal">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-28 346-160H160v-186L28-480l132-134v-186h186l134-132 134 132h186v186l132 134-132 134v186H614L480-28Zm0-112 80-80v-148q-26-15-43-50.5T500-500q0-58 26-99t64-41q37 0 63.5 41t26.5 99q0 47-17 82.5T620-368v128h100v-140l100-100-100-100v-140H580L480-820 380-720H240v140L140-480l100 100v140h100v-160q-26-6-43-27.5T280-477v-163h40v151h30v-151h40v151h30v-151h40v163q0 28-17 49.5T400-400v180l80 80Zm0-340Z" /></svg>
                         <h3>FREE</h3>
-                        <p>FOOD & DRINK</p>
+                        <p>FOOD &amp; DRINK</p>
                         <span>All of our big events serve free food and free Vietnamese cuisine</span>
                     </div>
                 </div>
             </div>
             <div className="event-of-the-year">
-                <div className="event-of-the-year-img-div">
+                <div className="event-of-the-year-img-div reveal">
                     <img src={event_of_the_year}></img>
                 </div>
-                <div className="event-of-the-year-text-div">
+                <div className="event-of-the-year-text-div reveal">
                     <div className="event-of-the-year-title-div">
                         <p id="quotation-mark">"</p>
                         <h2 id="flexing-title"><span>Club Event</span> of The Year</h2>
@@ -460,7 +462,7 @@ const EventsPage = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#C22E2D"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" /></svg>
                         </div>
                         <div className="bullet-points">
-                            <span>The Only Competition with 2 stages: Swiss Stage & Knockout Stage</span>
+                            <span>The Only Competition with 2 stages: Swiss Stage &amp; Knockout Stage</span>
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#C22E2D"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" /></svg>
                         </div>
                         <p>Join our next events and <span>experience the fun</span> yourself!</p>
@@ -468,14 +470,14 @@ const EventsPage = () => {
                 </div>
             </div>
 
-            <div className="section-title-container">
-                <h3>Impressions of Faculties & Attendees</h3>
+            <div className="section-title-container reveal">
+                <h3>Impressions of Faculties &amp; Attendees</h3>
                 <p>How the supervisor and students felt about our events</p>
                 <div className="horizontal-divider"></div>
             </div>
             <div className="accolade-container">
                 <div className="accolade-column">
-                    <div className="accolade">
+                    <div className="accolade reveal">
                         <div className="person">
                             <img src={paz}></img>
                             <div className="person-name-div">
@@ -489,7 +491,7 @@ const EventsPage = () => {
                         </p>
                         <img src={ribbon}></img>
                     </div>
-                    <div className="accolade">
+                    <div className="accolade reveal">
                         <div className="person">
                             <img src={roni}></img>
                             <div className="person-name-div">
@@ -507,7 +509,7 @@ const EventsPage = () => {
                     </div>
                 </div>
                 <div className="accolade-column">
-                    <div className="accolade">
+                    <div className="accolade reveal">
                         <div className="person">
                             <img className="square-img" src={shawn}></img>
                             <div className="person-name-div">
@@ -528,7 +530,7 @@ const EventsPage = () => {
 
                 </div>
                 <div className="accolade-column">
-                    <div className="accolade">
+                    <div className="accolade reveal">
                         <div className="person">
                             <img className="square-img" src={anonymous_male}></img>
                             <div className="person-name-div">
@@ -548,12 +550,14 @@ const EventsPage = () => {
 
             {/* <div className="section-wrapper"> */}
             <div id="memory-section">
-                <div id="memory-title" className="section-title-container">
+                <div id="memory-title" className="section-title-container reveal">
                     <h3><span>Memories</span> with Students</h3>
                     <p>The fun we get along the journey</p>
                     <div className="horizontal-divider"></div>
                 </div>
-                <div className="memory-carousel">
+                {/* Revealed as one unit rather than per-.memory: if the carousel
+                    track is CSS-animated, per-item GSAP transforms would fight it. */}
+                <div className="memory-carousel reveal">
                     <div className="memory">
                         <img src={choicau} alt="diary of Viet students" />
                         <div className="desc-holder">
