@@ -213,17 +213,13 @@ const EventsPage = () => {
             <div id="cover-photo-container">
                 <img src={coverPhoto} id="cover-photo"></img>
                 <div id="overlay"></div>
-                <motion.div
-                    className="cover-photo-text"
-                    initial={{ opacity: 0, x: -60 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{duration: 0.8, ease: "easeOut"}}>
+                <div className="cover-photo-text">
                     <span>VSA EVENTS</span>
                     <h1>Discover Events <br />that Bring
                         <span id="highlight-header"> Excitement</span>
                     </h1>
                     <span>Immerse in fun and exploration at our events</span>
-                </motion.div>
+                </div>
                 <div id="search-bar-container">
                     <form id="search-bar" onSubmit={handleSearch}>
                         <div className="search-filter-container" style={{ gridArea: "event-name"}}>

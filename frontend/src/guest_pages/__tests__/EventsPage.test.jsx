@@ -5,10 +5,22 @@ import EventsPage from "../EventsPage";
 import * as EventsContextModule from "../../context/EventsContext.jsx";
 
 vi.mock("../../context/EventsContext.jsx");
-vi.mock("framer-motion", () => ({
-    motion: {
-        div: ({ children, ...props }) => <div {...props}>{children}</div>,
+
+// Mock GSAP and ScrollTrigger to prevent window.matchMedia initialization errors
+vi.mock("gsap", () => ({
+    default: {
+        registerPlugin: vi.fn(),
     },
+}));
+
+vi.mock("gsap/ScrollTrigger", () => ({
+    default: {},
+    ScrollTrigger: {},
+}));
+
+// The scroll-reveal hook only drives animation; stub it so elements render visible
+vi.mock("../../hooks/useScrollReveal.js", () => ({
+    useScrollReveal: () => ({ current: null }),
 }));
 
 describe("EventsPage", () => {
