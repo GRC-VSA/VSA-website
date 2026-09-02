@@ -72,11 +72,18 @@ const EventsPage = () => {
         return matchesName && matchesTitle && matchesQuarter;
     });
 
-    // Same scroll-reveal pattern as the homepage sections. The extra deps are
-    // needed here (unlike HomePage) because this page returns a loading state
-    // before <main> exists, and because filtering swaps out the event cards —
-    // both change which .reveal elements are in the DOM.
-    const sectionRef = useScrollReveal(".reveal", [isLoading, error, filteredEvents.length]);
+    // Same scroll-reveal pattern as the homepage sections, but this page needs a
+    // rerun key (unlike HomePage) because it returns a loading/error state before
+    // <main> exists, and because filtering swaps out the event cards — both change
+    // which .reveal elements are in the DOM. The key lists the rendered event ids
+    // rather than their count, so swapping one event for another still re-runs.
+    const revealKey = [
+        isLoading ? "loading" : "loaded",
+        error ? "error" : "ok",
+        filteredEvents.map((event) => event.eventId).join(","),
+    ].join("|");
+
+    const sectionRef = useScrollReveal(".reveal", revealKey);
 
     const didYouMean = () => {
         const searchedName = normalizeText(appliedSearch.eventNameSearch);
