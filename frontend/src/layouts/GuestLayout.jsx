@@ -13,6 +13,7 @@ const GuestLayout = () => {
         "/reset-password",
         "/verify",
     ];
+    const registationPage = ["/event"]
 
     const hideNavbar = authPages.includes(location.pathname);
 
