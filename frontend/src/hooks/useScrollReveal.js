@@ -16,8 +16,14 @@ gsap.registerPlugin(ScrollTrigger);
  *     <h2 className="reveal">Heading</h2>
  *     <p className="reveal">Body text</p>
  *   </section>
+ *
+ * Pages whose `.reveal` elements change after the first render (conditional
+ * loading/error states, filtered lists) pass a `rerunKey`: a primitive that
+ * changes whenever the set of targets changes, so the effect re-attaches the
+ * triggers. Must be a primitive (string/number) — an array or object literal
+ * is a new value every render and would re-run the effect endlessly.
  */
-export function useScrollReveal(selector = ".reveal") {
+export function useScrollReveal(selector = ".reveal", rerunKey = "") {
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -60,7 +66,7 @@ export function useScrollReveal(selector = ".reveal") {
         }, container);
 
         return () => ctx.revert();
-    }, [selector]);
+    }, [selector, rerunKey]);
 
     return containerRef;
 }
