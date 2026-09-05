@@ -2,6 +2,8 @@ package com.vsa.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,10 +23,11 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
   // ── Primary Key ────────────────────────────────────────────
-  /** Student ID (SID) - unique identifier and primary key */
+  /** Auto-generated unique identifier and primary key */
   @Id
-  @Column(name = "SID")
-  private String sid;
+  @Column(name = "uid")
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String uid;
 
   // ── Profile Information ────────────────────────────────────
   /** User's first name */

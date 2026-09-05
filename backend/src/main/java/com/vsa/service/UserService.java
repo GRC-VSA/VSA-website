@@ -56,6 +56,9 @@ public class UserService {
    * @throws IllegalArgumentException If the email already exists
    */
   public User registerUser(User user) {
+    if (user.getUid() != null) {
+      throw new IllegalArgumentException("uid must not be provided");
+    }
     if (userRepository.existsByEmail(user.getEmail())) {
       throw new IllegalArgumentException("Email already exists");
     }

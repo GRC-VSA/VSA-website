@@ -1,0 +1,39 @@
+language: "en-US"
+
+reviews:
+  profile: "chill"
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+      - "Development"
+  path_filters:
+    - "!**/node_modules/**"
+    - "!frontend/dist/**"
+    - "!backend/target/**"
+    - "!backend/uploads/**"
+    - "!**/*.lock"
+    - "!**/package-lock.json"
+    - "!.idea/**"
+  path_instructions:
+    - path: "backend/**/*.java"
+      instructions: >
+        This is a layered Spring Boot app (controller -> service -> repository -> model).
+        Flag business logic placed in controllers instead of services, missing validation
+        on request DTOs, and any endpoint whose authorization doesn't match the matcher
+        rules already centralized in SecurityConfig.
+    - path: "frontend/src/**/*.{js,jsx}"
+      instructions: >
+        React 19 + react-router app. Flag JWTs or secrets read/written outside
+        api/authHeaders.js, and API calls that don't follow the one-file-per-resource
+        pattern used in src/api/*.js.
+  tools:
+    eslint:
+      enabled: true
+      config_file: "frontend/eslint.config.js"
+
+chat:
+  auto_reply: true

@@ -7,7 +7,6 @@ import "./AuthPages.css";
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
-        sid: "",
         firstName: "",
         lastName: "",
         email: "",
@@ -46,7 +45,6 @@ const RegisterPage = () => {
             setErrorMessage("");
 
             await registerUser({
-                sid: formData.sid,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
@@ -55,7 +53,7 @@ const RegisterPage = () => {
             });
 
             setFormData({
-                sid: "", firstName: "", lastName: "", email: "",
+                firstName: "", lastName: "", email: "",
                 phone: "", password: "", confirmPassword: "",
             });
 
@@ -95,11 +93,6 @@ const RegisterPage = () => {
                                 <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required />
                             </label>
                         </div>
-
-                        <label>
-                            Student ID
-                            <input type="text" name="sid" value={formData.sid} onChange={handleChange} required />
-                        </label>
 
                         <label>
                             Email
