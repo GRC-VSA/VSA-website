@@ -1,6 +1,7 @@
 import { useEvents } from "../context/EventsContext.jsx";
 import { useState } from "react";
-import { motion } from  "framer-motion";    
+import { motion } from  "framer-motion";   
+import { useNavigate } from "react-router-dom"; 
 import Fuse from "fuse.js";
 import "./EventsPage.css";
 
@@ -39,6 +40,23 @@ const EventsPage = () => {
         titleSearch: "all",
         quarterSearch: "all"
     });
+
+    const navigate = useNavigate();
+
+    const goToRegistrationForm = (eventObject) => {
+        const registrationType = eventObject.registrationType;
+        switch (registrationType) {
+            case "INTERNAL":
+                navigate(`/events/${eventObject.eventId}/register`);
+                break;
+            case "EXTERNAL":
+                window.open(`${eventObject.externalRegistrationUrl}`, "_blank", "noopener,noreferrer");
+                break;
+            default:
+                break;
+        }
+    }
+
 
     const mapDateToQuarter = (eventDate) => {
         if (!eventDate) return "all";
@@ -327,7 +345,7 @@ const EventsPage = () => {
             <div className="event-card-container">
                 {/* <h1>Upcoming Events</h1> */}
                 {filteredEvents.map((event) => (
-                    <div key={event.eventId} className="event-card">
+                    <div key={event.eventId} className="event-card" onClick={() => goToRegistrationForm(event)}>
                         <div className="image-placeholder">
                             <img src={event.imageUrl} />
                             <div className="event-date">

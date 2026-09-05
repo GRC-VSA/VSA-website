@@ -61,7 +61,7 @@ public class RegistrationService {
         }
         User user = getCurrentUser();
 
-        if (registrationRepository.existsByEvent_EventIdAndUser_Sid(eventId, user.getSid())) {
+        if (registrationRepository.existsByEvent_EventIdAndUser_Uid(eventId, user.getUid())) {
             throw new IllegalStateException("You have already registered for this event.");
         }
 

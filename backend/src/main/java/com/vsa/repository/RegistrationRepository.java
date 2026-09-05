@@ -33,8 +33,8 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
      * guard).
      *
      * @param eventId The event ID
-     * @param sid The user's SID
+     * @param Uid The user's ID
      * @return true if a registration already exists for this user/event pair
      */
-    boolean existsByEvent_EventIdAndUser_Sid(Long eventId, String sid);
+    boolean existsByEvent_EventIdAndUser_Uid(Long eventId, String Uid);
 }
