@@ -1,4 +1,5 @@
 import React from "react";
+import { MemoryRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import EventsPage from "../EventsPage";
@@ -23,11 +24,20 @@ vi.mock("../../hooks/useScrollReveal.js", () => ({
     useScrollReveal: () => ({ current: null }),
 }));
 
+
+const renderEventsPage = () => {
+    return render(
+        <MemoryRouter>
+            <EventsPage />
+        </MemoryRouter>
+    );
+};
+
 describe("EventsPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
-
+    
     it("displays loading state while events are fetching", () => {
         vi.spyOn(EventsContextModule, "useEvents").mockReturnValue({
             events: [],
@@ -35,7 +45,7 @@ describe("EventsPage", () => {
             error: null,
         });
 
-        render(<EventsPage />);
+        renderEventsPage();
         expect(screen.getByText("Loading...")).toBeInTheDocument();
     });
 
@@ -61,8 +71,8 @@ describe("EventsPage", () => {
             error: null,
         });
 
-        render(<EventsPage />);
-
+        renderEventsPage();
+        
         // Query heading specifically to avoid duplicate text matches in static page text
         expect(
             screen.getByRole("heading", { name: "Badminton Tournament 2026" })
@@ -91,7 +101,7 @@ describe("EventsPage", () => {
             error: null,
         });
 
-        const { container } = render(<EventsPage />);
+        const { container } = renderEventsPage();
 
         // Select input by name attribute
         const searchInput = container.querySelector('input[name="eventNameSearch"]');
