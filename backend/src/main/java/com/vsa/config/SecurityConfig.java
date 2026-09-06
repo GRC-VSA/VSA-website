@@ -94,8 +94,27 @@ public class SecurityConfig {
                                             "/api/users/verify",
                                             "/api/users/forgot-password",
                                             "/api/users/reset-password",
+                                            "/api/application-roles/open",
                                             "/uploads/**")
                                     .permitAll()
+
+                    // ── Officer recruitment builder ─────────────────
+                    .requestMatchers("/api/application-roles/**")
+                    .hasAnyAuthority("officer", "president")
+
+                    // ── Student application submission and self-service ─
+                    .requestMatchers(HttpMethod.POST, "/api/applications")
+                    .hasAuthority("student")
+                    .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
+                    .hasAuthority("student")
+                    .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
+                    .hasAuthority("student")
+                    .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
+                    .hasAuthority("student")
+
+                    // ── Officer application review ──────────────────
+                    .requestMatchers("/api/applications/**")
+                    .hasAnyAuthority("officer", "president")
 
                                     // ── Question type lookup (read-only, used by both
                                     //    officers building questions and guests answering

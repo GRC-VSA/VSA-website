@@ -10,6 +10,7 @@ reviews:
     base_branches:
       - "main"
       - "Development"
+      - "dev"
   path_filters:
     - "!**/node_modules/**"
     - "!frontend/dist/**"

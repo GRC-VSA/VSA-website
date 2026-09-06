@@ -2,6 +2,7 @@ package com.vsa.controller;
 
 import com.vsa.model.User;
 import com.vsa.service.UserService;
+import java.security.Principal;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,11 @@ public class UserController {
    */
   public UserController(UserService userService) {
     this.userService = userService;
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<ApplicationDtos.UserProfileResponse> getCurrentUser(Principal principal) {
+    return ResponseEntity.ok(userService.getProfile(principal.getName()));
   }
 
   // ── Registration & Verification ────────────────────────────
