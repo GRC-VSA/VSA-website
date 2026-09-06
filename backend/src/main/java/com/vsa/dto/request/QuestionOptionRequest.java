@@ -1,4 +1,4 @@
-package com.vsa.dto;
+package com.vsa.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

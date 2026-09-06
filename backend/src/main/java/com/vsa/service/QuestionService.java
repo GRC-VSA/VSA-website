@@ -1,7 +1,7 @@
 package com.vsa.service;
 
-import com.vsa.dto.QuestionRequest;
-import com.vsa.dto.QuestionOptionRequest;
+import com.vsa.dto.request.QuestionRequest;
+import com.vsa.dto.request.QuestionOptionRequest;
 import com.vsa.exception.ResourceNotFoundException;
 import com.vsa.model.Event;
 import com.vsa.model.Question;
