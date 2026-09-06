@@ -20,11 +20,12 @@ import ForgotPasswordPage from "./guest_pages/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
 import ProductsPage from "./guest_pages/ProductsPage.jsx";
 import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
+import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
 import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
-import TodoPage from "./officer_pages/TodoPage.jsx";
+import TodoPage from "./officer_pages/ToDoPage.jsx";
 
 import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
 import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
@@ -64,7 +65,8 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/events" element={<EventsPage />} />
           {/* <Route path="old-events" element={<OldEventsPage />} /> */}
-          <Route path="events/:eventId/register" element={<EventRegistrationPage />} />
+          <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
+          <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
           <Route path="/products" element={<ProductsPage />} />
         </Route>
 

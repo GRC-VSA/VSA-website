@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +36,7 @@ public class Registration {
 
     /** The user who registered, resolved from the authenticated JWT at request time */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sid", nullable = false)
+    @JoinColumn(name = "sid", nullable = true)
     private User user;
 
     /** Answers to the event's custom questions, submitted alongside the registration */
@@ -43,9 +44,23 @@ public class Registration {
     private List<EventAnswer> answers = new ArrayList<>();
 
     // ── Registration Details ───────────────────────────────────
-    /** Registration status, e.g. "confirmed" (no approval workflow yet — always set on creation) */
+    /**
+     * Student email submitted in the registration form.
+     * This is the email that must be verified.
+     */
+    @Column(name = "student_email", length = 320)
+    private String studentEmail;
+
+    /**
+     * Registration status.
+     *
+     * Expected values for now:
+     * - pending_email_verification
+     * - confirmed
+     */
     @Column(nullable = false)
-    private String status = "confirmed";
+    private String status = "pending_email_verification";
+
 
     /** Ticket type for this registration, e.g. "general". Defaults to "general" if not specified. */
     @Column(name = "ticket_type")
@@ -55,10 +70,45 @@ public class Registration {
     @Column(nullable = false)
     private int quantity = 1;
 
+    // ── Email Verification ─────────────────────────────────────
+
+    /**
+     * Public identifier used by the frontend verification page.
+     *
+     * Example:
+     * /events/23/registration/verify/{verificationId}
+     */
+    @Column(name = "verification_id", unique = true)
+    private UUID verificationId;
+
+    /**
+     * Hash of the verification code.
+     *
+     * Never store the actual verification code in the database.
+     */
+    @Column(name = "verification_code_hash", length = 100)
+    private String verificationCodeHash;
+
+    @Column(name = "verification_code_sent_at")
+    private LocalDateTime verificationCodeSentAt;
+
+    /** Time when the current verification code expires */
+    @Column(name = "verification_expires_at")
+    private LocalDateTime verificationExpiresAt;
+
+    /** Number of incorrect verification attempts */
+    @Column(name = "verification_attempts", nullable = false)
+    private int verificationAttempts = 0;
+
+    /** Time when the student email was successfully verified */
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
     // ── Metadata ───────────────────────────────────────────────
     /** Timestamp when the registration was created (auto-set on creation) */
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
+
 
     /** Automatically sets the registration timestamp before persisting the entity. */
     @PrePersist

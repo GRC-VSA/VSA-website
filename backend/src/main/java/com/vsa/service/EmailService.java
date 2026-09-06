@@ -97,6 +97,112 @@ public class EmailService {
   }
 
   // ── Event Registration Emails ──────────────────────────────
+  /**
+   * Sends an email verification code for an event registration.
+   *
+   * <p>The registration remains pending until the guest enters this
+   * code successfully on the event registration verification page.
+   *
+   * @param toEmail Student email address receiving the code
+   * @param eventName Name of the event being registered for
+   * @param verificationCode Eight-character verification code
+   */
+  public void sendEventRegistrationVerificationEmail(String toEmail, String eventName, String verificationCode) {
+    String body =
+      """
+          %s
+
+          <div style="
+              background-color: %s;
+              padding: 24px 20px;
+              border-radius: 12px;
+              margin: 24px 0;
+          ">
+
+              <h3 style="
+                  color: %s;
+                  margin: 0 0 12px 0;
+                  font-weight: 600;
+              ">
+                  Verify Your Event Registration
+              </h3>
+
+              <p style="
+                  color: %s;
+                  margin: 0 0 12px 0;
+                  line-height: 1.6;
+              ">
+                  You submitted a registration for:
+              </p>
+
+              <p style="
+                  color: %s;
+                  font-weight: 600;
+                  margin: 0 0 24px 0;
+              ">
+                  %s
+              </p>
+
+              <p style="
+                  color: %s;
+                  margin: 0 0 16px 0;
+                  line-height: 1.6;
+              ">
+                  Enter the verification code below on the registration verification page:
+              </p>
+
+              <div style="
+                  text-align: center;
+                  margin: 24px 0;
+              ">
+                  <div style="
+                      display: inline-block;
+                      background-color: %s;
+                      color: %s;
+                      padding: 16px 28px;
+                      border-radius: 8px;
+                      font-size: 28px;
+                      font-weight: 700;
+                      letter-spacing: 6px;
+                  ">
+                      %s
+                  </div>
+              </div>
+
+              <p style="
+                  color: %s;
+                  font-size: 13px;
+                  margin: 20px 0 0 0;
+              ">
+                  This verification code expires in 10 minutes.
+              </p>
+
+              <p style="
+                  color: %s;
+                  font-size: 13px;
+                  margin: 8px 0 0 0;
+              ">
+                  If you did not submit this event registration, you can safely ignore this email.
+              </p>
+
+          </div>
+          """
+          .formatted(
+              getEmailHeader("Event Registration Verification"),
+              ACCENT_COLOR,
+              PRIMARY_COLOR,
+              TEXT_DARK,
+              PRIMARY_COLOR,
+              eventName,
+              TEXT_DARK,
+              PRIMARY_COLOR,
+              TEXT_LIGHT,
+              verificationCode,
+              TEXT_MUTED,
+              TEXT_MUTED);
+
+    sendEmail(toEmail, "VSA - Verify Your Registration: " + eventName, body);
+}
 
   /**
    * Sends event registration confirmation email to a user.

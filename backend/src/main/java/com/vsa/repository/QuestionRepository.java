@@ -15,4 +15,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @EntityGraph(attributePaths = {"questionType", "options"})
     List<Question> findByEvent_EventIdAndIsActiveTrueOrderByDisplayOrderAsc(Long eventId);
+
+    boolean existsByEvent_EventIdAndSystemKey(Long eventId, String systemKey);
 }

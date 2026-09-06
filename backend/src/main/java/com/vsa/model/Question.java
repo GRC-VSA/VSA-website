@@ -45,6 +45,22 @@ public class Question {
     @Column(name = "question_text", nullable = false)
     private String questionText;
 
+    /**
+     * This field helps backend spots where student email question is.
+     * Backend needs to see the student email question because backend will 
+     * send verification email to the student email enter by the user.
+     * 
+     * Detail:
+     * Special identifier used by backend logic for system-defined questions.
+     *
+     * Normal officer-created questions have null.
+     *
+     * Example:
+     * STUDENT_EMAIL
+     */
+    @Column(name = "system_key", length = 50)
+    private String systemKey;
+
     /** Whether this question is required. Enforced on the frontend only for now. */
     @Column(name = "is_required", nullable = false)
     private boolean isRequired = false;

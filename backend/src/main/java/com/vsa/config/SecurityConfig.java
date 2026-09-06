@@ -113,6 +113,10 @@ public class SecurityConfig {
                                     .hasAnyAuthority("officer", "president")
                                     .requestMatchers(HttpMethod.POST, "/api/events/*/registrations")
                                     .permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/verify")
+                                    .permitAll()
+                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/resend-code")
+                                    .permitAll()
 
                                     // ── Read-only endpoints (anyone can browse) ──────
                                     // Also covers GET .../questions, which guests need to

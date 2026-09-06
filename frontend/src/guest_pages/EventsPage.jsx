@@ -1,5 +1,5 @@
 import { useEvents } from "../context/EventsContext.jsx";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { useScrollReveal } from "../hooks/useScrollReveal.js";
 import { useState } from "react";
 import Fuse from "fuse.js";
@@ -47,7 +47,7 @@ const EventsPage = () => {
         const registrationType = eventObject.registrationType;
         switch (registrationType) {
             case "INTERNAL":
-                navigate(`/events/${eventObject.eventId}/register`);
+                navigate(`/events/${eventObject.eventId}/registration-form`);
                 break;
             case "EXTERNAL":
                 window.open(`${eventObject.externalRegistrationUrl}`, "_blank", "noopener,noreferrer");
@@ -247,15 +247,15 @@ const EventsPage = () => {
                 </div>
                 <div id="search-bar-container">
                     <form id="search-bar" onSubmit={handleSearch}>
-                        <div className="search-filter-container" style={{ gridArea: "event-name"}}>
+                        <div className="search-filter-container" style={{ gridArea: "event-name" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M160-200v-80h528l-42-42 56-56 138 138-138 138-56-56 42-42H160Zm116-200 164-440h80l164 440h-76l-38-112H392l-40 112h-76Zm138-176h132l-64-182h-4l-64 182Z" /></svg>
                             <div className="event-name-search">
                                 <label>Event Name</label>
                                 <input type="text" name="eventNameSearch" value={filterInput.eventNameSearch} onChange={handleChange}></input>
                             </div>
                         </div>
-                        <div className="vertical-divider-search" style={{ gridArea: "divide-1"}}></div>
-                        <div className="search-filter-container" style={{ gridArea: "category"}}>
+                        <div className="vertical-divider-search" style={{ gridArea: "divide-1" }}></div>
+                        <div className="search-filter-container" style={{ gridArea: "category" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z" /></svg>
                             <div className="event-category-search">
                                 <label>Category</label>
@@ -268,8 +268,8 @@ const EventsPage = () => {
                                 </select>
                             </div>
                         </div>
-                        <div className="vertical-divider-search" style={{ gridArea: "divide-2"}}></div>
-                        <div className="search-filter-container" style={{ gridArea: "quarter"}}>
+                        <div className="vertical-divider-search" style={{ gridArea: "divide-2" }}></div>
+                        <div className="search-filter-container" style={{ gridArea: "quarter" }}>
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-188.5-11.5Q280-423 280-440t11.5-28.5Q303-480 320-480t28.5 11.5Q360-457 360-440t-11.5 28.5Q337-400 320-400t-28.5-11.5ZM640-400q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-188.5-11.5Q280-263 280-280t11.5-28.5Q303-320 320-320t28.5 11.5Q360-297 360-280t-11.5 28.5Q337-240 320-240t-28.5-11.5ZM640-240q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg>
                             <div className="event-quarter-search">
                                 <label>Quarter</label>
@@ -283,10 +283,10 @@ const EventsPage = () => {
                             </div>
                         </div>
                         <div className="buttons-div">
-                            <div className="button-div" id="filter-button-div" style={{ gridArea: "filter"}}>
+                            <div className="button-div" id="filter-button-div" style={{ gridArea: "filter" }}>
                                 <button type="submit" form="search-bar" id="filter-button">Search</button>
                             </div>
-                            <div className="button-div" id="clear-button-div" style={{ gridArea: "clear"}}>
+                            <div className="button-div" id="clear-button-div" style={{ gridArea: "clear" }}>
                                 <button type="button" onClick={handleClear} id="clear-button">Clear All</button>
                             </div>
                         </div>
@@ -350,34 +350,37 @@ const EventsPage = () => {
             <div className="event-card-container">
                 {/* <h1>Upcoming Events</h1> */}
                 {filteredEvents.map((event) => (
-                    <div key={event.eventId} className="event-card reveal" onClick={() => goToRegistrationForm(event)}>
-                        <div className="image-placeholder">
-                            <img src={event.imageUrl} />
-                            <div className="event-date">
-                                <span>{new Date(event.eventDate).toLocaleDateString('en-US', { day: 'numeric', timezone: 'UTC' })}</span>
-                                <span>{displayEventMonth(event.eventDate)}</span>
-                            </div>
-                        </div>
-                        <div className="event-detail-placeholder">
-                            <div className="event-main-info-div">
-                                <h3>{event.eventName}</h3>
-                            </div>
-                            <p className="event-description">{shortenDescription(event.description)}</p>
+                    <div key={event.eventId} className="event-card-reveal reveal">
+                        <div className="event-card" onClick={() => goToRegistrationForm(event)}>
 
-                            <div className="time-location-div">
-                                <div className="event-time-div">
-                                    <div className="time-div">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M339.5-108.5q-65.5-28.5-114-77t-77-114Q120-365 120-440t28.5-140.5q28.5-65.5 77-114t114-77Q405-800 480-800t140.5 28.5q65.5 28.5 114 77t77 114Q840-515 840-440t-28.5 140.5q-28.5 65.5-77 114t-114 77Q555-80 480-80t-140.5-28.5ZM480-440Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z" /></svg>
-                                        <span>{convert24hTo12h(event.startTime.slice(0, 5))}</span>
-                                        <span> - </span>
-                                        <span>{convert24hTo12h(event.endTime.slice(0, 5))}</span>
-                                    </div>
+                            <div className="image-placeholder">
+                                <img src={event.imageUrl} />
+                                <div className="event-date">
+                                    <span>{new Date(event.eventDate).toLocaleDateString('en-US', { day: 'numeric', timezone: 'UTC' })}</span>
+                                    <span>{displayEventMonth(event.eventDate)}</span>
                                 </div>
+                            </div>
+                            <div className="event-detail-placeholder">
+                                <div className="event-main-info-div">
+                                    <h3>{event.eventName}</h3>
+                                </div>
+                                <p className="event-description">{shortenDescription(event.description)}</p>
 
-                                {/* <button type="button">Register Now</button> */}
-                                <div className="location-div">
-                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M536.5-503.5Q560-527 560-560t-23.5-56.5Q513-640 480-640t-56.5 23.5Q400-593 400-560t23.5 56.5Q447-480 480-480t56.5-23.5ZM480-186q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" /></svg>
-                                    <span>{trimEventLocation(event.location)}</span>
+                                <div className="time-location-div">
+                                    <div className="event-time-div">
+                                        <div className="time-div">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M339.5-108.5q-65.5-28.5-114-77t-77-114Q120-365 120-440t28.5-140.5q28.5-65.5 77-114t114-77Q405-800 480-800t140.5 28.5q65.5 28.5 114 77t77 114Q840-515 840-440t-28.5 140.5q-28.5 65.5-77 114t-114 77Q555-80 480-80t-140.5-28.5ZM480-440Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z" /></svg>
+                                            <span>{convert24hTo12h(event.startTime.slice(0, 5))}</span>
+                                            <span> - </span>
+                                            <span>{convert24hTo12h(event.endTime.slice(0, 5))}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* <button type="button">Register Now</button> */}
+                                    <div className="location-div">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M536.5-503.5Q560-527 560-560t-23.5-56.5Q513-640 480-640t-56.5 23.5Q400-593 400-560t23.5 56.5Q447-480 480-480t56.5-23.5ZM480-186q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z" /></svg>
+                                        <span>{trimEventLocation(event.location)}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -399,24 +402,24 @@ const EventsPage = () => {
                                         <p>Did you mean: {suggestedEvent}?</p>
                                         <div className="suggestion-button-div">
                                             <button type="button" id="accept-button"
-                                                    onClick={() => {
-                                                        setFilterInput({
-                                                            eventNameSearch: suggestedEvent,
-                                                            titleSearch: "all",
-                                                            quarterSearch: "all"
-                                                        });
-                                                        setAppliedSearch({
-                                                            eventNameSearch: suggestedEvent,
-                                                            titleSearch: "all",
-                                                            quarterSearch: "all"
-                                                        });
-                                                    }}>
+                                                onClick={() => {
+                                                    setFilterInput({
+                                                        eventNameSearch: suggestedEvent,
+                                                        titleSearch: "all",
+                                                        quarterSearch: "all"
+                                                    });
+                                                    setAppliedSearch({
+                                                        eventNameSearch: suggestedEvent,
+                                                        titleSearch: "all",
+                                                        quarterSearch: "all"
+                                                    });
+                                                }}>
                                                 Yup! This is what I meant
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" /></svg>
                                             </button>
                                             <button type="button" id="refuse-button" onClick={() => { setHideSuggestion(true) }}>
                                                 Hell nah, bro!
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" /></svg>
                                             </button>
                                         </div>
                                     </div>

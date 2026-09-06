@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Request payload for a logged-in user registering for an event.
- *
- * <p>No name/email fields here — the registrant is resolved from the authenticated JWT, not the
- * request body.
+ * Request payload for submitting an event registration.
  *
  * @author VSA Development Team
  */

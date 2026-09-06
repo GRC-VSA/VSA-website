@@ -1,3 +1,305 @@
 .event-registration-page {
-    margin-bottom: 250px;
+    /* margin-bottom: 250px; */
+    min-height: 100vh;
+    padding: 85px 15px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.registration-form-div {
+    margin: 0 auto;
+    width: 45%;
+    height: 650px;
+    overflow: auto;
+    scrollbar-width: none;
+    border-radius: 8px;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+
+}
+
+.registration-form-header,
+.registration-form-body {
+    padding: 25px 45px;
+
+}
+
+.registration-form-header {
+    width: 100%;
+    height: 310px;
+    position: relative;
+    background: linear-gradient(135deg, #7F1F1F 0%, #AB3130 38%, #C94A48 72%, #ae403e 100%);
+
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.watermark p {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    margin-top: 5px;
+}
+
+.horizontal-div {
+    background-color: white;
+    height: 1.5px;
+    width: 30px;
+    margin-top: 7px;
+}
+
+.event-info {
+    margin-top: 25px;
+}
+
+.event-info h1,
+.event-info strong,
+.event-info span,
+.event-info svg {
+    color: white;
+}
+
+.event-info h1 {
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+.event-info strong,
+.event-info span {
+    font-size: 0.9rem;
+}
+.event-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.event-detail-title svg {
+    scale: 0.9;
+}
+
+.event-detail-div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+
+}
+
+.registration-form-body {
+    position: relative;
+    background-color: white;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    margin-top: -15px;
+
+    z-index: 2;
+}
+
+.registration-question-div {
+    margin-top: 15px;
+}
+
+.registration-question-div .question-text,
+.registration-question-div .question-number {
+    font-size: 1rem;
+}
+
+.required-text {
+    font-size: 0.8rem;
+    color: red;
+}
+
+.registration-form-body input[type="text"],
+.registration-form-body input[type="email"],
+.registration-form-body input[type="number"],
+.registration-form-body textarea {
+    width: 100%;
+    background: none;
+    border: 1.5px solid rgb(201, 201, 201);
+    margin: 10px 0;
+    border-radius: 10px;
+}
+/* Remove the default up and down buttons of input type "number" in Chrome, Edge, Safari */
+.registration-form-body input[type="number"]::-webkit-inner-spin-button,
+.registration-form-body input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove the default up and down buttons of input type "number" in Firefox */
+.registration-form-body input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+input::placeholder,
+textarea::placeholder {
+    font-weight: 400;
+}
+
+.choice-answer-div {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+    margin-left: 5px;
+    gap: -5px;
+}
+
+.choice-answer-div label {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 400;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.choice-answer-div input {
+    width: 18px;
+    border-radius: 50%;
+    accent-color: #ab3130;
+    cursor: pointer;
+}
+
+.registration-form-body button {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    width: 100%;
+    height: 40px;
+    border-radius: 8px;
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: inherit;
+    cursor: pointer;
+    background: linear-gradient(135deg, #7F1F1F 0%, #AB3130 38%, #C94A48 72%, #ae403e 100%);
+    background-size: 200% 100%;
+    background-position: left center;
+
+    transition: background-position 0.5s ease;
+}
+
+.registration-form-body button:hover {
+    background-position: right center;
+    color: #ECE0A6;
+}
+
+.registration-question-div.question-has-error input[type="text"],
+.registration-question-div.question-has-error input[type="email"],
+.registration-question-div.question-has-error input[type="tel"],
+.registration-question-div.question-has-error input[type="number"],
+.registration-question-div.question-has-error input[type="date"],
+.registration-question-div.question-has-error input[type="url"],
+.registration-question-div.question-has-error textarea {
+    border-color: #d93b3b;
+}
+
+.registration-question-div .question-has-error 
+.choice-answer-div label {
+    border-color: #d93b3b;
+}
+
+.required-questions-error,
+.registration-submit-error {
+    margin: 20px 0 10px;
+    color: #e04444;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.leave-warning-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 9999;
+}
+
+.leave-warning-modal {
+    width: min(420px, 90%);
+    padding: 30px;
+
+    background: white;
+    border-radius: 14px;
+
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+}
+
+.leave-warning-modal h2 {
+    margin-bottom: 10px;
+    color: #AB3130;
+}
+
+.leave-warning-modal p {
+    line-height: 1.5;
+
+    span {
+        text-decoration: underline;
+    }
+}
+
+.leave-warning-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.leave-warning-buttons button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.stay-button:hover {
+    filter: brightness(80%);
+}
+
+.leave-button {
+    color: white;
+    background: #AB3130;
+    font-weight: 700;
+    transition: 200ms ease;
+}
+
+.leave-button:hover {
+    /* color: #ECE0A6; */
+    filter: brightness(80%);
+}
+
+@media (max-width: 900px) {
+    .registration-form-div {
+        width: 75%;
+        padding: 5px 5px;
+    }
+}
+
+@media (max-width: 441px) {
+    .registration-form-header {
+        height: auto;
+    }
+    .event-info h1 {
+        font-size: 1.5em;
+    }
+    .event-detail-div {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+    .event-detail-title {
+        flex-direction: row;
+    }
+    .registration-form-body button {
+        height: 50px;
+    }
 }

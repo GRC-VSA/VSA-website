@@ -23,7 +23,7 @@ public class QuestionRequest {
     /** ID of the QuestionType this question uses (see GET /api/question-types) */
     private Long questionTypeId;
 
-    /** Whether the frontend should treat this question as required (not enforced server-side) */
+    /** Whether this question must be answered before registration can be submitted */
     private boolean required;
 
     /** Display order of the question within the event's question list */
