@@ -28,7 +28,6 @@ export async function submitRegistration(eventId, registrationData) {
         console.error("Submit registration failed.");
         console.error("Status:", response.status);
         console.error("Backend response:", errorText);
-        console.error("Payload sent:", registrationData);
 
         let errorMessage = "Failed to submit registration.";
         try {

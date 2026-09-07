@@ -108,13 +108,14 @@ const EventRegistrationPage = () => {
         setMissingRequiredQuestionIds((prev) => prev.filter((id) => id !== questionId));
     };
 
-    const renderQuestionInput = (question) => {
+    const renderQuestionInput = (question, inputId) => {
         const value = answers[question.questionId] ?? "";
 
         switch (question.typeName) {
             case "short_text":
                 return (
                     <input
+                        id={inputId}
                         type="text"
                         value={value}
                         required={question.required}
@@ -128,6 +129,7 @@ const EventRegistrationPage = () => {
             case "long_text":
                 return (
                     <textarea
+                        id={inputId}
                         value={value}
                         required={question.required}
                         onChange={(event) =>
@@ -140,6 +142,7 @@ const EventRegistrationPage = () => {
             case "email":
                 return (
                     <input
+                        id={inputId}
                         type="email"
                         value={value}
                         placeholder="Enter an email address"
@@ -153,6 +156,7 @@ const EventRegistrationPage = () => {
             case "phone":
                 return (
                     <input
+                        id={inputId}
                         type="tel"
                         value={value}
                         placeholder="Enter your phone number"
@@ -166,6 +170,7 @@ const EventRegistrationPage = () => {
             case "number":
                 return (
                     <input
+                        id={inputId}
                         type="number"
                         value={value}
                         placeholder="Enter a number"
@@ -179,6 +184,7 @@ const EventRegistrationPage = () => {
             case "date":
                 return (
                     <input
+                        id={inputId}
                         type="date"
                         value={value}
                         required={question.required}
@@ -191,6 +197,7 @@ const EventRegistrationPage = () => {
             case "url":
                 return (
                     <input
+                        id={inputId}
                         type="url"
                         value={value}
                         placeholder="Enter a URL"
@@ -251,6 +258,7 @@ const EventRegistrationPage = () => {
             default:
                 return (
                     <input
+                        id={inputId}
                         type="text"
                         value={value}
                         required={question.required}
@@ -309,9 +317,6 @@ const EventRegistrationPage = () => {
             setIsLoading(true);
 
             const payload = buildRegistrationPayload();
-
-            console.log("Submitting registration:", payload);
-
             const result = await submitRegistration(eventId, payload);
             setIsSubmitted(true);
             setVerificationResult(result);
@@ -425,23 +430,28 @@ const EventRegistrationPage = () => {
                     <form className="registration-form-body" onSubmit={handleSubmit} noValidate>
                         {[...formData.questions]
                             .sort((a, b) => a.displayOrder - b.displayOrder)
-                            .map((question, index) => (
-                                <div key={question.questionId}
-                                    className={`registration-question-div ${missingRequiredQuestionIds.includes(question.questionId) ? "question-has-error" : ""}`} >
-                                    <label>
-                                        <span className="question-number">{index + 1}. </span>
-                                        <span className="question-text">{question.questionText}</span>
+                            .map((question, index) => {
+                                const inputId = `registration-question-${question.questionId}`;
+                                const isChoiceQuestion = question.typeName === "single_choice" || question.typeName === "multiple_choice";
+                                return (
+                                    <div key={question.questionId}
+                                        className={`registration-question-div ${missingRequiredQuestionIds.includes(question.questionId) ? "question-has-error" : ""}`} >
+                                        <label htmlFor={isChoiceQuestion ? undefined : inputId}>
+                                            <span className="question-number">{index + 1}. </span>
+                                            <span className="question-text">{question.questionText}</span>
 
-                                        {question.required && (
-                                            <span className="required-text"> *Required</span>
-                                        )}
-                                    </label>
-                                    <br></br>
-                                    {renderQuestionInput(question)}
-                                </div>
-                            ))}
+                                            {question.required && (
+                                                <span className="required-text"> *Required</span>
+                                            )}
+                                        </label>
+                                        <br></br>
+                                        {renderQuestionInput(question, inputId)}
+                                    </div>
+                                );
+                            })
+                        };
                         {missingRequiredQuestionIds.length > 0 && (
-                            <p className="required-questions-error">Some required questions are not answered!</p>
+                                <p className="required-questions-error">Some required questions are not answered!</p>
                         )}
                         {submitError && (
                             <p className="registration-submit-error">
