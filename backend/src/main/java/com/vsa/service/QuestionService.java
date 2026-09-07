@@ -50,10 +50,7 @@ public class QuestionService {
     // CREATE Operations
 
     @Transactional
-    public List<Question> createQuestions(
-            Long eventId,
-            List<QuestionRequest> requests
-    ) {
+    public List<Question> createQuestions(Long eventId, List<QuestionRequest> requests) {
         Event event = eventService.getEventById(eventId);
 
         List<Question> questions = new ArrayList<>();
@@ -63,16 +60,10 @@ public class QuestionService {
         // Automatically create the required student-email question
         // --------------------------------------------------------
 
-        boolean studentEmailQuestionExists =
-                questionRepository.existsByEvent_EventIdAndSystemKey(
-                        eventId,
-                        STUDENT_EMAIL_SYSTEM_KEY
-                );
+        boolean studentEmailQuestionExists = questionRepository.existsByEvent_EventIdAndSystemKey(eventId, STUDENT_EMAIL_SYSTEM_KEY);
 
         if (!studentEmailQuestionExists) {
-            Question studentEmailQuestion =
-                    buildStudentEmailQuestion(event);
-
+            Question studentEmailQuestion = buildStudentEmailQuestion(event);
             questions.add(studentEmailQuestion);
         }
 
@@ -87,17 +78,7 @@ public class QuestionService {
         List<Question> customQuestions =
                 requests.stream()
                         .map(req -> {
-                            Question question =
-                                    buildQuestion(
-                                            new Question(),
-                                            event,
-                                            req
-                                    );
-
-                            question.setDisplayOrder(
-                                    req.getDisplayOrder() + 1
-                            );
-
+                            Question question = buildQuestion(new Question(), event, req);
                             return question;
                         })
                         .collect(Collectors.toList());
@@ -109,37 +90,22 @@ public class QuestionService {
 
 
     // UPDATE Operations
-
     @Transactional
     public Question updateQuestion(Long eventId, Long questionId, QuestionRequest req) {
-        Question existing =
-                getQuestionForEventOrThrow(eventId, questionId);
+        Question existing = getQuestionForEventOrThrow(eventId, questionId);
 
         if (STUDENT_EMAIL_SYSTEM_KEY.equals(existing.getSystemKey())) {
-            throw new IllegalStateException(
-                    "The student email question cannot be modified."
-            );
+            throw new IllegalStateException("The student email question cannot be modified.");
         }
 
-        return questionRepository.save(
-                buildQuestion(
-                        existing,
-                        existing.getEvent(),
-                        req
-                )
-        );
+        return questionRepository.save(buildQuestion(existing, existing.getEvent(), req));
     }
 
 
     // DELETE Operations
-
     @Transactional
-    public void deleteQuestion(
-            Long eventId,
-            Long questionId
-    ) {
-        Question existing =
-                getQuestionForEventOrThrow(eventId, questionId);
+    public void deleteQuestion(Long eventId, Long questionId) {
+        Question existing = getQuestionForEventOrThrow(eventId, questionId);
 
         if (STUDENT_EMAIL_SYSTEM_KEY.equals(existing.getSystemKey())) {
             throw new IllegalStateException("The student email question cannot be deleted.");
@@ -165,52 +131,31 @@ public class QuestionService {
 
         question.setQuestionText("What is your student email?");
 
-        question.setSystemKey(
-                STUDENT_EMAIL_SYSTEM_KEY
-        );
+        question.setSystemKey(STUDENT_EMAIL_SYSTEM_KEY);
 
         question.setRequired(true);
-        question.setDisplayOrder(1);
+        question.setDisplayOrder(0);
         question.setActive(true);
 
         return question;
     }
 
 
-    private Question getQuestionForEventOrThrow(
-            Long eventId,
-            Long questionId
-    ) {
+    private Question getQuestionForEventOrThrow(Long eventId, Long questionId) {
         Question question =
                 questionRepository
                         .findById(questionId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Question",
-                                        questionId
-                                )
-                        );
+                        .orElseThrow(() -> new ResourceNotFoundException("Question", questionId));
 
-        if (!question
-                .getEvent()
-                .getEventId()
-                .equals(eventId)) {
-
-            throw new ResourceNotFoundException(
-                    "Question",
-                    questionId
-            );
+        if (!question.getEvent().getEventId().equals(eventId)) {
+            throw new ResourceNotFoundException("Question", questionId);
         }
 
         return question;
     }
 
 
-    private Question buildQuestion(
-            Question question,
-            Event event,
-            QuestionRequest req
-    ) {
+    private Question buildQuestion(Question question, Event event, QuestionRequest req) {
 
         QuestionType questionType =
                 questionTypeRepository
@@ -229,7 +174,7 @@ public class QuestionService {
 
         question.setRequired(req.isRequired());
 
-        question.setDisplayOrder(req.getDisplayOrder());
+        question.setDisplayOrder(req.getDisplayOrder() + 1);
 
 
         if (req.getOptions() != null) {

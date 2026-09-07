@@ -8,6 +8,7 @@
     import com.vsa.dto.response.RegistrationFormResponse;
     import com.vsa.dto.response.RegistrationQuestionResponse;
     import com.vsa.dto.response.RegistrationStartResponse;
+    import com.vsa.dto.response.RegistrationResponse;
     import com.vsa.exception.ResourceNotFoundException;
     import com.vsa.model.*;
     import com.vsa.repository.QuestionRepository;
@@ -34,7 +35,7 @@
         private final RegistrationRepository registrationRepository;
         private final QuestionRepository questionRepository;
         private final EventService eventService;
-        private final EmailService emailService;
+        private final EmailOutboxService emailOutboxService;        
         private final BCryptPasswordEncoder passwordEncoder;
 
         private static final String STUDENT_EMAIL_SYSTEM_KEY = "STUDENT_EMAIL";
@@ -55,22 +56,26 @@
                 RegistrationRepository registrationRepository,
                 QuestionRepository questionRepository,
                 EventService eventService,
-                EmailService emailService,
+                EmailOutboxService emailOutboxService,
                 BCryptPasswordEncoder passwordEncoder) {
             this.registrationRepository = registrationRepository;
             this.questionRepository = questionRepository;
             this.eventService = eventService;
-            this.emailService = emailService;
+            this.emailOutboxService = emailOutboxService;            
             this.passwordEncoder = passwordEncoder;
 
         }
 
 
         //Read
-        public List<Registration> getRegistrationsForEvent(Long eventId){
+        public List<RegistrationResponse> getRegistrationsForEvent(Long eventId){
             eventService.getEventById(eventId);
-            return registrationRepository.findByEvent_EventId(eventId);
-    }
+            return registrationRepository
+                    .findByEvent_EventId(eventId)
+                    .stream()
+                    .map(this::toRegistrationResponse)
+                    .toList();
+        }
 
         //Create
         @Transactional
@@ -165,11 +170,12 @@
 
             Registration saved = registrationRepository.save(registration);
 
-            // Send verification code — NOT the final confirmation email yet
-            emailService.sendEventRegistrationVerificationEmail(
-                    studentEmail,
-                    event.getEventName(),
-                    verificationCode
+            // Queue verification email for asynchronous delivery
+            emailOutboxService.queueRegistrationVerificationEmail(
+                saved.getRegistrationId(),
+                studentEmail,
+                event.getEventName(),
+                verificationCode
             );
 
             return new RegistrationStartResponse(
@@ -178,35 +184,29 @@
                     saved.getVerificationExpiresAt()
             );
     }
+    @Transactional(dontRollbackOn = IncorrectVerificationCodeException.class)
+    public void verifyRegistration(Long eventId, RegistrationVerificationRequest req) {
 
-    public void verifyRegistration(Long eventId,RegistrationVerificationRequest req) {
+        if (req.getVerificationId() == null) {
+            throw new IllegalStateException(
+                    "Verification ID is required."
+            );
+        }
 
-    if (req.getVerificationId() == null) {
-        throw new IllegalStateException(
-                "Verification ID is required."
-        );
-    }
+        if (req.getCode() == null || req.getCode().isBlank()) {
+            throw new IllegalStateException("Verification code is required.");
+        }
 
-    if (req.getCode() == null || req.getCode().isBlank()) {
-        throw new IllegalStateException(
-                "Verification code is required."
-        );
-    }
-
-    String enteredCode =
+        String enteredCode =
             req.getCode()
                     .trim()
                     .toUpperCase(Locale.ROOT);
 
-    if (!enteredCode.matches(
-            "^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$"
-    )) {
-        throw new IllegalStateException(
-                "Invalid verification code."
-        );
-    }
+        if (!enteredCode.matches("^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$")) {
+            throw new IllegalStateException("Invalid verification code.");
+        }
 
-    Registration registration =
+        Registration registration =
             registrationRepository
                     .findByVerificationId(
                             req.getVerificationId()
@@ -217,143 +217,117 @@
                             )
                     );
 
-    /*
-     * Make sure somebody cannot take a verification ID
-     * belonging to another event and use it here.
-     */
-    if (!registration
+        /*
+        * Make sure somebody cannot take a verification ID
+        * belonging to another event and use it here.
+        */
+        if (!registration
             .getEvent()
             .getEventId()
             .equals(eventId)) {
 
-        throw new IllegalStateException(
-                "Invalid registration verification request."
-        );
-    }
+            throw new IllegalStateException("Invalid registration verification request.");
+        }
 
-    /*
-     * If it was already confirmed, don't confirm/send email again.
-     */
-    if (STATUS_CONFIRMED.equals(registration.getStatus())) {
-        return;
-    }
+        /*
+        * If it was already confirmed, don't confirm/send email again.
+        */
+        if (STATUS_CONFIRMED.equals(registration.getStatus())) {
+            return;
+        }
 
-    if (!STATUS_PENDING.equals(registration.getStatus())) {
-        throw new IllegalStateException(
-                "This registration cannot be verified."
-        );
-    }
+        if (!STATUS_PENDING.equals(registration.getStatus())) {
+            throw new IllegalStateException("This registration cannot be verified.");
+        }
 
-    /*
-     * Reject expired codes.
-     */
-    if (registration.getVerificationExpiresAt() == null
-            || registration
+        /*
+        * Reject expired codes.
+        */
+        if (registration.getVerificationExpiresAt() == null || registration
                     .getVerificationExpiresAt()
                     .isBefore(LocalDateTime.now())) {
 
-        throw new IllegalStateException(
-                "Verification code has expired."
-        );
-    }
+            throw new IllegalStateException("Verification code has expired.");
+        }
 
-    /*
-     * Prevent unlimited guessing.
-     */
-    if (registration.getVerificationAttempts() >= 5) {
-        throw new IllegalStateException(
-                "Too many incorrect verification attempts."
-        );
-    }
+        /*
+        * Prevent unlimited guessing.
+        */
+        if (registration.getVerificationAttempts() >= 5) {
+            throw new IllegalStateException("Too many incorrect verification attempts.");
+        }
 
-    /*
-     * Compare the entered code against the BCrypt hash.
-     */
-    boolean codeMatches =
-            passwordEncoder.matches(
+        /*
+        * Compare the entered code against the BCrypt hash.
+        */
+        boolean codeMatches =
+                passwordEncoder.matches(
                     enteredCode,
                     registration.getVerificationCodeHash()
-            );
+                );
 
-    if (!codeMatches) {
+        if (!codeMatches) {
+            registration.setVerificationAttempts(registration.getVerificationAttempts() + 1);
+            registrationRepository.save(registration);
+            throw new IncorrectVerificationCodeException();
+        }
 
-        registration.setVerificationAttempts(
-                registration.getVerificationAttempts() + 1
-        );
+        Event event = registration.getEvent();
 
-        registrationRepository.save(registration);
-
-        throw new IllegalStateException(
-                "Incorrect verification code."
-        );
-    }
-
-    Event event = registration.getEvent();
-
-    /*
-     * Check capacity again here.
-     *
-     * The event may have filled up during the 10 minutes
-     * while this user was verifying their email.
-     */
-    long confirmedCount =
+        /*
+        * Check capacity again here.
+        *
+        * The event may have filled up during the 10 minutes
+        * while this user was verifying their email.
+        */
+        long confirmedCount =
             registrationRepository
                     .countByEvent_EventIdAndStatus(
                             eventId,
                             STATUS_CONFIRMED
                     );
 
-    if (confirmedCount >= event.getCapacity()) {
-        throw new IllegalStateException(
-                "This event is now at capacity."
-        );
-    }
+        if (confirmedCount >= event.getCapacity()) {
+            throw new IllegalStateException("This event is now at capacity.");
+        }
 
-    /*
-     * Verification succeeded.
-     */
-    registration.setStatus(STATUS_CONFIRMED);
+        /*
+         * Verification succeeded.
+        */
+        registration.setStatus(STATUS_CONFIRMED);
 
-    registration.setEmailVerifiedAt(
-            LocalDateTime.now()
-    );
+        registration.setEmailVerifiedAt(LocalDateTime.now());
 
-    /*
-     * The verification code is single-use.
-     * We no longer need its hash or expiration.
-     */
-    registration.setVerificationCodeHash(null);
-    registration.setVerificationExpiresAt(null);
+        /*
+        * The verification code is single-use.
+        * We no longer need its hash or expiration.
+        */
+        registration.setVerificationCodeHash(null);
+        registration.setVerificationExpiresAt(null);
 
-    Registration saved =
-            registrationRepository.save(registration);
-
-    /*
-     * NOW the registration is officially confirmed,
-     * so send the confirmation email.
-     */
-    emailService.sendEventRegistrationEmail(
+        Registration saved = registrationRepository.save(registration);
+        /*
+        * The registration is officially confirmed,
+        * so queue the confirmation email.
+        */
+        emailOutboxService.queueRegistrationConfirmationEmail(
+            saved.getRegistrationId(),
             saved.getStudentEmail(),
             "there",
             event.getEventName(),
             event.getEventDate().format(DATE_FORMATTER),
             event.getStartTime().format(TIME_FORMATTER),
             event.getLocation()
-    );
-}
-
-        public void resendVerificationCode(
-        Long eventId,
-        RegistrationResendRequest req
-) {
-    if (req.getVerificationId() == null) {
-        throw new IllegalStateException(
-                "Verification ID is required."
         );
     }
+        @Transactional
+        public void resendVerificationCode(Long eventId, RegistrationResendRequest req) {
+            if (req.getVerificationId() == null) {
+                throw new IllegalStateException("Verification ID is required.");
+            }
 
-    Registration registration =
-            registrationRepository
+            Registration registration =
+                registrationRepository
                     .findByVerificationId(req.getVerificationId())
                     .orElseThrow(() ->
                             new IllegalStateException(
@@ -361,74 +335,54 @@
                             )
                     );
 
-    // Make sure this verification belongs to the event in the URL
-    if (!registration
-            .getEvent()
-            .getEventId()
-            .equals(eventId)) {
+            // Make sure this verification belongs to the event in the URL
+            if (!registration.getEvent().getEventId().equals(eventId)) {
 
-        throw new IllegalStateException(
-                "Invalid registration verification request."
-        );
-    }
+                throw new IllegalStateException("Invalid registration verification request.");
+            }
 
-    // A confirmed registration no longer needs verification codes
-    if (STATUS_CONFIRMED.equals(registration.getStatus())) {
-        throw new IllegalStateException(
-                "This registration is already confirmed."
-        );
-    }
+            // A confirmed registration no longer needs verification codes
+            if (STATUS_CONFIRMED.equals(registration.getStatus())) {
+                throw new IllegalStateException("This registration is already confirmed.");
+            }
 
-    if (!STATUS_PENDING.equals(registration.getStatus())) {
-        throw new IllegalStateException(
-                "This registration cannot receive a verification code."
-        );
-    }
+            if (!STATUS_PENDING.equals(registration.getStatus())) {
+                throw new IllegalStateException("This registration cannot receive a verification code.");
+            }
 
-    LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
-    // Prevent repeatedly requesting emails
-    if (registration.getVerificationCodeSentAt() != null
-            && now.isBefore(
+            // Prevent repeatedly requesting emails
+            if (registration.getVerificationCodeSentAt() != null && now.isBefore(
                     registration
                             .getVerificationCodeSentAt()
-                            .plusSeconds(
-                                    VERIFICATION_RESEND_COOLDOWN_SECONDS
-                            )
-            )) {
+                            .plusSeconds(VERIFICATION_RESEND_COOLDOWN_SECONDS)
+                )) {
 
-        throw new IllegalStateException(
-                "Please wait before requesting another verification code."
-        );
-    }
+                throw new IllegalStateException("Please wait before requesting another verification code.");
+            }
 
-    String verificationCode =
-            generateVerificationCode();
+            String verificationCode = generateVerificationCode();
 
-    // Replace the old code with a fresh one
-    registration.setVerificationCodeHash(
-            passwordEncoder.encode(verificationCode)
-    );
+            // Replace the old code with a fresh one
+            registration.setVerificationCodeHash(passwordEncoder.encode(verificationCode));
 
-    registration.setVerificationCodeSentAt(now);
+            registration.setVerificationCodeSentAt(now);
 
-    registration.setVerificationExpiresAt(
-            now.plusMinutes(
-                    VERIFICATION_EXPIRATION_MINUTES
-            )
-    );
+            registration.setVerificationExpiresAt(now.plusMinutes(VERIFICATION_EXPIRATION_MINUTES));
 
-    // Give the new code a fresh set of attempts
-    registration.setVerificationAttempts(0);
+            // Give the new code a fresh set of attempts
+            registration.setVerificationAttempts(0);
 
-    registrationRepository.save(registration);
+            Registration saved = registrationRepository.save(registration);
 
-    emailService.sendEventRegistrationVerificationEmail(
-            registration.getStudentEmail(),
-            registration.getEvent().getEventName(),
-            verificationCode
-    );
-}
+            emailOutboxService.queueRegistrationVerificationEmail(
+                saved.getRegistrationId(),
+                saved.getStudentEmail(),
+                saved.getEvent().getEventName(),
+                verificationCode
+            );
+        }
 
         @Transactional
         public RegistrationFormResponse getRegistrationForm(Long eventId) {
@@ -459,15 +413,9 @@
             response.setQuestions(questionResponses);
 
             return response;
-    }
+        }
 
         //Helper
-        // private User getCurrentUser() {
-        //     String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        //     return userRepository
-        //             .findByEmail(email)
-        //             .orElseThrow(() -> new IllegalStateException("Authenticated user not found: " + email));
-        // }
 
         private EventAnswer buildAnswer(Long eventId, Registration registration, AnswerRequest req) {
             Question question =
@@ -644,4 +592,20 @@
             return localPart.charAt(0) + "***" + localPart.charAt(localPart.length() - 1)+ domain;
         }
 
+        private RegistrationResponse toRegistrationResponse(Registration registration) {
+            RegistrationResponse response = new RegistrationResponse();
+
+            response.setRegistrationId(registration.getRegistrationId());
+            response.setStudentEmail(registration.getStudentEmail());
+            response.setStatus(registration.getStatus());
+            response.setTicketType(registration.getTicketType());
+
+            return response;
+        }
+        private static class IncorrectVerificationCodeException extends IllegalStateException {
+
+            private IncorrectVerificationCodeException() {
+                super("Incorrect verification code.");
+            }
+        }
     }

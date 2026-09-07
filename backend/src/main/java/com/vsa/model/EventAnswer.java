@@ -31,6 +31,6 @@ public class EventAnswer {
     private Question question;
 
     /** The guest's answer (for choice-based questions, the selected option's text) */
-    @Column(name = "answer_value")
+    @Column(name = "answer_value", columnDefinition = "TEXT")
     private String answerValue;
 }

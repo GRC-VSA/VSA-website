@@ -5,7 +5,7 @@ import com.vsa.dto.request.RegistrationResendRequest;
 import com.vsa.dto.request.RegistrationVerificationRequest;
 import com.vsa.dto.response.RegistrationFormResponse;
 import com.vsa.dto.response.RegistrationStartResponse;
-import com.vsa.model.Registration;
+import com.vsa.dto.response.RegistrationResponse;
 import com.vsa.service.RegistrationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class RegistrationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Registration>> getRegistrations(@PathVariable Long eventId){
+    public ResponseEntity<List<RegistrationResponse>> getRegistrations(@PathVariable Long eventId){
         return ResponseEntity.ok(registrationService.getRegistrationsForEvent(eventId));
     }
 
