@@ -1,7 +1,7 @@
 import { useEvents } from "../context/EventsContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { useScrollReveal } from "../hooks/useScrollReveal.js";
-import { useState } from "react";
+import React, { useState } from "react";
 import Fuse from "fuse.js";
 import "./EventsPage.css";
 
