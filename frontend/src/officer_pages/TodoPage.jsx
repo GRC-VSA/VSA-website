@@ -1,5 +1,5 @@
-const TodoPage = () => {
+const ToDoPage = () => {
 
 }
 
-export default TodoPage;
+export default ToDoPage;
