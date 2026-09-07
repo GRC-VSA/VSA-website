@@ -25,8 +25,7 @@ import RegistrationVerificationPage from "./guest_pages/RegistrationVerification
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
 import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
-import TodoPage from "./officer_pages/ToDoPage.jsx";
-
+import ToDoPage from "./officer_pages/ToDoPage.jsx";
 import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
 import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
 import CreateRegistrationPage from "./officer_pages/CreateRegistrationPage.jsx";
@@ -86,7 +85,7 @@ function App() {
           <Route path="availability" element={<AvailabilityListPage />} />
           <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
           <Route path="availability/:id" element={<AvailabilityDetailPage />} />
-          <Route path="todo-list" element={<TodoPage />} />
+          <Route path="todo-list" element={<ToDoPage />} />
           <Route path="events/create-event" element={<CreateEventPage />} />
           <Route path="events/manage-event" element={<ManageEventPage />} />
           <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
