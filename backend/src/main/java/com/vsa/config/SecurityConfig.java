@@ -92,6 +92,7 @@ public class SecurityConfig {
                                             "/api/users/register",
                                             "/api/users/login",
                                             "/api/users/verify",
+                                            "/api/users/resend-verification",
                                             "/api/users/forgot-password",
                                             "/api/users/reset-password",
                                             "/api/application-roles/open",
