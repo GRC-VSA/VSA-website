@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import useDocumentTitle from "../../hooks/useDocumentTitle.js";
 import EventCarousel from "./EventCarousel.jsx";
 import WhoWeAreSection from "./WhoWeAreSection.jsx";
 import WhatWeDoSection from "./WhatWeDoSection.jsx";
@@ -7,6 +8,7 @@ import WhatWeBelieveSection from "./WhatWeBelieveSection.jsx";
 import "./HomeSections.css";
 
 const HomePage = () => {
+    useDocumentTitle("HomePage");
     // useEffect(() => {
     //     // 1. Force window to scroll to top immediately on load/refresh
     //     window.scrollTo(0, 0);

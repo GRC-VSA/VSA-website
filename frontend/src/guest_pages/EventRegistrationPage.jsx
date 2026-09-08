@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useBlocker, useNavigate } from "react-router-dom";
 import { getRegistrationForm, submitRegistration } from "../api/Registration.js";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import registrationBackground from "../assets/guest/event-registration-background-img.png"
 import "./EventRegistrationPage.css";
 
@@ -16,6 +17,8 @@ const EventRegistrationPage = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [missingRequiredQuestionIds, setMissingRequiredQuestionIds] = useState([]);
     const [verificationResult, setVerificationResult] = useState(null);
+
+    useDocumentTitle(formData?.eventName ? `${formData.eventName} Registration` : "Event Registration");
 
     useEffect(() => {
         const fetchForm = async () => {
@@ -108,6 +111,28 @@ const EventRegistrationPage = () => {
         setMissingRequiredQuestionIds((prev) => prev.filter((id) => id !== questionId));
     };
 
+    /*
+    This button is not currently used
+    */
+    const renderToTheWebsiteButton = () => {
+        const handleReturnToWebsite = () => {
+            if (window.history.length > 1) {
+                navigate(-1);
+            }
+            else {
+                navigate("/");
+            }
+        };
+        return (
+            <button type="button" id="to-website-button" onClick={() => handleReturnToWebsite()}>
+                <span className="to-website-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M400-240 160-480l240-240 56 58-142 142h486v80H314l142 142-56 58Z" /></svg>                </span>
+                <span className="to-website-text">
+                    Return To VSA Website
+                </span>
+            </button>
+        );
+    }
     const renderQuestionInput = (question, inputId) => {
         const value = answers[question.questionId] ?? "";
 
@@ -432,26 +457,53 @@ const EventRegistrationPage = () => {
                             .sort((a, b) => a.displayOrder - b.displayOrder)
                             .map((question, index) => {
                                 const inputId = `registration-question-${question.questionId}`;
-                                const isChoiceQuestion = question.typeName === "single_choice" || question.typeName === "multiple_choice";
-                                return (
-                                    <div key={question.questionId}
-                                        className={`registration-question-div ${missingRequiredQuestionIds.includes(question.questionId) ? "question-has-error" : ""}`} >
-                                        <label htmlFor={isChoiceQuestion ? undefined : inputId}>
-                                            <span className="question-number">{index + 1}. </span>
-                                            <span className="question-text">{question.questionText}</span>
 
-                                            {question.required && (
-                                                <span className="required-text"> *Required</span>
-                                            )}
-                                        </label>
-                                        <br></br>
-                                        {renderQuestionInput(question, inputId)}
+                                const isChoiceQuestion = question.typeName === "single_choice" || question.typeName === "multiple_choice";
+
+                                const questionLabel = (
+                                    <>
+                                        <span className="question-number">{index + 1}. </span>
+                                        <span className="question-text">{question.questionText}</span>
+
+                                        {question.required && (
+                                            <span className="required-text"> *Required</span>
+                                        )}
+                                    </>
+                                );
+
+                                return (
+                                    <div
+                                        key={question.questionId}
+                                        className={`registration-question-div ${missingRequiredQuestionIds.includes(question.questionId)
+                                            ? "question-has-error"
+                                            : ""
+                                            }`}
+                                    >
+                                        {isChoiceQuestion ? (
+                                            <fieldset>
+                                                <legend>
+                                                    {questionLabel}
+                                                </legend>
+
+                                                {renderQuestionInput(question, inputId)}
+                                            </fieldset>
+                                        ) : (
+                                            <>
+                                                <label htmlFor={inputId}>
+                                                    {questionLabel}
+                                                </label>
+
+                                                <br />
+
+                                                {renderQuestionInput(question, inputId)}
+                                            </>
+                                        )}
                                     </div>
                                 );
                             })
-                        };
+                        }
                         {missingRequiredQuestionIds.length > 0 && (
-                                <p className="required-questions-error">Some required questions are not answered!</p>
+                            <p className="required-questions-error">Some required questions are not answered!</p>
                         )}
                         {submitError && (
                             <p className="registration-submit-error">
@@ -464,6 +516,7 @@ const EventRegistrationPage = () => {
                     </form>
                 </div>
             </main>
+            {/* {renderToTheWebsiteButton()} */}
             {blocker.state === "blocked" && (
                 <div className="leave-warning-overlay">
                     <div className="leave-warning-modal">

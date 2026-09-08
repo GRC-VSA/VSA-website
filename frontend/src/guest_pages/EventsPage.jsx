@@ -1,10 +1,10 @@
 import { useEvents } from "../context/EventsContext.jsx";
 import { useNavigate } from "react-router-dom";
 import { useScrollReveal } from "../hooks/useScrollReveal.js";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Fuse from "fuse.js";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import "./EventsPage.css";
-
 import coverPhoto from "../assets/guest/event_coverphoto.JPG";
 import event_of_the_year from "../assets/guest/eventoftheyear.png";
 import paz from "../assets/guest/paz.png";
@@ -24,6 +24,9 @@ import doinhay from "../assets/guest/doinhay.jpg";
 import noeventfound from "../assets/guest/noeventfound.png"
 
 const EventsPage = () => {
+
+    useDocumentTitle("Events");
+    
     const { events, isLoading, error } = useEvents();
 
     const upcomingEvents = events.filter((event) => event.status === "upcoming" || event.status === "ongoing");
@@ -356,7 +359,7 @@ const EventsPage = () => {
                             <div className="image-placeholder">
                                 <img src={event.imageUrl} />
                                 <div className="event-date">
-                                    <span>{new Date(event.eventDate).toLocaleDateString('en-US', { day: 'numeric', timezone: 'UTC' })}</span>
+                                    <span>{new Date(event.eventDate).toLocaleDateString('en-US', { day: 'numeric', timeZone: 'UTC' })}</span>
                                     <span>{displayEventMonth(event.eventDate)}</span>
                                 </div>
                             </div>

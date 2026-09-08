@@ -6,7 +6,109 @@
     background-position: center;
     background-repeat: no-repeat;
 }
+#to-website-button {
+    position: absolute;
+    top: 10%;
+    left: 5%;
 
+    width: 320px;
+    height: 56px;
+
+    /* Reserve space for the 48px icon */
+    padding: 0 20px 0 68px;
+
+    border: solid 1.5px #AB3130;
+    border-radius: 16px;
+
+    background: white;
+    color: #AB3130;
+
+    font-size: 20px;
+    font-weight: 600;
+    font-family: inherit;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.to-website-icon {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    background: #AB3130;
+
+    z-index: 2;
+
+    transition: width 0.5s ease;
+}
+
+.to-website-icon svg {
+    position: static;
+
+    width: 24px;
+    height: 24px;
+    scale: 1.1;
+    fill: white;
+    flex-shrink: 0;
+}
+
+.to-website-text {
+    position: relative;
+    z-index: 1;
+
+    /* No manual translate needed anymore */
+    transform: none;
+    white-space: nowrap;
+}
+
+#to-website-button:hover .to-website-icon {
+    width: calc(100% - 8px);
+}
+
+#to-website-button:focus-visible {
+    outline: 3px solid #AB3130;
+    outline-offset: 3px;
+}
+ /*
+#to-website-button {
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 15px;
+    border: solid 2px #ab3130;
+    border-radius: 7px;
+    background: white;
+    transition: 200ms ease-in;
+}
+#to-website-button span {
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color:#AB3130;
+}
+
+#to-website-button svg {
+    fill:#AB3130;
+}
+#to-website-button:hover {
+    filter:brightness(1.5);
+} */
 .registration-form-div {
     margin: 0 auto;
     width: 45%;
@@ -71,11 +173,13 @@
 .event-info span {
     font-size: 0.9rem;
 }
+
 .event-detail-title {
     display: flex;
     align-items: center;
     gap: 5px;
 }
+
 .event-detail-title svg {
     scale: 0.9;
 }
@@ -112,6 +216,16 @@
     color: red;
 }
 
+.registration-question-div fieldset {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.registration-question-div legend {
+    padding: 0;
+}
+
 .registration-form-body input[type="text"],
 .registration-form-body input[type="email"],
 .registration-form-body input[type="number"],
@@ -122,6 +236,7 @@
     margin: 10px 0;
     border-radius: 10px;
 }
+
 /* Remove the default up and down buttons of input type "number" in Chrome, Edge, Safari */
 .registration-form-body input[type="number"]::-webkit-inner-spin-button,
 .registration-form-body input[type="number"]::-webkit-outer-spin-button {
@@ -198,8 +313,7 @@ textarea::placeholder {
     border-color: #d93b3b;
 }
 
-.registration-question-div .question-has-error 
-.choice-answer-div label {
+.registration-question-div .question-has-error .choice-answer-div label {
     border-color: #d93b3b;
 }
 
@@ -288,17 +402,21 @@ textarea::placeholder {
     .registration-form-header {
         height: auto;
     }
+
     .event-info h1 {
         font-size: 1.5em;
     }
+
     .event-detail-div {
         flex-direction: column;
         align-items: flex-start;
         margin-bottom: 20px;
     }
+
     .event-detail-title {
         flex-direction: row;
     }
+
     .registration-form-body button {
         height: 50px;
     }
