@@ -32,14 +32,11 @@ public class EmailOutboxService {
             String eventName,
             String verificationCode
     ) {
-        /*
-        * A new verification code makes any older unsent
-        * verification-code email for this registration useless.
-        */
+
         emailOutboxRepository.deleteByRegistrationIdAndEmailTypeAndStatus(
-            registrationId,
-            EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
-            EmailOutbox.Status.PENDING
+                registrationId,
+                EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
+                EmailOutbox.Status.PENDING
         );
         Map<String, Object> payload = new LinkedHashMap<>();
 
@@ -48,6 +45,7 @@ public class EmailOutboxService {
 
         saveOutboxEntry(
                 registrationId,
+                null,
                 EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
                 recipientEmail,
                 payload
@@ -73,7 +71,34 @@ public class EmailOutboxService {
 
         saveOutboxEntry(
                 registrationId,
+                null,
                 EmailOutbox.EmailType.REGISTRATION_CONFIRMATION,
+                recipientEmail,
+                payload
+        );
+    }
+
+    public void queueAccountVerificationEmail(
+            String userUid,
+            String recipientEmail,
+            String firstName,
+            String verificationCode
+    ) {
+        emailOutboxRepository.deleteByUserUidAndEmailTypeAndStatus(
+                userUid,
+                EmailOutbox.EmailType.ACCOUNT_VERIFICATION,
+                EmailOutbox.Status.PENDING
+        );
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("firstName", firstName);
+        payload.put("verificationCode", verificationCode);
+
+        saveOutboxEntry(
+                null,
+                userUid,
+                EmailOutbox.EmailType.ACCOUNT_VERIFICATION,
                 recipientEmail,
                 payload
         );
@@ -81,6 +106,7 @@ public class EmailOutboxService {
 
     private void saveOutboxEntry(
             Long registrationId,
+            String userUid,
             EmailOutbox.EmailType emailType,
             String recipientEmail,
             Map<String, Object> payload
@@ -88,6 +114,7 @@ public class EmailOutboxService {
         EmailOutbox outbox = new EmailOutbox();
 
         outbox.setRegistrationId(registrationId);
+        outbox.setUserUid(userUid);
         outbox.setEmailType(emailType);
         outbox.setRecipientEmail(recipientEmail);
         outbox.setPayload(toJson(payload));

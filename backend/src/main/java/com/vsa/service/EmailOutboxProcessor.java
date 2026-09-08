@@ -148,6 +148,10 @@ public class EmailOutboxProcessor {
         );
     }
 
+    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload){
+        emailService.sendAccountVerificationCodeEmail(outbox.getRecipientEmail(), (String) payload.get("firstName"), (String) payload.get("verificationCode"));
+    }
+
     private String getErrorMessage(Exception ex) {
 
         String message = ex.getMessage();
