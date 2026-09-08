@@ -1,5 +1,6 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, matchPath } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import Footer from "../components/Footer.jsx";
 import "./GuestLayout.css";
 
 const GuestLayout = () => {
@@ -12,9 +13,12 @@ const GuestLayout = () => {
         "/reset-password",
         "/verify",
     ];
+    
+    const isRegistrationPage = matchPath("/events/:eventId/registration-form", location.pathname);
+    const isRegistrationVerificationPage = matchPath("/events/:eventId/registration/verify/:verificationId", location.pathname);
 
-    const hideNavbar = authPages.includes(location.pathname);
-
+    const noNavbar = authPages.includes(location.pathname);
+    const hideNavbar = isRegistrationPage || noNavbar || isRegistrationVerificationPage;
     return (
         <>
             {!hideNavbar && <Navbar />}
@@ -22,6 +26,8 @@ const GuestLayout = () => {
             <main id="guest-main">
                 <Outlet />
             </main>
+
+            {!hideNavbar && <Footer />}
         </>
     );
 };

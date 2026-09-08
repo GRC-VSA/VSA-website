@@ -920,10 +920,10 @@ in this case: "VSA EVENTS"
     height: 550px; */
     margin-top: 200px;
     position: relative;
-    height: 550px;
+    height: 600px;
     background-color: #EFEFEF;
     overflow: visible;
-    padding: 0 30px;
+    padding: 0 30px -10px 30px;
 
 }
 

@@ -1,22 +1,23 @@
 import { useEffect } from "react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import useDocumentTitle from "../../hooks/useDocumentTitle.js";
 import EventCarousel from "./EventCarousel.jsx";
 import WhoWeAreSection from "./WhoWeAreSection.jsx";
 import WhatWeDoSection from "./WhatWeDoSection.jsx";
 import WhatWeBelieveSection from "./WhatWeBelieveSection.jsx";
-import Footer from "../../components/Footer.jsx";
 import "./HomeSections.css";
 
 const HomePage = () => {
-    useEffect(() => {
-        // 1. Force window to scroll to top immediately on load/refresh
-        window.scrollTo(0, 0);
+    useDocumentTitle("HomePage");
+    // useEffect(() => {
+    //     // 1. Force window to scroll to top immediately on load/refresh
+    //     window.scrollTo(0, 0);
 
-        // 2. Disable browser's automatic scroll restoration on reload
-        if ("scrollRestoration" in window.history) {
-            window.history.scrollRestoration = "manual";
-        }
-    }, []);
+    //     // 2. Disable browser's automatic scroll restoration on reload
+    //     if ("scrollRestoration" in window.history) {
+    //         window.history.scrollRestoration = "manual";
+    //     }
+    // }, []);
     // Images loading after mount can also change page height / trigger
     // positions — catch that with a final refresh once everything's in.
     useEffect(() => {
@@ -31,7 +32,6 @@ const HomePage = () => {
             <WhoWeAreSection />
             <WhatWeDoSection />
             <WhatWeBelieveSection />
-            <Footer />
         </main>
     );
 };

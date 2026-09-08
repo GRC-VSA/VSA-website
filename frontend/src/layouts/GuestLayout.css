@@ -7,3 +7,12 @@
     background-color: var(--background-color);
     height: 100%;
 }
+
+/* .page-footer-space {
+    padding-bottom: 120px;
+} */
+
+.home-footer {
+  margin-top: -235px;
+  padding-top: 70px;
+}

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useEvents } from "../../context/EventsContext.jsx";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,7 +22,7 @@ const EventCarousel = () => {
             newIndex = events.length - 1;
         }
         else {
-            newIndex = currentIndex -1;
+            newIndex = currentIndex - 1;
         }
         setPreviousIndex(currentIndex);
         setCurrentIndex(newIndex);
@@ -63,6 +64,36 @@ const EventCarousel = () => {
             setPreviousIndex(null);
         }, TRANSITION_DURATION);
     };
+    const renderRegisterButton = (eventObject) => {
+        const registrationType = eventObject.registrationType;
+        switch (registrationType) {
+            case "INTERNAL":
+                return (
+                    <Link to={`/events/${eventObject.eventId}/registration-form`} className="register-button"> Register Now
+                        <div className="icon">
+                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
+                        </div>
+                    </Link>
+                )
+            case "EXTERNAL":
+                return (
+                    <a href={eventObject.externalRegistrationUrl} target="_blank" rel="noopener noreferrer" className="register-button">
+                        Register Now
+                        <div className="icon">
+                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
+                        </div>
+                    </a>
+                )
+            default:
+                return (
+                    <button className="register-button"> Learn More
+                        <div className="icon">
+                            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
+                        </div>
+                    </button>
+                )
+        }
+    }
     useEffect(() => {
         if (!events || events.length === 0)
             return;
@@ -122,10 +153,10 @@ const EventCarousel = () => {
 
     // This function receives an event and renders that event to screen
     const renderEventContent = (event, showContent = true) => {
-        return(
+        return (
             <>
                 {event.imageUrl && (
-                    (<img src={event.imageUrl} /*alt={currentEvent.eventName}*/ className="event-image"/>)
+                    (<img src={event.imageUrl} /*alt={currentEvent.eventName}*/ className="event-image" />)
                 )}
                 <div className="overlay"></div>
                 {
@@ -138,11 +169,7 @@ const EventCarousel = () => {
                                 <div className="event-description-div">
                                     <p className="event-description">{event.description}</p>
                                 </div>
-                                <button className="register-button"> Register Now
-                                    <div className="icon">
-                                        <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"></path><path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path></svg>
-                                    </div>
-                                </button>
+                                {renderRegisterButton(event)}
                             </div>
                         </div>
                     )
@@ -156,7 +183,7 @@ const EventCarousel = () => {
         <section className="events-list">
             <div className="event-carousel">
                 <button type="button" onClick={handlePrevious} hidden={events.length <= 1} className="carousel-arrow-left" aria-label="Previous event">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M640-80 240-480l400-400 71 71-329 329 329 329-71 71Z" /></svg>
                 </button>
 
                 <div className="slider-stack">
@@ -173,7 +200,7 @@ const EventCarousel = () => {
                 </div>
 
                 <button type="button" onClick={handleNext} hidden={events.length <= 1} className="carousel-arrow-right" aria-label="Next event">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="m321-80-71-71 329-329-329-329 71-71 400 400L321-80Z" /></svg>
                 </button>
                 <div className="event-progress-outer">
                     <div className="event-progress-wrapper">

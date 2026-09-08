@@ -1,0 +1,10 @@
+#create-registration-page{
+    margin: 0 auto;
+}
+
+.header-div {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

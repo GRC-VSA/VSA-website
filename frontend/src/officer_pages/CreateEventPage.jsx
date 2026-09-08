@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createEvent } from "../api/Events.js";
 import "./CreateEventPage.css";
 import VSA_blacklogo from "../assets/officer/VSA_blacklogo.png"
@@ -15,25 +16,28 @@ const CreateEventPage = () => {
         location: '',
         capacity: '',
         minAge: '',
-        status: ''
+        status: 'upcoming',
+        registrationType: 'NONE',
+        externalRegistrationUrl: ''
     });
 
+    const navigate = useNavigate();
     const [imageFiles, setImageFiles] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
-
-    const handleChange = (event) => {
-        const {name, value} = event.target;
-        setFormData({
-            ...formData, [name]: value
-        });
-    };
+        const handleChange = (event) => {
+            const { name, value } = event.target;
+            setFormData({
+                ...formData, [name]: value,
+                ...(name === "registrationType" && value !== "EXTERNAL" ? { externalRegistrationUrl: "" } : {})
+            });
+        };
 
     const handleImageChange = (event) => {
         const files = Array.from(event.target.files);
         if (files.length === 0) {
             return;
         }
-        setImageFiles((prev) =>  
+        setImageFiles((prev) =>
             [...prev, ...files]
         );
 
@@ -41,7 +45,7 @@ const CreateEventPage = () => {
             ...prev, ...files.map((file) => URL.createObjectURL(file))
         ]);
 
-        event.target.value ='';
+        event.target.value = '';
     };
 
     const handleRemoveImage = (index) => {
@@ -57,8 +61,8 @@ const CreateEventPage = () => {
     }
 
     const handleEnterKey = (event) => {
-        if (event.key ==="Enter") {
-            if (event.target.tagName ==="TEXTAREA") {
+        if (event.key === "Enter") {
+            if (event.target.tagName === "TEXTAREA") {
                 return;
             }
             else {
@@ -72,16 +76,25 @@ const CreateEventPage = () => {
             imagePreviews.forEach((url) => URL.revokeObjectURL(url));
         };
     }, [imagePreviews]);
-    
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
+
         try {
-            const createdEvent = await createEvent(formData, imageFiles);
-        
+            const eventData = {
+                ...formData,
+                externalRegistrationUrl: formData.registrationType === "EXTERNAL" ? formData.externalRegistrationUrl : null
+            };
+
+            const createdEvent = await createEvent(eventData, imageFiles);
+            const createdEventID = createdEvent.eventId;
             console.log("Backend response: ", createdEvent);
             console.log("Event created successfully.");
 
+            if (formData.registrationType === "INTERNAL") {
+                navigate(`/officer/events/${createdEventID}/create-registration-form`);
+                return;
+            }
             setFormData({
                 eventName: '',
                 title: '',
@@ -92,18 +105,19 @@ const CreateEventPage = () => {
                 location: '',
                 capacity: '',
                 minAge: '',
-                status: ''
+                status: 'upcoming',
+                registrationType: 'NONE',
+                externalRegistrationUrl: ''
             });
             imagePreviews.forEach((url) => URL.revokeObjectURL(url));
             setImageFiles([]);
             setImagePreviews([]);
-
             alert('Event is created!');
-        } 
+        }
         catch (error) {
             console.error("Failed to create event: ", error);
             alert('Something went wrong creating event. Please try again.');
-        } 
+        }
 
     }
     return (
@@ -113,7 +127,7 @@ const CreateEventPage = () => {
                     <h1>Create Events</h1>
                     <span>Create a new event and publish it on the website</span>
                 </div>
-                <img src={VSA_blacklogo} alt="vsa-logo"/>
+                <img src={VSA_blacklogo} alt="vsa-logo" />
             </div>
 
             <form className="form-container" id="form-container" onSubmit={handleSubmit} onKeyDown={handleEnterKey}>
@@ -121,12 +135,12 @@ const CreateEventPage = () => {
                     <h3>Title</h3>
                     <div className="event-title-desc">
                         <label>Event Name:</label>
-                        <input type="text" name="eventName" value={formData.eventName} id="title" placeholder="Name of the event" onChange={handleChange} required/>
+                        <input type="text" name="eventName" value={formData.eventName} id="title" placeholder="Name of the event" onChange={handleChange} required />
                     </div>
 
                     <div className="event-title-desc">
                         <label>Event Category:</label>
-                        <input type="text" name="title" value={formData.title} placeholder="Cate of the event" onChange={handleChange} required/>
+                        <input type="text" name="title" value={formData.title} placeholder="Cate of the event" onChange={handleChange} required />
                     </div>
 
                     <div className="event-title-desc">
@@ -136,7 +150,7 @@ const CreateEventPage = () => {
                 </div>
 
                 <hr></hr>
-            
+
                 <div className="section" id="time-section">
                     <h3 style={{ gridArea: "timelabel" }}>Time</h3>
                     <div className="box" id="time-box">
@@ -150,21 +164,21 @@ const CreateEventPage = () => {
                         </div>
                         <div className="timeinfo" style={{ gridArea: "date" }}>
                             <label>Date:</label>
-                            <input type="date" name="eventDate" value={formData.eventDate} id="date" onChange={handleChange} required/>
+                            <input type="date" name="eventDate" value={formData.eventDate} id="date" onChange={handleChange} required />
                         </div>
-                    
+
                         <div className="timeinfo" style={{ gridArea: "start-time" }}>
                             <label>Start Time:</label>
-                            <input type="time" name="startTime" value={formData.startTime} id="start-time" onChange={handleChange} required/>
+                            <input type="time" name="startTime" value={formData.startTime} id="start-time" onChange={handleChange} required />
                         </div>
 
                         <div className="timeinfo" style={{ gridArea: "end-time" }}>
                             <label>End Time:</label>
-                            <input type="time" name="endTime" value={formData.endTime} id="end-time" onChange={handleChange} required/>
+                            <input type="time" name="endTime" value={formData.endTime} id="end-time" onChange={handleChange} required />
                         </div>
                     </div>
                 </div>
-                
+
                 <hr></hr>
 
                 <div className="section" id="location-section">
@@ -172,17 +186,17 @@ const CreateEventPage = () => {
                     <div className="box" id="location-box">
                         <div className="other-info" style={{ gridArea: "location" }} id="location-div">
                             <label>Location</label>
-                            <input type="text" name="location" value={formData.location} id="location" onChange={handleChange} required/>
+                            <input type="text" name="location" value={formData.location} id="location" onChange={handleChange} required />
                         </div>
 
                         <div className="other-info" style={{ gridArea: "capacity" }} id="capacity-div">
                             <label>Capacity</label>
-                            <input type="number" name="capacity" value={formData.capacity} id="capacity" onChange={handleChange} required/>
-                        </div> 
+                            <input type="number" name="capacity" value={formData.capacity} id="capacity" onChange={handleChange} required />
+                        </div>
 
                         <div className="other-info" style={{ gridArea: "min-age" }} id="min-age-div">
                             <label>Min age</label>
-                            <input type="number" name="minAge" value={formData.minAge} id="min-age" onChange={handleChange} required/>
+                            <input type="number" name="minAge" value={formData.minAge} id="min-age" onChange={handleChange} required />
                         </div>
 
                         <div className="other-info" style={{ gridArea: "status" }} id="status-div">
@@ -193,34 +207,76 @@ const CreateEventPage = () => {
                                 <option value="ongoing">Ongoing</option>
                                 <option value="archived">Archived (old)</option>
                             </select>
-                        </div>                        
+                        </div>
                     </div>
-                    
+
                 </div>
+
+                <hr></hr>
+
+                <div id="registration_div">
+                    <h3>Registration</h3>
+                    <div id="registration_type_div">
+                        <label htmlFor="registrationType">Where do students register for this event?</label>
+                        <select name="registrationType" value={formData.registrationType} onChange={handleChange} required>
+                            <option value="NONE">No Registration Needed</option>
+                            <option value="INTERNAL">On this VSA Website</option>
+                            <option value="EXTERNAL">Through an external link</option>
+                        </select>
+                    </div>
+
+                    {formData.registrationType === "EXTERNAL" && (
+                        <div id="external_url_div">
+                            <label htmlFor="externalRegistrationUrl">External URL for students to register</label>
+                            <input
+                                id="external_url"
+                                name="externalRegistrationUrl"
+                                type="url"
+                                value={formData.externalRegistrationUrl}
+                                placeholder="https://example.com/ticketseller"
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <hr></hr>
+
                 <div id="cover-photo">
                     <h3>Cover Photo</h3>
                     <p>This photo helps desplay the event better on the website homepage</p>
-                    <input type="file" name="eventImage" id="eventImage" accept="image/*" onChange={handleImageChange} multiple hidden/>
+                    <input type="file" name="eventImage" id="eventImage" accept="image/*" onChange={handleImageChange} multiple hidden />
                     <label htmlFor="eventImage" className="upload-button">Upload a photo</label>
 
                     <div className="photo-preview-list">
                         {
                             imagePreviews.length > 0 && imagePreviews.map((url, index) => (
-                              <div key={url}> 
-                                <img src={url} alt={`Preview ${index + 1}`} width="100px"/>
-                                <button type="button" onClick={() => handleRemoveImage(index)}>x</button>
-                              </div>  
+                                <div key={url}>
+                                    <img src={url} alt={`Preview ${index + 1}`} width="100px" />
+                                    <button type="button" onClick={() => handleRemoveImage(index)}>x</button>
+                                </div>
                             ))
                         }
                     </div>
                 </div>
-                
+
+
             </form>
-            
+
             <div className="last-button-zone">
-                <button type="submit" form="form-container" id="submit-button">Create Event</button>
+                {
+                    formData.registrationType === "INTERNAL" ? (
+                        <button type="submit" form="form-container" id="submit-button">
+                            Continue to Create Registration Form
+                        </button>
+                    )
+                        : (
+                            <button type="submit" form="form-container" id="submit-button">Create This Event</button>
+                        )
+                }
             </div>
-            
+
         </main>
     );
 }

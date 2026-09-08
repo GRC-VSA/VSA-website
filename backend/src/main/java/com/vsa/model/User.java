@@ -1,7 +1,12 @@
 package com.vsa.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,10 +26,11 @@ import lombok.Setter;
 @Table(name = "users")
 public class User {
   // ── Primary Key ────────────────────────────────────────────
-  /** Student ID (SID) - unique identifier and primary key */
+  /** Auto-generated unique identifier and primary key */
   @Id
-  @Column(name = "SID")
-  private String sid;
+  @Column(name = "uid")
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String uid;
 
   // ── Profile Information ────────────────────────────────────
   /** User's first name */
@@ -41,6 +47,11 @@ public class User {
 
   /** User's phone number (optional) */
   private String phone;
+
+  /** Officer applications submitted by this user. */
+  @JsonIgnore
+  @OneToMany(mappedBy = "user")
+  private List<Applicant> applicants = new ArrayList<>();
 
   // ── Authentication & Security ─────────────────────────────
   /** Hashed password (never stored in plain text) */
