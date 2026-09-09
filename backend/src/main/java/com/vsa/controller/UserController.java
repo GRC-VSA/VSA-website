@@ -1,5 +1,8 @@
 package com.vsa.controller;
 
+import com.vsa.dto.request.AccountResendRequest;
+import com.vsa.dto.request.AccountVerificationRequest;
+import com.vsa.dto.response.AccountVerificationStartResponse;
 import com.vsa.model.User;
 import com.vsa.service.UserService;
 import java.security.Principal;
@@ -40,37 +43,22 @@ public class UserController {
 
   // ── Registration & Verification ────────────────────────────
 
-  /**
-   * Registers a new user account.
-   *
-   * <p>A verification email will be sent to the user's email address. The user must verify their
-   * email before they can log in to the system.
-   *
-   * <p>Endpoint: POST /api/users/register
-   *
-   * @param user The user details including email, password, first name, and last name
-   * @return ResponseEntity with status 201 (Created) and the registered user details
-   */
   @PostMapping("/register")
-  public ResponseEntity<?> registerUser(@RequestBody User user) {
+  public ResponseEntity<AccountVerificationStartResponse> registerUser(@RequestBody User user) {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(user));
   }
 
-  /**
-   * Verifies a user's email address using a verification token.
-   *
-   * <p>The token is typically sent to the user via email during registration. After successful
-   * verification, the user can log in to the system.
-   *
-   * <p>Endpoint: GET /api/users/verify?token=abc123
-   *
-   * @param token The verification token sent to the user's email
-   * @return ResponseEntity with status 200 (OK) and a success message
-   */
-  @GetMapping("/verify")
-  public ResponseEntity<?> verifyEmail(@RequestParam String token) {
-    userService.verifyEmail(token);
-    return ResponseEntity.ok("Email verified successfully");
+  @PostMapping("/verify")
+  public ResponseEntity<Map<String, String>> verifyEmail(
+          @RequestBody AccountVerificationRequest request) {
+    String token = userService.verifyEmail(request);
+    return ResponseEntity.ok(Map.of("token", token, "message", "Email verified successfully"));
+  }
+
+  @PostMapping("/resend-verification")
+  public ResponseEntity<AccountVerificationStartResponse> resendVerification(
+          @RequestBody AccountResendRequest request) {
+    return ResponseEntity.ok(userService.resendVerificationCode(request));
   }
 
   // ── Authentication ──────────────────────────────────────────
