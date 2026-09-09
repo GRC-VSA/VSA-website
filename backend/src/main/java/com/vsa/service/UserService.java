@@ -210,22 +210,29 @@ public class UserService {
       throw new IllegalArgumentException("Email is required.");
     }
 
-    User user =
-            userRepository
-                    .findByEmailIgnoreCase(req.getEmail().trim())
-                    .orElseThrow(
-                            () -> new IllegalArgumentException("No pending account found for this email."));
+    String email = req.getEmail().trim();
 
-    if (user.isEmailVerified()) {
-      throw new IllegalArgumentException("This account is already verified. Please sign in.");
+    // Don't reveal via distinct error messages whether an account exists or is already
+    // verified -- that lets an attacker enumerate registered emails. Every well-formed email
+    // gets the same generic success response; only an existing, unverified account actually
+    // gets a code queued.
+    Optional<User> maybeUser = userRepository.findByEmailIgnoreCase(email);
+
+    if (maybeUser.isEmpty() || maybeUser.get().isEmailVerified()) {
+      return genericResendResponse(email);
     }
 
+    User user = maybeUser.get();
     LocalDateTime now = LocalDateTime.now();
 
-    if (user.getVerificationCodeSentAt() != null
-            && now.isBefore(
-            user.getVerificationCodeSentAt().plusSeconds(VERIFICATION_RESEND_COOLDOWN_SECONDS))) {
-      throw new IllegalArgumentException("Please wait before requesting another code.");
+    boolean withinCooldown =
+            user.getVerificationCodeSentAt() != null
+                    && now.isBefore(
+                    user.getVerificationCodeSentAt().plusSeconds(VERIFICATION_RESEND_COOLDOWN_SECONDS));
+
+    if (withinCooldown) {
+      return new AccountVerificationStartResponse(
+              user.getVerificationId(), maskEmail(user.getEmail()), user.getVerificationExpiresAt());
     }
 
     String verificationCode = issueVerificationCode(user);
@@ -237,6 +244,17 @@ public class UserService {
 
     return new AccountVerificationStartResponse(
             saved.getVerificationId(), maskEmail(saved.getEmail()), saved.getVerificationExpiresAt());
+  }
+
+  /**
+   * Builds a success response indistinguishable from a real one, for emails with no pending,
+   * unverified account -- so the caller can't tell "no such account" from "code sent" apart.
+   */
+  private AccountVerificationStartResponse genericResendResponse(String email) {
+    return new AccountVerificationStartResponse(
+            UUID.randomUUID(),
+            maskEmail(email),
+            LocalDateTime.now().plusMinutes(VERIFICATION_EXPIRATION_MINUTES));
   }
 
   // ── Authentication ──────────────────────────────────────────

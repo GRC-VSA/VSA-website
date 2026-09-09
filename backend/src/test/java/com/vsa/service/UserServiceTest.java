@@ -384,46 +384,44 @@ class UserServiceTest {
     }
 
     @Test
-    void resendVerificationCode_UnknownEmail_ThrowsException() {
+    void resendVerificationCode_UnknownEmail_ReturnsGenericSuccessWithoutQueuingEmail() {
         when(userRepository.findByEmailIgnoreCase("nobody@vsa.com")).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> userService.resendVerificationCode(resendRequest("nobody@vsa.com")));
+        AccountVerificationStartResponse response =
+                userService.resendVerificationCode(resendRequest("nobody@vsa.com"));
 
-        assertEquals("No pending account found for this email.", ex.getMessage());
+        assertEquals("n***y@vsa.com", response.getMaskedEmail());
+        verify(userRepository, never()).save(any(User.class));
+        verifyNoInteractions(emailOutboxService);
     }
 
     @Test
-    void resendVerificationCode_AlreadyVerified_ThrowsException() {
+    void resendVerificationCode_AlreadyVerified_ReturnsGenericSuccessWithoutQueuingEmail() {
         User user = pendingUser(UUID.randomUUID());
         user.setEmailVerified(true);
 
         when(userRepository.findByEmailIgnoreCase("pending@vsa.com")).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> userService.resendVerificationCode(resendRequest("pending@vsa.com")));
+        AccountVerificationStartResponse response =
+                userService.resendVerificationCode(resendRequest("pending@vsa.com"));
 
-        assertEquals("This account is already verified. Please sign in.", ex.getMessage());
+        assertEquals("p***g@vsa.com", response.getMaskedEmail());
+        verify(userRepository, never()).save(any(User.class));
         verifyNoInteractions(emailOutboxService);
     }
 
     @Test
-    void resendVerificationCode_WithinCooldown_ThrowsException() {
-        User user = pendingUser(UUID.randomUUID());
+    void resendVerificationCode_WithinCooldown_ReturnsExistingSessionWithoutQueuingEmail() {
+        UUID verificationId = UUID.randomUUID();
+        User user = pendingUser(verificationId);
         user.setVerificationCodeSentAt(LocalDateTime.now().minusSeconds(30));
 
         when(userRepository.findByEmailIgnoreCase("pending@vsa.com")).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
-                        IllegalArgumentException.class,
-                        () -> userService.resendVerificationCode(resendRequest("pending@vsa.com")));
+        AccountVerificationStartResponse response =
+                userService.resendVerificationCode(resendRequest("pending@vsa.com"));
 
-        assertEquals("Please wait before requesting another code.", ex.getMessage());
+        assertEquals(verificationId, response.getVerificationId());
         verify(userRepository, never()).save(any(User.class));
         verifyNoInteractions(emailOutboxService);
     }
