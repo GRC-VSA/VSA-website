@@ -1,5 +1,6 @@
 package com.vsa.config;
 
+import com.vsa.security.IpRateLimitFilter;
 import com.vsa.security.JwtFilter;
 
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   // ── Dependencies ──────────────────────────────────────────
   private final JwtFilter jwtFilter;
+  private final IpRateLimitFilter ipRateLimitFilter;
 
   @Value("${frontend.url}")
   private String frontendUrl;
@@ -51,9 +53,11 @@ public class SecurityConfig {
    * Constructs SecurityConfig with required dependencies.
    *
    * @param jwtFilter Filter for JWT token validation
+   * @param ipRateLimitFilter Filter for per-IP rate limiting on sensitive endpoints
    */
-  public SecurityConfig(JwtFilter jwtFilter) {
+  public SecurityConfig(JwtFilter jwtFilter, IpRateLimitFilter ipRateLimitFilter) {
     this.jwtFilter = jwtFilter;
+    this.ipRateLimitFilter = ipRateLimitFilter;
   }
 
   // ── Bean Definitions ──────────────────────────────────────
@@ -156,7 +160,8 @@ public class SecurityConfig {
                                     // ── Everything else requires authentication ─────
                                     .anyRequest()
                                     .authenticated())
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(ipRateLimitFilter, JwtFilter.class);
     return http.build();
   }
 
