@@ -34,36 +34,36 @@ public class EmailOutboxProcessor {
     public void processPendingEmails() {
 
         /*
-        * If a backend instance crashed after claiming an email,
-        * return that email to PENDING after the timeout.
-        */
+         * If a backend instance crashed after claiming an email,
+         * return that email to PENDING after the timeout.
+         */
         LocalDateTime cutoff =
-            LocalDateTime.now()
-                    .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
+                LocalDateTime.now()
+                        .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
 
         emailOutboxRepository.recoverStaleProcessingEmails(
-            EmailOutbox.Status.PROCESSING,
-            EmailOutbox.Status.PENDING,
-            cutoff
+                EmailOutbox.Status.PROCESSING,
+                EmailOutbox.Status.PENDING,
+                cutoff
         );
 
         List<EmailOutbox> pendingEmails =
-            emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
-                    EmailOutbox.Status.PENDING
-            );
+                emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
+                        EmailOutbox.Status.PENDING
+                );
 
         for (EmailOutbox outbox : pendingEmails) {
 
             int claimed =
-                emailOutboxRepository.claimPendingEmail(
-                        outbox.getOutboxId(),
-                        EmailOutbox.Status.PENDING,
-                        EmailOutbox.Status.PROCESSING
-                );
+                    emailOutboxRepository.claimPendingEmail(
+                            outbox.getOutboxId(),
+                            EmailOutbox.Status.PENDING,
+                            EmailOutbox.Status.PROCESSING
+                    );
 
             /*
-            * Another backend instance already claimed this email.
-            */
+             * Another backend instance already claimed this email.
+             */
             if (claimed == 0) {
                 continue;
             }
@@ -76,8 +76,8 @@ public class EmailOutboxProcessor {
 
         try {
             Map<String, Object> payload = objectMapper.readValue(
-                outbox.getPayload(), 
-                new TypeReference<Map<String, Object>>() {}
+                    outbox.getPayload(),
+                    new TypeReference<Map<String, Object>>() {}
             );
 
             switch (outbox.getEmailType()) {
@@ -85,6 +85,10 @@ public class EmailOutboxProcessor {
                 case REGISTRATION_VERIFICATION -> sendRegistrationVerificationEmail(outbox, payload);
 
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
+
+                case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
+
+                case EMAIL_CHANGE_VERIFICATION -> sendEmailChangeVerificationEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -93,10 +97,12 @@ public class EmailOutboxProcessor {
             outbox.setLastError(null);
 
             /*
-             * Verification payload contains the plaintext code.
+             * Verification payloads contain the plaintext code.
              * Once successfully delivered, we no longer need to keep it.
              */
-            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION) {
+            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.ACCOUNT_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION) {
                 outbox.setPayload("{}");
             }
 
@@ -108,18 +114,18 @@ public class EmailOutboxProcessor {
             outbox.setLastError(getErrorMessage(ex));
 
             /*
-            * This processing attempt is over.
-            */
+             * This processing attempt is over.
+             */
             outbox.setProcessingStartedAt(null);
-            
+
             if (attempts >= MAX_ATTEMPTS) {
                 outbox.setStatus(EmailOutbox.Status.FAILED);
             }
             else {
                 /*
-                * SMTP failed, so make the email available
-                * for another retry on the next processor cycle.
-                */
+                 * SMTP failed, so make the email available
+                 * for another retry on the next processor cycle.
+                 */
                 outbox.setStatus(EmailOutbox.Status.PENDING);
             }
         }
@@ -145,6 +151,24 @@ public class EmailOutboxProcessor {
                 (String) payload.get("eventDate"),
                 (String) payload.get("startTime"),
                 (String) payload.get("location")
+        );
+    }
+
+    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendAccountVerificationCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendEmailChangeVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendEmailChangeCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
         );
     }
 

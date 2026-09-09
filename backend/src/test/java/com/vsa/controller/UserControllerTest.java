@@ -5,9 +5,14 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.vsa.dto.request.AccountResendRequest;
+import com.vsa.dto.request.AccountVerificationRequest;
+import com.vsa.dto.response.AccountVerificationStartResponse;
 import com.vsa.model.User;
 import com.vsa.service.UserService;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,26 +29,47 @@ class UserControllerTest {
     @InjectMocks private UserController userController;
 
     @Test
-    void registerUser_ReturnsCreatedUser() {
+    void registerUser_ReturnsVerificationStartResponse() {
         User inputUser = new User();
-        when(userService.registerUser(inputUser)).thenReturn(inputUser);
+        AccountVerificationStartResponse startResponse = startResponse();
+        when(userService.registerUser(inputUser)).thenReturn(startResponse);
 
-        ResponseEntity<?> response = userController.registerUser(inputUser);
+        ResponseEntity<AccountVerificationStartResponse> response =
+                userController.registerUser(inputUser);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(inputUser, response.getBody());
+        assertEquals(startResponse, response.getBody());
     }
 
     @Test
-    void verifyEmail_ReturnsSuccessMessage() {
-        String token = "validToken123";
-        doNothing().when(userService).verifyEmail(token);
+    void verifyEmail_ReturnsTokenAndSuccessMessage() {
+        AccountVerificationRequest request = new AccountVerificationRequest();
+        request.setVerificationId(UUID.randomUUID());
+        request.setCode("ABCDEFG2");
 
-        ResponseEntity<?> response = userController.verifyEmail(token);
+        when(userService.verifyEmail(request)).thenReturn("mock.jwt.token");
+
+        ResponseEntity<Map<String, String>> response = userController.verifyEmail(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Email verified successfully", response.getBody());
-        verify(userService).verifyEmail(token);
+        assertEquals("mock.jwt.token", response.getBody().get("token"));
+        assertEquals("Email verified successfully", response.getBody().get("message"));
+        verify(userService).verifyEmail(request);
+    }
+
+    @Test
+    void resendVerification_ReturnsVerificationStartResponse() {
+        AccountResendRequest request = new AccountResendRequest();
+        request.setEmail("test@vsa.com");
+
+        AccountVerificationStartResponse startResponse = startResponse();
+        when(userService.resendVerificationCode(request)).thenReturn(startResponse);
+
+        ResponseEntity<AccountVerificationStartResponse> response =
+                userController.resendVerification(request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(startResponse, response.getBody());
     }
 
     @Test
@@ -82,5 +108,10 @@ class UserControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Password reset successfully", response.getBody());
         verify(userService).resetPassword("resetToken123", "newPassword123");
+    }
+
+    private AccountVerificationStartResponse startResponse() {
+        return new AccountVerificationStartResponse(
+                UUID.randomUUID(), "t***t@vsa.com", LocalDateTime.now().plusMinutes(15));
     }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 public class EmailOutbox {
 
-    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION}
+    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, ACCOUNT_VERIFICATION, EMAIL_CHANGE_VERIFICATION}
 
     public enum Status {PENDING, PROCESSING, SENT,  FAILED}
 
@@ -25,9 +25,22 @@ public class EmailOutbox {
      *
      * This is intentionally just an ID rather than a JPA relationship.
      * The outbox should remain independent from Registration.
+     *
+     * Null for emails that aren't about an event registration.
      */
     @Column(name = "registration_id")
     private Long registrationId;
+
+    /*
+     * User this email belongs to, for account-level emails such as signup
+     * verification. Kept separate from registrationId because users are keyed
+     * by a String UUID while registrations use a numeric id, and because an
+     * email belongs to one or the other, never both.
+     *
+     * Null for emails that aren't about a user account.
+     */
+    @Column(name = "user_uid")
+    private String userUid;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "email_type", nullable = false, length = 50)

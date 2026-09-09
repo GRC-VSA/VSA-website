@@ -15,12 +15,13 @@ public final class ApplicationDtos {
   private ApplicationDtos() {}
 
   public record UserProfileResponse(
-      String sid,
+      String uid,
       String firstName,
       String lastName,
       String email,
       String phone,
-      String role) {}
+      String role,
+      String profileImageUrl) {}
 
   public record QuestionRequest(
       @NotBlank @Size(max = 2000) String prompt,
