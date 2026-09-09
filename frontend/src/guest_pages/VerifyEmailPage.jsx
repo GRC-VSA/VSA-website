@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { verifyEmailCode, resendVerificationCode } from "../api/auth";
+import { useAuth } from "../context/AuthContext";
 import "./AuthPages.css";
 
 const CODE_LENGTH = 8;
@@ -9,6 +10,7 @@ const RESEND_COOLDOWN_SECONDS = 60; // matches the backend's cooldown
 const VerifyEmailPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { loginWithToken } = useAuth();
 
     // RegisterPage passes these through router state after a successful signup.
     const passedState = location.state || {};
@@ -72,9 +74,13 @@ const VerifyEmailPage = () => {
 
             const { token } = await verifyEmailCode({ verificationId, code });
 
-            // Verification returns a JWT, so the user is already signed in.
-            // See the note in the handoff about wiring this into AuthContext.
-            localStorage.setItem("token", token);
+            if (!token || typeof token !== "string") {
+                throw new Error("Email verification failed.");
+            }
+
+            // Verification returns a JWT, so the user is already signed in --
+            // route it through AuthContext so token/user state stay in sync.
+            loginWithToken(token);
 
             navigate("/", { replace: true });
         } catch (error) {
