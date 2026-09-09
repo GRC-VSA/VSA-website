@@ -130,12 +130,20 @@ public class UserService {
     account.setRole("student");
     account.setEmailVerified(false);
 
-    String verificationCode = issueVerificationCode(account);
+    LocalDateTime now = LocalDateTime.now();
+    boolean withinResendCooldown =
+            account.getVerificationCodeSentAt() != null
+                    && now.isBefore(
+                    account.getVerificationCodeSentAt().plusSeconds(VERIFICATION_RESEND_COOLDOWN_SECONDS));
+
+    String verificationCode = withinResendCooldown ? null : issueVerificationCode(account);
 
     User saved = userRepository.save(account);
 
-    emailOutboxService.queueAccountVerificationEmail(
-            saved.getUid(), saved.getEmail(), saved.getFirstName(), verificationCode);
+    if (verificationCode != null) {
+      emailOutboxService.queueAccountVerificationEmail(
+              saved.getUid(), saved.getEmail(), saved.getFirstName(), verificationCode);
+    }
 
     return new AccountVerificationStartResponse(
             saved.getVerificationId(), maskEmail(saved.getEmail()), saved.getVerificationExpiresAt());
