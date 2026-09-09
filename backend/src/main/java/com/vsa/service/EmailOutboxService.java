@@ -32,7 +32,10 @@ public class EmailOutboxService {
             String eventName,
             String verificationCode
     ) {
-
+        /*
+         * A new verification code makes any older unsent
+         * verification-code email for this registration useless.
+         */
         emailOutboxRepository.deleteByRegistrationIdAndEmailTypeAndStatus(
                 registrationId,
                 EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
@@ -78,6 +81,13 @@ public class EmailOutboxService {
         );
     }
 
+    /**
+     * Queues the signup verification-code email for a user account.
+     *
+     * <p>Mirrors the registration equivalent: reissuing a code invalidates any
+     * unsent email carrying the previous one, so a slow outbox can never deliver
+     * a stale code after a newer one was requested.
+     */
     public void queueAccountVerificationEmail(
             String userUid,
             String recipientEmail,
@@ -100,6 +110,38 @@ public class EmailOutboxService {
                 userUid,
                 EmailOutbox.EmailType.ACCOUNT_VERIFICATION,
                 recipientEmail,
+                payload
+        );
+    }
+
+    /**
+     * Queues the code confirming a change of account email.
+     *
+     * <p>recipientEmail is the NEW address, not the account's current one — that
+     * address is exactly what the code is proving ownership of.
+     */
+    public void queueEmailChangeVerificationEmail(
+            String userUid,
+            String newEmail,
+            String firstName,
+            String verificationCode
+    ) {
+        emailOutboxRepository.deleteByUserUidAndEmailTypeAndStatus(
+                userUid,
+                EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION,
+                EmailOutbox.Status.PENDING
+        );
+
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("firstName", firstName);
+        payload.put("verificationCode", verificationCode);
+
+        saveOutboxEntry(
+                null,
+                userUid,
+                EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION,
+                newEmail,
                 payload
         );
     }
