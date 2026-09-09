@@ -123,6 +123,97 @@ class EmailOutboxProcessorTest {
     }
 
     @Test
+    void processPendingEmails_accountVerificationSuccess_marksSentAndScrubsCode() {
+
+        EmailOutbox outbox = createAccountVerificationOutbox(6L, 0);
+
+        when(emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
+                EmailOutbox.Status.PENDING
+        )).thenReturn(List.of(outbox));
+
+        when(emailOutboxRepository.claimPendingEmail(
+                6L,
+                EmailOutbox.Status.PENDING,
+                EmailOutbox.Status.PROCESSING
+        )).thenReturn(1);
+
+        emailOutboxProcessor.processPendingEmails();
+
+        /*
+         * The signup code has to actually reach the mail service. If the
+         * dispatch switch has no ACCOUNT_VERIFICATION case, the row is
+         * silently marked SENT and no email is ever delivered.
+         */
+        verify(emailService).sendAccountVerificationCodeEmail(
+                "student@uw.edu",
+                "John",
+                "ABCDEFG2"
+        );
+
+        ArgumentCaptor<EmailOutbox> captor =
+                ArgumentCaptor.forClass(EmailOutbox.class);
+
+        verify(emailOutboxRepository).save(captor.capture());
+
+        EmailOutbox saved = captor.getValue();
+
+        assertEquals(EmailOutbox.Status.SENT, saved.getStatus());
+        assertNotNull(saved.getSentAt());
+        assertNull(saved.getProcessingStartedAt());
+        assertNull(saved.getLastError());
+
+        /*
+         * Account codes are just as sensitive as event-registration codes,
+         * so this payload gets scrubbed too.
+         */
+        assertEquals("{}", saved.getPayload());
+    }
+
+    @Test
+    void processPendingEmails_accountVerificationSmtpFailure_returnsEmailToPending() {
+
+        EmailOutbox outbox = createAccountVerificationOutbox(7L, 0);
+
+        when(emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
+                EmailOutbox.Status.PENDING
+        )).thenReturn(List.of(outbox));
+
+        when(emailOutboxRepository.claimPendingEmail(
+                7L,
+                EmailOutbox.Status.PENDING,
+                EmailOutbox.Status.PROCESSING
+        )).thenReturn(1);
+
+        doThrow(new RuntimeException("SMTP unavailable"))
+                .when(emailService)
+                .sendAccountVerificationCodeEmail(
+                        "student@uw.edu",
+                        "John",
+                        "ABCDEFG2"
+                );
+
+        emailOutboxProcessor.processPendingEmails();
+
+        ArgumentCaptor<EmailOutbox> captor =
+                ArgumentCaptor.forClass(EmailOutbox.class);
+
+        verify(emailOutboxRepository).save(captor.capture());
+
+        EmailOutbox saved = captor.getValue();
+
+        assertEquals(EmailOutbox.Status.PENDING, saved.getStatus());
+        assertEquals(1, saved.getAttemptCount());
+        assertEquals("SMTP unavailable", saved.getLastError());
+        assertNull(saved.getSentAt());
+
+        /*
+         * The code must survive an undelivered attempt, otherwise the retry
+         * would send an email with a code the user was never given.
+         */
+        assertTrue(saved.getPayload().contains("ABCDEFG2"));
+    }
+
+    @Test
     void processPendingEmails_temporarySmtpFailure_returnsEmailToPending() {
 
         EmailOutbox outbox = createVerificationOutbox(3L, 0);
@@ -268,6 +359,34 @@ class EmailOutboxProcessorTest {
                 """
                 {
                   "eventName": "VSA Welcome Night",
+                  "verificationCode": "ABCDEFG2"
+                }
+                """
+        );
+
+        outbox.setStatus(EmailOutbox.Status.PENDING);
+        outbox.setAttemptCount(attemptCount);
+
+        return outbox;
+    }
+
+    private EmailOutbox createAccountVerificationOutbox(
+            Long outboxId,
+            int attemptCount
+    ) {
+        EmailOutbox outbox = new EmailOutbox();
+
+        outbox.setOutboxId(outboxId);
+        outbox.setUserUid("user-uid-1");
+        outbox.setEmailType(
+                EmailOutbox.EmailType.ACCOUNT_VERIFICATION
+        );
+        outbox.setRecipientEmail("student@uw.edu");
+
+        outbox.setPayload(
+                """
+                {
+                  "firstName": "John",
                   "verificationCode": "ABCDEFG2"
                 }
                 """

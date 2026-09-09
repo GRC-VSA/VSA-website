@@ -8,14 +8,27 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.core.type.TypeReference;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class EmailOutboxProcessor {
 
     private static final int MAX_ATTEMPTS = 5;
     private static final int PROCESSING_TIMEOUT_MINUTES = 5;
+
+    /*
+     * Email types whose payload carries a plaintext verification code,
+     * and so must be scrubbed once the email has been delivered.
+     */
+    private static final Set<EmailOutbox.EmailType> CODE_BEARING_EMAIL_TYPES =
+            EnumSet.of(
+                    EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
+                    EmailOutbox.EmailType.ACCOUNT_VERIFICATION
+            );
+
     private final EmailOutboxRepository emailOutboxRepository;
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
@@ -85,6 +98,8 @@ public class EmailOutboxProcessor {
                 case REGISTRATION_VERIFICATION -> sendRegistrationVerificationEmail(outbox, payload);
 
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
+
+                case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -93,10 +108,10 @@ public class EmailOutboxProcessor {
             outbox.setLastError(null);
 
             /*
-             * Verification payload contains the plaintext code.
+             * Verification payloads contain the plaintext code.
              * Once successfully delivered, we no longer need to keep it.
              */
-            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION) {
+            if (CODE_BEARING_EMAIL_TYPES.contains(outbox.getEmailType())) {
                 outbox.setPayload("{}");
             }
 
@@ -146,6 +161,10 @@ public class EmailOutboxProcessor {
                 (String) payload.get("startTime"),
                 (String) payload.get("location")
         );
+    }
+
+    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload){
+        emailService.sendAccountVerificationCodeEmail(outbox.getRecipientEmail(), (String) payload.get("firstName"), (String) payload.get("verificationCode"));
     }
 
     private String getErrorMessage(Exception ex) {

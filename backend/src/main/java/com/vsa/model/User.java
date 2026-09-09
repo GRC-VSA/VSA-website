@@ -55,6 +55,7 @@ public class User {
 
   // ── Authentication & Security ─────────────────────────────
   /** Hashed password (never stored in plain text) */
+  @JsonIgnore
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
@@ -66,9 +67,31 @@ public class User {
   @Column(name = "email_verified", nullable = false)
   private boolean emailVerified = false;
 
-  /** Token sent to user's email for email verification */
-  @Column(name = "verification_token")
-  private String verificationToken;
+  // ── Email Verification (code-based) ────────────────────────
+  /**
+   * Opaque handle for the current verification session, returned to the frontend so it can submit
+   * the code without ever sending the email address back. Regenerated each time a new code is
+   * issued.
+   */
+  @JsonIgnore
+  @Column(name = "verification_id")
+  private UUID verificationId;
+
+  @JsonIgnore
+  @Column(name = "verification_code_hash")
+  private String verificationCodeHash;
+
+  @JsonIgnore
+  @Column(name = "verification_code_sent_at")
+  private LocalDateTime verificationCodeSentAt;
+
+  @JsonIgnore
+  @Column(name = "verification_expires_at")
+  private LocalDateTime verificationExpiresAt;
+
+  @JsonIgnore
+  @Column(name = "verification_attempts", nullable = false)
+  private int verificationAttempts = 0;
 
   /** Token sent to user's email for password reset */
   @Column(name = "reset_token")

@@ -14,9 +14,19 @@ public interface EmailOutboxRepository extends JpaRepository<EmailOutbox, Long> 
     List<EmailOutbox> findByStatusOrderByCreatedAtAsc(EmailOutbox.Status status);
 
     void deleteByRegistrationIdAndEmailTypeAndStatus(
-        Long registrationId,
-        EmailOutbox.EmailType emailType,
-        EmailOutbox.Status status
+            Long registrationId,
+            EmailOutbox.EmailType emailType,
+            EmailOutbox.Status status
+    );
+
+    /*
+     * Account-level equivalent of the delete above: a newly issued code makes
+     * any still-unsent code email for that user obsolete.
+     */
+    void deleteByUserUidAndEmailTypeAndStatus(
+            String userUid,
+            EmailOutbox.EmailType emailType,
+            EmailOutbox.Status status
     );
 
     @Transactional
@@ -29,9 +39,9 @@ public interface EmailOutboxRepository extends JpaRepository<EmailOutbox, Long> 
           AND e.status = :pendingStatus
         """)
     int claimPendingEmail(
-        @Param("outboxId") Long outboxId,
-        @Param("pendingStatus") EmailOutbox.Status pendingStatus,
-        @Param("processingStatus") EmailOutbox.Status processingStatus
+            @Param("outboxId") Long outboxId,
+            @Param("pendingStatus") EmailOutbox.Status pendingStatus,
+            @Param("processingStatus") EmailOutbox.Status processingStatus
     );
 
     @Transactional
@@ -45,8 +55,8 @@ public interface EmailOutboxRepository extends JpaRepository<EmailOutbox, Long> 
           AND e.processingStartedAt < :cutoff
         """)
     int recoverStaleProcessingEmails(
-        @Param("processingStatus") EmailOutbox.Status processingStatus,
-        @Param("pendingStatus") EmailOutbox.Status pendingStatus,
-        @Param("cutoff") LocalDateTime cutoff
+            @Param("processingStatus") EmailOutbox.Status processingStatus,
+            @Param("pendingStatus") EmailOutbox.Status pendingStatus,
+            @Param("cutoff") LocalDateTime cutoff
     );
 }
