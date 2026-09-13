@@ -14,6 +14,7 @@ import HomePage from "./guest_pages/homepage/HomePage.jsx";
 import SignInPage from "./guest_pages/SignInPage.jsx";
 import EventsPage from "./guest_pages/EventsPage.jsx";
 // import OldEventsPage from "./guest_pages/OldEventsPage.jsx";
+import OurTeamPage from "./guest_pages/OurTeamPage.jsx";
 import RegisterPage from "./guest_pages/RegisterPage.jsx";
 import VerifyEmailPage from "./guest_pages/VerifyEmailPage.jsx";
 import ForgotPasswordPage from "./guest_pages/ForgotPasswordPage.jsx";
@@ -63,6 +64,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/our-team" element={<OurTeamPage/>} />
           {/* <Route path="old-events" element={<OldEventsPage />} /> */}
           <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
           <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />

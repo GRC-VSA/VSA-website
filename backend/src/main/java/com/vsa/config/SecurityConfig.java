@@ -1,7 +1,5 @@
 package com.vsa.config;
 
-import com.vsa.security.JwtFilter;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,173 +18,180 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.vsa.security.JwtFilter;
+
 /**
  * Configuration class for Spring Security.
  *
- * <p>Configures authentication, authorization, CORS, and JWT token validation. Implements stateless
- * session management with JWT-based authentication.
+ * <p>
+ * Configures authentication, authorization, CORS, and JWT token validation.
+ * Implements stateless session management with JWT-based authentication.
  *
- * <p>Authorization levels: - Public endpoints: Registration, login, verification, password reset,
- * uploads, GET requests - Officer+ only: POST, PUT, DELETE on events and products - Authenticated:
- * All other requests
+ * <p>
+ * Authorization levels: - Public endpoints: Registration, login, verification,
+ * password reset, uploads, GET requests - Officer+ only: POST, PUT, DELETE on
+ * events and products - Authenticated: All other requests
  *
- * <p>Note on rule ordering: Spring evaluates {@code authorizeHttpRequests} matchers in the order
- * they're declared and stops at the first match. The broad {@code /api/events/**} rules below
- * would otherwise also catch the new nested question/registration routes in the wrong way (e.g.
- * making the registrant list public, or requiring officer role to register) — so the specific
- * overrides for those cases are declared first.
+ * <p>
+ * Note on rule ordering: Spring evaluates {@code authorizeHttpRequests}
+ * matchers in the order they're declared and stops at the first match. The
+ * broad {@code /api/events/**} rules below would otherwise also catch the new
+ * nested question/registration routes in the wrong way (e.g. making the
+ * registrant list public, or requiring officer role to register) — so the
+ * specific overrides for those cases are declared first.
  *
  * @author VSA Development Team
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-  // ── Dependencies ──────────────────────────────────────────
-  private final JwtFilter jwtFilter;
+    // ── Dependencies ──────────────────────────────────────────
 
-  @Value("${frontend.url}")
-  private String frontendUrl;
+    private final JwtFilter jwtFilter;
 
-  /**
-   * Constructs SecurityConfig with required dependencies.
-   *
-   * @param jwtFilter Filter for JWT token validation
-   */
-  public SecurityConfig(JwtFilter jwtFilter) {
-    this.jwtFilter = jwtFilter;
-  }
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
-  // ── Bean Definitions ──────────────────────────────────────
+    /**
+     * Constructs SecurityConfig with required dependencies.
+     *
+     * @param jwtFilter Filter for JWT token validation
+     */
+    public SecurityConfig(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
+    }
 
-  /**
-   * Creates a BCryptPasswordEncoder bean for password hashing and verification.
-   *
-   * @return BCryptPasswordEncoder instance
-   */
-  @Bean
-  public BCryptPasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+    // ── Bean Definitions ──────────────────────────────────────
+    /**
+     * Creates a BCryptPasswordEncoder bean for password hashing and
+     * verification.
+     *
+     * @return BCryptPasswordEncoder instance
+     */
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-  /**
-   * Configures the main security filter chain for HTTP security.
-   *
-   * <p>Sets up: - CORS configuration for cross-origin requests - Stateless session management (JWT)
-   * - Authorization rules for different endpoints - JWT filter integration
-   *
-   * @param http HttpSecurity object to configure
-   * @return Configured SecurityFilterChain
-   * @throws Exception If configuration fails
-   */
-  @Bean
-  SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
-    http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(
-                    session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(
-                    auth ->
-                            auth
-                                    // ── Fully public endpoints ────────────────────────
-                                    .requestMatchers(
-                                            "/api/users/register",
-                                            "/api/users/login",
-                                            "/api/users/verify",
-                                            "/api/users/forgot-password",
-                                            "/api/users/reset-password",
-                                            "/api/application-roles/open",
-                                            "/uploads/**")
-                                    .permitAll()
+    /**
+     * Configures the main security filter chain for HTTP security.
+     *
+     * <p>
+     * Sets up: - CORS configuration for cross-origin requests - Stateless
+     * session management (JWT) - Authorization rules for different endpoints -
+     * JWT filter integration
+     *
+     * @param http HttpSecurity object to configure
+     * @return Configured SecurityFilterChain
+     * @throws Exception If configuration fails
+     */
+    @Bean
+    SecurityFilterChain applicationSecurity(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth
+                        -> auth
+                                // ── Fully public endpoints ────────────────────────
+                                .requestMatchers(
+                                        "/api/users/register",
+                                        "/api/users/login",
+                                        "/api/users/verify",
+                                        "/api/users/forgot-password",
+                                        "/api/users/reset-password",
+                                        "/api/application-roles/open",
+                                        "/uploads/**")
+                                .permitAll()
+                                // ── Officer recruitment builder ─────────────────
+                                .requestMatchers("/api/application-roles/**")
+                                .hasAnyAuthority("officer", "president")
+                                // ── Student application submission and self-service ─
+                                .requestMatchers(HttpMethod.POST, "/api/applications")
+                                .hasAuthority("student")
+                                .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
+                                .hasAuthority("student")
+                                .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
+                                .hasAuthority("student")
+                                .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
+                                .hasAuthority("student")
+                                // ── Officer application review ──────────────────
+                                .requestMatchers("/api/applications/**")
+                                .hasAnyAuthority("officer", "president")
+                                // ── Question type lookup (read-only, used by both
+                                //    officers building questions and guests answering
+                                //    them) ────────────────────────────────────────
+                                .requestMatchers(HttpMethod.GET, "/api/question-types/**")
+                                .permitAll()
+                                // ── Registration overrides — must precede the broad
+                                //    /api/events/** rules below. GET .../registrations
+                                //    must stay officer-only (it would otherwise become
+                                //    public); POST .../registrations must only require
+                                //    login, not an officer role (it would otherwise be
+                                //    blocked for regular students) ──────────────────
+                                .requestMatchers(HttpMethod.GET, "/api/events/*/registrations")
+                                .hasAnyAuthority("officer", "president")
+                                .requestMatchers(HttpMethod.POST, "/api/events/*/registrations")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/verify")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/resend-code")
+                                .permitAll()
+                                // ── Read-only endpoints (anyone can browse) ──────
+                                // Also covers GET .../questions, which guests need to
+                                // render the registration form.
+                                .requestMatchers(
+                                        HttpMethod.GET,
+                                        "/api/events/**",
+                                        "/api/products/**",
+                                        "/api/our-team/**"
+                                )
+                                .permitAll()
+                                // ── Write endpoints (officers and presidents only) ─
+                                // Also covers POST/PUT/DELETE .../questions.
+                                .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**", "/api/our-team/**")
+                                .hasAnyAuthority("officer", "president")
+                                .requestMatchers(HttpMethod.PUT, "/api/events/**", "/api/products/**")
+                                .hasAnyAuthority("officer", "president")
+                                .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**", "/api/our-team/**")
+                                .hasAnyAuthority("officer", "president")
+                                // ── Everything else requires authentication ─────
+                                .anyRequest()
+                                .authenticated())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
-                    // ── Officer recruitment builder ─────────────────
-                    .requestMatchers("/api/application-roles/**")
-                    .hasAnyAuthority("officer", "president")
+    /**
+     * Configures CORS (Cross-Origin Resource Sharing) settings.
+     *
+     * <p>
+     * Allows requests from the configured frontend origin (`frontend.url`) with
+     * standard HTTP methods and credentials.
+     *
+     * @return CorsConfigurationSource configured for the application
+     */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(parseAllowedOrigins());
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
+        config.setMaxAge(3600L);
+        config.setAllowCredentials(true);
 
-                    // ── Student application submission and self-service ─
-                    .requestMatchers(HttpMethod.POST, "/api/applications")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
-                    .hasAuthority("student")
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
-                    // ── Officer application review ──────────────────
-                    .requestMatchers("/api/applications/**")
-                    .hasAnyAuthority("officer", "president")
-
-                                    // ── Question type lookup (read-only, used by both
-                                    //    officers building questions and guests answering
-                                    //    them) ────────────────────────────────────────
-                                    .requestMatchers(HttpMethod.GET, "/api/question-types/**")
-                                    .permitAll()
-
-                                    // ── Registration overrides — must precede the broad
-                                    //    /api/events/** rules below. GET .../registrations
-                                    //    must stay officer-only (it would otherwise become
-                                    //    public); POST .../registrations must only require
-                                    //    login, not an officer role (it would otherwise be
-                                    //    blocked for regular students) ──────────────────
-                                    .requestMatchers(HttpMethod.GET, "/api/events/*/registrations")
-                                    .hasAnyAuthority("officer", "president")
-                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations")
-                                    .permitAll()
-                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/verify")
-                                    .permitAll()
-                                    .requestMatchers(HttpMethod.POST, "/api/events/*/registrations/resend-code")
-                                    .permitAll()
-
-                                    // ── Read-only endpoints (anyone can browse) ──────
-                                    // Also covers GET .../questions, which guests need to
-                                    // render the registration form.
-                                    .requestMatchers(HttpMethod.GET, "/api/events/**", "/api/products/**")
-                                    .permitAll()
-
-                                    // ── Write endpoints (officers and presidents only) ─
-                                    // Also covers POST/PUT/DELETE .../questions.
-                                    .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**")
-                                    .hasAnyAuthority("officer", "president")
-                                    .requestMatchers(HttpMethod.PUT, "/api/events/**", "/api/products/**")
-                                    .hasAnyAuthority("officer", "president")
-                                    .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**")
-                                    .hasAnyAuthority("officer", "president")
-
-                                    // ── Everything else requires authentication ─────
-                                    .anyRequest()
-                                    .authenticated())
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
-  }
-
-  /**
-   * Configures CORS (Cross-Origin Resource Sharing) settings.
-   *
-   * <p>Allows requests from the configured frontend origin (`frontend.url`) with standard HTTP
-   * methods and credentials.
-   *
-   * @return CorsConfigurationSource configured for the application
-   */
-  @Bean
-  CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(parseAllowedOrigins());
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-    config.setAllowedHeaders(List.of("*"));
-    config.setExposedHeaders(List.of("*"));
-    config.setMaxAge(3600L);
-    config.setAllowCredentials(true);
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
-  }
-
-  private List<String> parseAllowedOrigins() {
-    return Arrays.stream(frontendUrl.split(","))
-            .map(String::trim)
-            .filter(origin -> !origin.isEmpty())
-            .collect(Collectors.toList());
-  }
+    private List<String> parseAllowedOrigins() {
+        return Arrays.stream(frontendUrl.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .collect(Collectors.toList());
+    }
 
 }
