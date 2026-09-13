@@ -9,7 +9,7 @@
 }
 
 
-#cover-photo-container {
+#event-cover-photo-container {
     position: relative;
     width: 100%;
     height: 510px;
@@ -33,7 +33,7 @@
     z-index: 1;
 }
 
-.cover-photo-text {
+.event-cover-photo-text {
     width: auto;
     height: auto;
     position: absolute;
@@ -46,8 +46,8 @@
     gap: 2px;
 }
 
-.cover-photo-text>h1,
-.cover-photo-text>span {
+.event-cover-photo-text>h1,
+.event-cover-photo-text>span {
     color: white;
 }
 
@@ -55,11 +55,11 @@
 the first child is the span above the header h1
 in this case: "VSA EVENTS" 
 */
-.cover-photo-text>span:first-child {
+.event-cover-photo-text>span:first-child {
     font-size: 1.3rem;
 }
 
-.cover-photo-text h1 {
+.event-cover-photo-text h1 {
     font-family: inherit;
     font-weight: 600;
     font-size: 3.7rem;
@@ -1095,15 +1095,15 @@ in this case: "VSA EVENTS"
 }
 
 @media (max-width: 441px) {
-    .cover-photo-text>span:first-child {
+    .event-cover-photo-text>span:first-child {
         font-size: 1rem;
     }
 
-    .cover-photo-text h1 {
+    .event-cover-photo-text h1 {
         font-size: 2.3rem;
     }
 
-    .cover-photo-text>span:last-child {
+    .event-cover-photo-text>span:last-child {
         font-size: 0.9rem;
     }
 
@@ -1665,7 +1665,7 @@ in this case: "VSA EVENTS"
 }
 
 @media (min-width: 442px) and (max-width: 496px) {
-    .cover-photo-text h1 {
+    .event-cover-photo-text h1 {
         font-size: 3rem;
     }
 }

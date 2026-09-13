@@ -145,16 +145,17 @@ public class SecurityConfig {
                                         HttpMethod.GET,
                                         "/api/events/**",
                                         "/api/products/**",
-                                        "/api/our-team/**"
-                                )
+                                        "/api/our-team/**",
+                                        "/api/sponsors/**"
+                                ) 
                                 .permitAll()
                                 // ── Write endpoints (officers and presidents only) ─
                                 // Also covers POST/PUT/DELETE .../questions.
-                                .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**", "/api/our-team/**")
+                                .requestMatchers(HttpMethod.POST, "/api/events/**", "/api/products/**", "/api/our-team/**", "/api/sponsors/**")
                                 .hasAnyAuthority("officer", "president")
                                 .requestMatchers(HttpMethod.PUT, "/api/events/**", "/api/products/**")
                                 .hasAnyAuthority("officer", "president")
-                                .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**", "/api/our-team/**")
+                                .requestMatchers(HttpMethod.DELETE, "/api/events/**", "/api/products/**", "/api/our-team/**", "/api/sponsors/**")
                                 .hasAnyAuthority("officer", "president")
                                 // ── Everything else requires authentication ─────
                                 .anyRequest()
