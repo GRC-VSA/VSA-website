@@ -23,6 +23,7 @@ import ProductsPage from "./guest_pages/ProductsPage.jsx";
 import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
 import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
 import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
+import ApplyPage from "./guest_pages/ApplyPage.jsx";
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
 import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
@@ -69,6 +70,7 @@ function App() {
           <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
           <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/apply" element={<ApplyPage />} />
           <Route path="/sponsors" element={<SponsorsPage/>} />
         </Route>
 

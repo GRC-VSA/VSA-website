@@ -187,13 +187,6 @@ const SponsorsPage = () => {
                     formData.image
                 );
 
-
-            /*
-             * POST returns the newly created sponsor.
-             *
-             * Since the backend assigns increasing sponsor IDs,
-             * appending it here preserves insertion order.
-             */
             setSponsors(previous => [
                 ...previous,
                 createdSponsor
@@ -202,7 +195,7 @@ const SponsorsPage = () => {
 
             /*
              * Return to normal viewing mode after
-             * successfully creating the sponsor.
+             * successfully creating a sponsor.
              */
             setManagementMode(null);
 
@@ -239,10 +232,6 @@ const SponsorsPage = () => {
 
             await deleteSponsor(sponsorId);
 
-            /*
-             * Remove the deleted sponsor immediately
-             * without reloading the whole page.
-             */
             setSponsors(previous =>
                 previous.filter(
                     sponsor =>
@@ -358,13 +347,6 @@ const SponsorsPage = () => {
                 {!loading &&
                     sponsors.map((sponsor, index) => {
 
-                        /*
-                         * Even index:
-                         * logo left / information right
-                         *
-                         * Odd index:
-                         * information left / logo right
-                         */
                         const reverse =
                             index % 2 !== 0;
 
@@ -469,10 +451,6 @@ const SponsorsPage = () => {
 
             </section>
 
-
-            {/* =========================
-                ADD SPONSOR POPUP
-            ========================== */}
 
             {managementMode === "add" && (
 
