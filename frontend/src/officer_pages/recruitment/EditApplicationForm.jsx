@@ -283,13 +283,7 @@ const EditApplicationForm = () => {
 
             setRoles(roleData);
 
-            setSavedDraftSnapshot(JSON.stringify(buildBuilderPayload(
-                recruitmentStatus.recruitmentOpen,
-                roleData
-            )
-            )
-            );
-
+            setSavedDraftSnapshot(JSON.stringify(buildBuilderPayload(recruitmentStatus.recruitmentOpen, roleData)));
 
             setSelectedRoleId(previous => {
 

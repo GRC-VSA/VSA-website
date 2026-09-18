@@ -1382,26 +1382,28 @@ public class ApplicationService {
             );
         }
 
-        question.getOptions().clear();
+        // question.getOptions().clear();
+        List<ApplicationQuestionOption> currentOption = question.getOptions();
+        // int displayOrder = 1;
 
-        int displayOrder = 1;
+        for (int index = 0; index < options.size(); index++) {
+                String optionText = options.get(index);
+                int displayOrder = index + 1;
+                if (index < currentOption.size()) {
+                        ApplicationQuestionOption option = currentOption.get(index);
+                        option.setOptionText(optionText);
+                }
+                else {
+                        ApplicationQuestionOption option = new ApplicationQuestionOption();
+                        option.setQuestion(question);
+                        option.setOptionText(optionText);
+                        option.setDisplayOrder(displayOrder);
+                        currentOption.add(option);
+                }
+        }
 
-        for (String optionText : options) {
-
-            ApplicationQuestionOption option
-                    = new ApplicationQuestionOption();
-
-            option.setQuestion(question);
-
-            option.setOptionText(
-                    optionText
-            );
-
-            option.setDisplayOrder(
-                    displayOrder++
-            );
-
-            question.getOptions().add(option);
+        while (currentOption.size() > options.size()) {
+                currentOption.remove(currentOption.size() - 1);
         }
     }
 
