@@ -1,5 +1,8 @@
 package com.vsa.controller;
 
+import com.vsa.dto.request.AccountResendRequest;
+import com.vsa.dto.request.AccountVerificationRequest;
+import com.vsa.dto.response.AccountVerificationStartResponse;
 import com.vsa.model.User;
 import com.vsa.dto.response.UserProfileResponse;
 import com.vsa.service.UserService;
@@ -43,6 +46,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getProfile(principal.getName()));
     }
 
+<<<<<<< HEAD
     // ── Registration & Verification ────────────────────────────
     /**
      * Registers a new user account.
@@ -82,6 +86,25 @@ public class UserController {
         userService.verifyEmail(token);
         return ResponseEntity.ok("Email verified successfully");
     }
+=======
+  @PostMapping("/register")
+  public ResponseEntity<AccountVerificationStartResponse> registerUser(@RequestBody User user) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(user));
+  }
+
+  @PostMapping("/verify")
+  public ResponseEntity<Map<String, String>> verifyEmail(
+          @RequestBody AccountVerificationRequest request) {
+    String token = userService.verifyEmail(request);
+    return ResponseEntity.ok(Map.of("token", token, "message", "Email verified successfully"));
+  }
+
+  @PostMapping("/resend-verification")
+  public ResponseEntity<AccountVerificationStartResponse> resendVerification(
+          @RequestBody AccountResendRequest request) {
+    return ResponseEntity.ok(userService.resendVerificationCode(request));
+  }
+>>>>>>> origin/dev/Verification-Code-and-Resend/Expiry
 
     // ── Authentication ──────────────────────────────────────────
     /**
@@ -124,6 +147,7 @@ public class UserController {
         return ResponseEntity.ok("Reset link sent to your email");
     }
 
+<<<<<<< HEAD
     /**
      * Resets a user's password using a reset token.
      *
@@ -144,3 +168,41 @@ public class UserController {
         return ResponseEntity.ok("Password reset successfully");
     }
 }
+=======
+  // ── Password Management ────────────────────────────────────
+
+  /**
+   * Initiates a password reset process for a user.
+   *
+   * <p>A password reset link will be sent to the user's email address. The link is valid for 30
+   * minutes from the time this endpoint is called.
+   *
+   * <p>Endpoint: POST /api/users/forgot-password
+   *
+   * @param body A map containing the "email" field
+   * @return ResponseEntity with status 200 (OK) and a confirmation message
+   */
+  @PostMapping("/forgot-password")
+  public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> body) {
+    userService.forgotPassword(body.get("email"));
+    return ResponseEntity.ok("Reset link sent to your email");
+  }
+
+  /**
+   * Resets a user's password using a reset token.
+   *
+   * <p>The reset token is sent to the user via email when they use the forgot-password endpoint.
+   * The token must be valid (not expired) for this operation to succeed.
+   *
+   * <p>Endpoint: POST /api/users/reset-password
+   *
+   * @param body A map containing "token" and "newPassword" fields
+   * @return ResponseEntity with status 200 (OK) and a success message
+   */
+  @PostMapping("/reset-password")
+  public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body) {
+    userService.resetPassword(body.get("token"), body.get("newPassword"));
+    return ResponseEntity.ok("Password reset successfully");
+  }
+}
+>>>>>>> origin/dev/Verification-Code-and-Resend/Expiry

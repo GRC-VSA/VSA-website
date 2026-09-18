@@ -153,4 +153,68 @@ class EmailOutboxServiceTest {
                 any()
         );
     }
+
+    @Test
+    void queueAccountVerificationEmail_replacesOldPendingEmailAndQueuesNewOne() {
+
+        emailOutboxService.queueAccountVerificationEmail(
+                "user-uid-1",
+                "student@uw.edu",
+                "John",
+                "ABCDEFG2"
+        );
+
+        /*
+         * A newly issued code makes any still-unsent code email
+         * for that account obsolete.
+         */
+        verify(emailOutboxRepository)
+                .deleteByUserUidAndEmailTypeAndStatus(
+                        "user-uid-1",
+                        EmailOutbox.EmailType.ACCOUNT_VERIFICATION,
+                        EmailOutbox.Status.PENDING
+                );
+
+        ArgumentCaptor<EmailOutbox> captor =
+                ArgumentCaptor.forClass(EmailOutbox.class);
+
+        verify(emailOutboxRepository).save(captor.capture());
+
+        EmailOutbox savedOutbox = captor.getValue();
+
+        assertEquals(
+                "user-uid-1",
+                savedOutbox.getUserUid()
+        );
+
+        /*
+         * Account verification is not tied to an event registration.
+         */
+        assertNull(savedOutbox.getRegistrationId());
+
+        assertEquals(
+                "student@uw.edu",
+                savedOutbox.getRecipientEmail()
+        );
+
+        assertEquals(
+                EmailOutbox.EmailType.ACCOUNT_VERIFICATION,
+                savedOutbox.getEmailType()
+        );
+
+        assertEquals(
+                EmailOutbox.Status.PENDING,
+                savedOutbox.getStatus()
+        );
+
+        assertTrue(
+                savedOutbox.getPayload()
+                        .contains("John")
+        );
+
+        assertTrue(
+                savedOutbox.getPayload()
+                        .contains("ABCDEFG2")
+        );
+    }
 }
