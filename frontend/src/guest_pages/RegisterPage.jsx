@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api/auth.js";
 import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";
@@ -6,8 +7,9 @@ import "./RegisterPage.css";
 import "./AuthPages.css";
 
 const RegisterPage = () => {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
-        sid: "",
         firstName: "",
         lastName: "",
         email: "",
@@ -18,7 +20,6 @@ const RegisterPage = () => {
 
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [message, setMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
     const handleChange = (event) => {
@@ -42,11 +43,10 @@ const RegisterPage = () => {
 
         try {
             setIsSubmitting(true);
-            setMessage("");
             setErrorMessage("");
 
-            await registerUser({
-                sid: formData.sid,
+            // Returns the verification session, not the created user.
+            const { verificationId, maskedEmail, expiresAt } = await registerUser({
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
@@ -54,16 +54,20 @@ const RegisterPage = () => {
                 passwordHash: formData.password,
             });
 
-            setFormData({
-                sid: "", firstName: "", lastName: "", email: "",
-                phone: "", password: "", confirmPassword: "",
+            // Hand the session to the verify page. The raw email goes along too so
+            // "resend" works there -- the resend endpoint is keyed by email.
+            navigate("/verify", {
+                replace: true,
+                state: {
+                    verificationId,
+                    maskedEmail,
+                    expiresAt,
+                    email: formData.email,
+                },
             });
-
-            setMessage("Account created. Please check your email and click the verification link before signing in.");
         } catch (error) {
             console.error("Failed to register account: ", error);
             setErrorMessage(error.message || "Registration failed. Please try again.");
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -81,7 +85,6 @@ const RegisterPage = () => {
                     </h1>
                     <p className="auth-tagline">Start Your Journey With VSA Here!</p>
 
-                    {message && <p className="auth-success">{message}</p>}
                     {errorMessage && <p className="auth-error">{errorMessage}</p>}
 
                     <form className="auth-form" onSubmit={handleSubmit} onKeyDown={handleEnterKey}>
@@ -95,11 +98,6 @@ const RegisterPage = () => {
                                 <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} required />
                             </label>
                         </div>
-
-                        <label>
-                            Student ID
-                            <input type="text" name="sid" value={formData.sid} onChange={handleChange} required />
-                        </label>
 
                         <label>
                             Email

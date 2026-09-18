@@ -57,6 +57,28 @@ export function AuthProvider({ children }) {
         return loggedInUser;
     }
 
+    // Used after email verification, which returns a JWT directly instead of
+    // going through loginUser -- decodes and stores it the same way login() does.
+    const loginWithToken = (jwt) => {
+        if (!jwt || typeof jwt !== "string") {
+            throw new Error("A valid token is required.");
+        }
+
+        const decodedToken = jwtDecode(jwt);
+
+        const loggedInUser = {
+            email: decodedToken.sub,
+            role: decodedToken.role,
+        };
+
+        localStorage.setItem("token", jwt);
+
+        setToken(jwt);
+        setUser(loggedInUser);
+
+        return loggedInUser;
+    }
+
     const logout = () => {
         localStorage.removeItem("token");
 
@@ -67,7 +89,7 @@ export function AuthProvider({ children }) {
     const isAuthenticated = Boolean(token);
 
     return (
-        <AuthContext.Provider value={{user, token, isAuthenticated, login, logout}}>
+        <AuthContext.Provider value={{user, token, isAuthenticated, login, loginWithToken, logout}}>
             {children}
         </AuthContext.Provider>
     );

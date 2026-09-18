@@ -520,6 +520,42 @@
     background: var(--vsa-gold);
 }
 
+.verify-code-input {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5em;
+    /* letter-spacing adds trailing space after the last character, which throws
+       off the centering — pull it back by half an em */
+    text-indent: 0.5em;
+    font-family: "Courier New", monospace;
+    text-transform: uppercase;
+}
+
+.verify-resend-button {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--vsa-red, #ab3130);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.verify-resend-button:disabled {
+    color: #999;
+    cursor: default;
+}
+
+.verify-resend-button:not(:disabled):hover {
+    text-decoration: underline;
+}
+
+
 @media (max-width: 560px) {
     .reset-password-page,
     .verify-email-page,

@@ -1,0 +1,366 @@
+.registration-verification-page {
+    min-height: 100vh;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+
+    color: #f5f5f5;
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(194, 46, 45, 0.22),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(171, 49, 48, 0.16),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #181818 0%,
+            #222222 50%,
+            #161616 100%
+        );
+}
+
+
+/* ------------------------------
+   Title
+------------------------------ */
+
+.registration-verification-page > h1 {
+    margin: 0 0 12px;
+
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+
+    color: #ffffff;
+}
+
+
+/* Red accent underneath title */
+.registration-verification-page > h1::after {
+    content: "";
+
+    display: block;
+
+    width: 55px;
+    height: 4px;
+
+    margin: 14px auto 0;
+
+    border-radius: 999px;
+
+    background: linear-gradient(
+        90deg,
+        #7f1f1f,
+        #c22e2d,
+        #e15a57
+    );
+}
+
+
+/* ------------------------------
+   Intro text
+------------------------------ */
+
+.registration-verification-page > p {
+    max-width: 520px;
+
+    margin: 0 0 30px;
+
+    color: #bfbfbf;
+
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.registration-verification-page > p strong {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+
+/* ------------------------------
+   Verification card
+------------------------------ */
+
+.registration-verification-page form {
+    width: min(100%, 440px);
+
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    padding: 34px;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(55, 55, 55, 0.96),
+            rgba(37, 37, 37, 0.96)
+        );
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+
+/* ------------------------------
+   Verification code input
+------------------------------ */
+
+.registration-verification-page form > input {
+    width: 100%;
+    height: 64px;
+
+    box-sizing: border-box;
+
+    padding: 0 18px;
+
+    border: 2px solid #555555;
+    border-radius: 12px;
+
+    outline: none;
+
+    background-color: #1e1e1e;
+
+    color: #ffffff;
+
+    font-size: 1.55rem;
+    font-weight: 700;
+    text-align: center;
+
+    letter-spacing: 0.32em;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.registration-verification-page form > input::placeholder {
+    color: #686868;
+}
+
+.registration-verification-page form > input:hover {
+    border-color: #777777;
+}
+
+.registration-verification-page form > input:focus {
+    border-color: #c22e2d;
+
+    background-color: #202020;
+
+    box-shadow:
+        0 0 0 4px rgba(194, 46, 45, 0.14),
+        0 8px 22px rgba(0, 0, 0, 0.2);
+}
+
+
+/* ------------------------------
+   Verify button
+------------------------------ */
+
+.registration-verification-page form > button[type="submit"] {
+    width: 100%;
+    min-height: 52px;
+
+    border: none;
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8e2322 0%,
+            #c22e2d 55%,
+            #d44846 100%
+        );
+
+    color: #ffffff;
+
+    font-size: 1rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 20px rgba(194, 46, 45, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+.registration-verification-page form > button[type="submit"]:hover:not(:disabled) {
+    transform: translateY(-2px);
+
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 12px 28px rgba(194, 46, 45, 0.3);
+}
+
+.registration-verification-page form > button[type="submit"]:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.registration-verification-page form > button[type="submit"]:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+/* ------------------------------
+   Error message
+------------------------------ */
+
+.verification-error {
+    margin: -6px 0 0;
+
+    padding: 11px 14px;
+
+    border: 1px solid rgba(255, 90, 90, 0.28);
+    border-radius: 9px;
+
+    background-color: rgba(194, 46, 45, 0.12);
+
+    color: #ff9290;
+
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+
+/* ------------------------------
+   Resend section
+------------------------------ */
+
+.verification-resend {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 10px;
+
+    padding-top: 5px;
+}
+
+.verification-resend button {
+    padding: 5px 8px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #df6664;
+
+    font-size: 0.92rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.verification-resend button:hover:not(:disabled) {
+    color: #ff8986;
+    text-decoration: underline;
+}
+
+.verification-resend button:disabled {
+    color: #777777;
+    cursor: not-allowed;
+}
+
+
+/* ------------------------------
+   Resend success/error text
+------------------------------ */
+
+.verification-resend-message {
+    margin: 0;
+
+    color: #aaaaaa;
+
+    font-size: 0.86rem;
+    line-height: 1.4;
+}
+
+
+/* ------------------------------
+   Successful registration state
+------------------------------ */
+
+.registration-verification-page > h1:first-child {
+    animation: verificationFadeIn 0.45s ease;
+}
+
+
+/* ------------------------------
+   Mobile
+------------------------------ */
+
+@media (max-width: 600px) {
+    .registration-verification-page {
+        padding: 30px 16px;
+        justify-content: center;
+    }
+
+    .registration-verification-page > h1 {
+        font-size: 2rem;
+    }
+
+    .registration-verification-page > p {
+        font-size: 0.94rem;
+        margin-bottom: 24px;
+    }
+
+    .registration-verification-page form {
+        padding: 26px 20px;
+        border-radius: 15px;
+    }
+
+    .registration-verification-page form > input {
+        height: 60px;
+
+        font-size: 1.3rem;
+        letter-spacing: 0.25em;
+    }
+}
+
+
+/* ------------------------------
+   Entry animation
+------------------------------ */
+
+@keyframes verificationFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

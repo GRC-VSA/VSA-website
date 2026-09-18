@@ -13,6 +13,15 @@ vi.mock("../../components/AuthPhotoPanel.jsx", () => ({
     default: () => <div>AuthPhotoPanel</div>,
 }));
 
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+    const actual = await vi.importActual("react-router-dom");
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+    };
+});
+
 describe("RegisterPage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -27,7 +36,6 @@ describe("RegisterPage", () => {
 
         fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: "John" } });
         fireEvent.change(screen.getByLabelText(/Last Name/i), { target: { value: "Doe" } });
-        fireEvent.change(screen.getByLabelText(/Student ID/i), { target: { value: "8001234" } });
         fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "john@vsa.com" } });
         fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: "password123" } });
         fireEvent.change(screen.getByLabelText(/Re-enter Password/i), { target: { value: "password999" } });
@@ -39,7 +47,11 @@ describe("RegisterPage", () => {
     });
 
     it("submits registration successfully when passwords match", async () => {
-        authApi.registerUser.mockResolvedValueOnce({ message: "Success" });
+        authApi.registerUser.mockResolvedValueOnce({
+            verificationId: "vid-123",
+            maskedEmail: "j***e@vsa.com",
+            expiresAt: "2026-09-17T12:00:00Z",
+        });
 
         render(
             <MemoryRouter>
@@ -49,7 +61,6 @@ describe("RegisterPage", () => {
 
         fireEvent.change(screen.getByLabelText(/First Name/i), { target: { value: "Jane" } });
         fireEvent.change(screen.getByLabelText(/Last Name/i), { target: { value: "Luu" } });
-        fireEvent.change(screen.getByLabelText(/Student ID/i), { target: { value: "8009999" } });
         fireEvent.change(screen.getByLabelText(/Email/i), { target: { value: "jane@vsa.com" } });
         fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: "password123" } });
         fireEvent.change(screen.getByLabelText(/Re-enter Password/i), { target: { value: "password123" } });
@@ -58,16 +69,21 @@ describe("RegisterPage", () => {
 
         await waitFor(() => {
             expect(authApi.registerUser).toHaveBeenCalledWith({
-                sid: "8009999",
                 firstName: "Jane",
                 lastName: "Luu",
                 email: "jane@vsa.com",
                 phone: "",
                 passwordHash: "password123",
             });
-            expect(
-                screen.getByText(/Account created. Please check your email/i)
-            ).toBeInTheDocument();
+            expect(mockNavigate).toHaveBeenCalledWith("/verify", {
+                replace: true,
+                state: {
+                    verificationId: "vid-123",
+                    maskedEmail: "j***e@vsa.com",
+                    expiresAt: "2026-09-17T12:00:00Z",
+                    email: "jane@vsa.com",
+                },
+            });
         });
     });
 });

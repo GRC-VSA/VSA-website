@@ -2,6 +2,7 @@ package com.vsa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Entry point for the VSA (Vietnamese Student Association) Backend Application.
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author VSA Development Team
  */
 @SpringBootApplication
+@EnableScheduling
 public class BackendApplication {
 
   /**

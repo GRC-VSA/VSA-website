@@ -65,32 +65,32 @@ const WhoWeAreSection = () => {
           </button>
         </div>
 
-        {/* Infinite Scrolling Track */}
-        <div className="who-we-are__scroll-container">
-          <div className="who-we-are__scroll-track">
-            {/* Set 1 */}
-            {photos.map((photo, i) => (
-                <div
-                    key={`set1-${i}`}
-                    className={`who-we-are__photo-card ${
-                        photo.wide ? "who-we-are__photo-card--wide" : ""
-                    }`}
-                >
-                  <img src={photo.src} alt={photo.alt} />
-                </div>
-            ))}
+          {/* Infinite Scrolling Track */}
+          <div className="who-we-are__scroll-container">
+            <div className="who-we-are__scroll-track">
+              {/* Set 1 */}
+              {photos.map((photo, i) => (
+                  <div
+                      key={`set1-${i}`}
+                      className={`who-we-are__photo-card ${
+                          photo.wide ? "who-we-are__photo-card--wide" : ""
+                      }`}
+                  >
+                    <img src={photo.src} alt={photo.alt} />
+                  </div>
+              ))}
 
-            {/* Duplicated Set 2 for seamless loop */}
-            {photos.map((photo, i) => (
-                <div
-                    key={`set2-${i}`}
-                    className={`who-we-are__photo-card ${
-                        photo.wide ? "who-we-are__photo-card--wide" : ""
-                    }`}
-                >
-                  <img src={photo.src} alt={photo.alt} />
-                </div>
-            ))}
+              {/* Duplicated Set 2 for seamless loop */}
+              {photos.map((photo, i) => (
+                  <div
+                      key={`set2-${i}`}
+                      className={`who-we-are__photo-card ${
+                          photo.wide ? "who-we-are__photo-card--wide" : ""
+                      }`}
+                  >
+                    <img src={photo.src} alt={photo.alt} />
+                  </div>
+              ))}
           </div>
         </div>
       </section>
