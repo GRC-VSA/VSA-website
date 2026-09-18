@@ -3,7 +3,6 @@ package com.vsa.repository;
 import com.vsa.model.User;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Repository;
  * Repository interface for User entity data access.
  *
  * <p>Extends JpaRepository to provide CRUD operations on User entities. Includes custom queries for
- * email, verification tokens, and reset tokens.
+ * email, verification sessions, and reset tokens.
  *
  * @author VSA Development Team
  */
@@ -36,7 +35,6 @@ public interface UserRepository extends JpaRepository<User, String> {
    * @return Optional containing the user if found
    */
   Optional<User> findByEmailIgnoreCase(String email);
-
 
   /**
    * Finds a user by their current email-verification session id.

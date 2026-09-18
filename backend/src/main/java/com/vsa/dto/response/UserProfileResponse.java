@@ -12,6 +12,8 @@ public record UserProfileResponse(
 
     String phone,
 
-    String role
+    String role,
+
+    String profileImageUrl
 
 ) {}

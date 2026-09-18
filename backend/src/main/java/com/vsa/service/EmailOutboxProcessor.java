@@ -8,27 +8,14 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.core.type.TypeReference;
 
 import java.time.LocalDateTime;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class EmailOutboxProcessor {
 
     private static final int MAX_ATTEMPTS = 5;
     private static final int PROCESSING_TIMEOUT_MINUTES = 5;
-
-    /*
-     * Email types whose payload carries a plaintext verification code,
-     * and so must be scrubbed once the email has been delivered.
-     */
-    private static final Set<EmailOutbox.EmailType> CODE_BEARING_EMAIL_TYPES =
-            EnumSet.of(
-                    EmailOutbox.EmailType.REGISTRATION_VERIFICATION,
-                    EmailOutbox.EmailType.ACCOUNT_VERIFICATION
-            );
-
     private final EmailOutboxRepository emailOutboxRepository;
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
@@ -47,36 +34,36 @@ public class EmailOutboxProcessor {
     public void processPendingEmails() {
 
         /*
-        * If a backend instance crashed after claiming an email,
-        * return that email to PENDING after the timeout.
-        */
+         * If a backend instance crashed after claiming an email,
+         * return that email to PENDING after the timeout.
+         */
         LocalDateTime cutoff =
-            LocalDateTime.now()
-                    .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
+                LocalDateTime.now()
+                        .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
 
         emailOutboxRepository.recoverStaleProcessingEmails(
-            EmailOutbox.Status.PROCESSING,
-            EmailOutbox.Status.PENDING,
-            cutoff
+                EmailOutbox.Status.PROCESSING,
+                EmailOutbox.Status.PENDING,
+                cutoff
         );
 
         List<EmailOutbox> pendingEmails =
-            emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
-                    EmailOutbox.Status.PENDING
-            );
+                emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
+                        EmailOutbox.Status.PENDING
+                );
 
         for (EmailOutbox outbox : pendingEmails) {
 
             int claimed =
-                emailOutboxRepository.claimPendingEmail(
-                        outbox.getOutboxId(),
-                        EmailOutbox.Status.PENDING,
-                        EmailOutbox.Status.PROCESSING
-                );
+                    emailOutboxRepository.claimPendingEmail(
+                            outbox.getOutboxId(),
+                            EmailOutbox.Status.PENDING,
+                            EmailOutbox.Status.PROCESSING
+                    );
 
             /*
-            * Another backend instance already claimed this email.
-            */
+             * Another backend instance already claimed this email.
+             */
             if (claimed == 0) {
                 continue;
             }
@@ -89,8 +76,8 @@ public class EmailOutboxProcessor {
 
         try {
             Map<String, Object> payload = objectMapper.readValue(
-                outbox.getPayload(), 
-                new TypeReference<Map<String, Object>>() {}
+                    outbox.getPayload(),
+                    new TypeReference<Map<String, Object>>() {}
             );
 
             switch (outbox.getEmailType()) {
@@ -100,6 +87,8 @@ public class EmailOutboxProcessor {
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
 
                 case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
+
+                case EMAIL_CHANGE_VERIFICATION -> sendEmailChangeVerificationEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -111,7 +100,9 @@ public class EmailOutboxProcessor {
              * Verification payloads contain the plaintext code.
              * Once successfully delivered, we no longer need to keep it.
              */
-            if (CODE_BEARING_EMAIL_TYPES.contains(outbox.getEmailType())) {
+            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.ACCOUNT_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION) {
                 outbox.setPayload("{}");
             }
 
@@ -123,18 +114,18 @@ public class EmailOutboxProcessor {
             outbox.setLastError(getErrorMessage(ex));
 
             /*
-            * This processing attempt is over.
-            */
+             * This processing attempt is over.
+             */
             outbox.setProcessingStartedAt(null);
-            
+
             if (attempts >= MAX_ATTEMPTS) {
                 outbox.setStatus(EmailOutbox.Status.FAILED);
             }
             else {
                 /*
-                * SMTP failed, so make the email available
-                * for another retry on the next processor cycle.
-                */
+                 * SMTP failed, so make the email available
+                 * for another retry on the next processor cycle.
+                 */
                 outbox.setStatus(EmailOutbox.Status.PENDING);
             }
         }
@@ -163,8 +154,22 @@ public class EmailOutboxProcessor {
         );
     }
 
-    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload){
-        emailService.sendAccountVerificationCodeEmail(outbox.getRecipientEmail(), (String) payload.get("firstName"), (String) payload.get("verificationCode"));
+    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendAccountVerificationCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendEmailChangeVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendEmailChangeCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
+        );
     }
 
     private String getErrorMessage(Exception ex) {

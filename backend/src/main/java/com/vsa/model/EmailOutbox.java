@@ -1,9 +1,17 @@
 package com.vsa.model;
-import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "email_outbox")
@@ -11,7 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 public class EmailOutbox {
 
-    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, ACCOUNT_VERIFICATION}
+    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, ACCOUNT_VERIFICATION, EMAIL_CHANGE_VERIFICATION}
 
     public enum Status {PENDING, PROCESSING, SENT,  FAILED}
 
@@ -31,6 +39,14 @@ public class EmailOutbox {
     @Column(name = "registration_id")
     private Long registrationId;
 
+    /*
+     * User this email belongs to, for account-level emails such as signup
+     * verification. Kept separate from registrationId because users are keyed
+     * by a String UUID while registrations use a numeric id, and because an
+     * email belongs to one or the other, never both.
+     *
+     * Null for emails that aren't about a user account.
+     */
     @Column(name = "user_uid")
     private String userUid;
 

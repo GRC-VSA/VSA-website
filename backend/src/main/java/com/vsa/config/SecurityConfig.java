@@ -1,8 +1,5 @@
 package com.vsa.config;
 
-import com.vsa.security.IpRateLimitFilter;
-import com.vsa.security.JwtFilter;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.vsa.security.IpRateLimitFilter;
 import com.vsa.security.JwtFilter;
 
 /**
