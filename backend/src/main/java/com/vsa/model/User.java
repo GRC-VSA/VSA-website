@@ -1,12 +1,19 @@
 package com.vsa.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import java.util.UUID;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,8 +21,8 @@ import lombok.Setter;
 /**
  * Entity representing a User account in the VSA system.
  *
- * <p>Stores user credentials, profile information, and authentication tokens. Supports email
- * verification and password reset functionality.
+ * <p>Stores user credentials, profile information, and authentication tokens.
+ * Supports email verification and password reset functionality.
  *
  * @author VSA Development Team
  */
@@ -25,14 +32,18 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @Table(name = "users")
 public class User {
+
   // ── Primary Key ────────────────────────────────────────────
+
   /** Auto-generated unique identifier and primary key */
   @Id
   @Column(name = "uid")
   @GeneratedValue(strategy = GenerationType.UUID)
   private String uid;
 
+
   // ── Profile Information ────────────────────────────────────
+
   /** User's first name */
   @Column(name = "first_name", nullable = false)
   private String firstName;
@@ -48,21 +59,31 @@ public class User {
   /** User's phone number (optional) */
   private String phone;
 
-  /** Officer applications submitted by this user. */
+
+  // ── Officer Applications ───────────────────────────────────
+
+  /**
+   * Officer applications created by this user.
+   *
+   * One user may have multiple applications, but only one
+   * application per officer role.
+   */
   @JsonIgnore
   @OneToMany(mappedBy = "user")
-  private List<Applicant> applicants = new ArrayList<>();
+  private List<OfficerApplication> officerApplications = new ArrayList<>();
+
 
   // ── Authentication & Security ─────────────────────────────
+
   /** Hashed password (never stored in plain text) */
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
-  /** User's role in the system: "student", "officer", or "president" (default: "student") */
+  /** User's role: "student", "officer", or "president" */
   @Column(nullable = false)
   private String role = "student";
 
-  /** Whether the user's email has been verified (default: false) */
+  /** Whether the user's email has been verified */
   @Column(name = "email_verified", nullable = false)
   private boolean emailVerified = false;
 
@@ -78,12 +99,14 @@ public class User {
   @Column(name = "reset_token_expiry")
   private LocalDateTime resetTokenExpiry;
 
+
   // ── Metadata ───────────────────────────────────────────────
-  /** Timestamp when the user account was created (auto-set on creation) */
+
+  /** Timestamp when the user account was created */
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  /** Automatically sets the creation timestamp before persisting the entity. */
+  /** Automatically sets creation timestamp before persisting */
   @PrePersist
   public void prePersist() {
     this.createdAt = LocalDateTime.now();

@@ -8,6 +8,7 @@ const OfficerNavBar = () => {
     const [sidebarClosed, setSidebarClosed] = useState(false);
     const [subMenuOpen, setSubMenuOpen] = useState({
         dashboard: false,
+        application: false,
         events: false
     });
 
@@ -36,7 +37,7 @@ const OfficerNavBar = () => {
         <nav id="sidebar" className={sidebarClosed ? "close" : ""}>
             <ul>
                 <li>
-                    <img src={VSA_redlogo} className="logo" alt="vsa-logo"/>
+                    <img src={VSA_redlogo} className="logo" alt="vsa-logo" />
                     {/* <span className="logo">VSA</span> */}
                     <button type="button" id="toggle-btn" className={sidebarClosed ? "rotate" : ""} onClick={toggleSideBar}>
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M440-240 200-480l240-240 56 56-183 184 183 184-56 56Zm264 0L464-480l240-240 56 56-183 184 183 184-56 56Z" /></svg>
@@ -65,6 +66,27 @@ const OfficerNavBar = () => {
                             <li>
                                 <NavLink to="/officer/dashboard/event-board" className={({ isActive }) => (isActive ? "active" : "")}>
                                     Events
+                                </NavLink>
+                            </li>
+                        </div>
+                    </ul>
+                </li>
+                <li>
+                    <button type="button" className={subMenuOpen.application ? "dropdown-btn rotate" : "dropdown-btn"} onClick={() => toggleSubMenu("application")}>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-480q-51 0-85.5-34.5T360-600q0-50 34.5-85t85.5-35q50 0 85 35t35 85q0 51-35 85.5T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560ZM240-240v-76q0-21 10.5-39.5T279-385q46-27 96.5-41T480-440q54 0 104.5 14t96.5 41q18 11 28.5 29.5T720-316v76H240Zm160-110q-39 10-74 30h308q-35-20-74-30t-80-10q-41 0-80 10Zm80-250Zm80 280h74-308 234ZM160-80q-33 0-56.5-23.5T80-160v-160h80v160h160v80H160ZM80-640v-160q0-33 23.5-56.5T160-880h160v80H160v160H80ZM640-80v-80h160v-160h80v160q0 33-23.5 56.5T800-80H640Zm160-560v-160H640v-80h160q33 0 56.5 23.5T880-800v160h-80Z" /></svg>                        <span>Recruitment</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" /></svg>
+                    </button>
+                    <ul className={subMenuOpen.application ? "sub-menu show" : "sub-menu"}>
+                        <div>
+                            <li>
+                                <NavLink to="/officer/recruitment/applicants" end className={({ isActive }) => (isActive ? "active" : "")}>
+                                    Applicants
+                                </NavLink>
+                            </li>
+
+                            <li>
+                                <NavLink to="/officer/recruitment/edit-form" className={({ isActive }) => (isActive ? "active" : "")}>
+                                    Edit Form
                                 </NavLink>
                             </li>
                         </div>
@@ -106,7 +128,7 @@ const OfficerNavBar = () => {
             </ul>
 
             <button type="button" id="exit-admin-button" onClick={() => navigate("/")}>
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" /></svg>
                 <span>Back to Main</span>
             </button>
         </nav>

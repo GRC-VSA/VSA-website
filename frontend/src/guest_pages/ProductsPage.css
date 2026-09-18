@@ -10,26 +10,20 @@
     margin-top: 50px;
     min-height: 70vh;
     padding: 40px 24px;
-
     text-align: center;
 }
 
 .product-image-placeholder img {
     width: min(100%, 420px);
     height: auto;
-
     object-fit: contain;
 }
 
 .product-coming-soon h1 {
     /* max-width: px; */
-
     margin: 10px 0 0;
-
     color: #AB3130;
-
     font-size:  clamp(1.3rem, 3.2vw, 2.1rem);
     font-weight: 600;
-
     line-height: 1.35;
 }

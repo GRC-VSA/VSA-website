@@ -3,10 +3,25 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  assetsInclude: ['**/*.JPG', '**/*.jpg', '**/*.png'], // Handles capital asset extensions
+
+  assetsInclude: [
+    '**/*.JPG',
+    '**/*.jpg',
+    '**/*.png'
+  ],
+
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
+  },
+
   test: {
-    globals: true, // Enables describe, it, expect globally without importing
-    environment: 'jsdom', // Provides browser APIs like localStorage and window
+    globals: true,
+    environment: 'jsdom',
     setupFiles: './src/setupTests.js',
   },
 });

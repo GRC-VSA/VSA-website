@@ -9,7 +9,7 @@ import "./Navbar.css";
 
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const [isEventsOpen, setIsEventsOpen] = useState(false);
   const [accountIsClicked, setAccountIsClicked] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,6 +23,19 @@ const Navbar = () => {
     navigate("/");
   }
 
+  const handleApplyClick = (event) => {
+    event.preventDefault();
+    if (!isAuthenticated) {
+
+      window.location.replace(
+        "/sign-in?redirect=/apply"
+      )
+    } else {
+      window.location.replace(
+        "/apply"
+      )
+    }
+  }
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   let isOfficer = false;
@@ -81,18 +94,18 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-return (
-  <nav className="navbar">
-    <div className="navbar-background" ref={navbarBackgroundRef}>
-      <NavLink to="/" className="logo-div" onClick={closeMobileMenu}>
-        <img src={VSA_coloredlogo} alt={"vsa-logo-red"} className="logo"></img>
-      </NavLink>
-
-      <div className="navbar-pages" ref={navbarPagesRef}>
-        <NavLink to="/events" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
-          Events
+  return (
+    <nav className="navbar">
+      <div className="navbar-background" ref={navbarBackgroundRef}>
+        <NavLink to="/" className="logo-div" onClick={closeMobileMenu}>
+          <img src={VSA_coloredlogo} alt={"vsa-logo-red"} className="logo"></img>
         </NavLink>
-        {/* <div className="navbar-dropdown" onMouseEnter={() => setIsEventsOpen(true)} onMouseLeave={() => setIsEventsOpen(false)}>
+
+        <div className="navbar-pages" ref={navbarPagesRef}>
+          <NavLink to="/events" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
+            Events
+          </NavLink>
+          {/* <div className="navbar-dropdown" onMouseEnter={() => setIsEventsOpen(true)} onMouseLeave={() => setIsEventsOpen(false)}>
             <button className="nav-link dropdown-trigger">Events</button>
             {
                 isEventsOpen && (
@@ -110,73 +123,73 @@ return (
               )
             }
           </div> */}
-        <NavLink to="/products" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
-          Products
-        </NavLink>
-        <NavLink to="/our-team" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
-          Our Team
-        </NavLink>
-        <NavLink to="/apply" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
-          Apply
-        </NavLink>
-        <NavLink to="/sponsors" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
-          Sponsors
-        </NavLink>
-      </div>
-
-      <div className="search-and-signin-section">
-        <div className="search-icon-div">
-          <LuSearch id="search-icon" />
+          <NavLink to="/products" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
+            Products
+          </NavLink>
+          <NavLink to="/our-team" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")}>
+            Our Team
+          </NavLink>
+          <NavLink to="/apply" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")} onClick={handleApplyClick}>
+            Apply
+          </NavLink>
+          <NavLink to="/sponsors" className={({ isActive }) => (isActive ? "nav-link-active" : "nav-link")} >
+            Sponsors
+          </NavLink>
         </div>
-        {
-          user ? (
-            <div className="navbar-dropdown" onClick={() => setAccountIsClicked((accountState) => !accountState)}>
-              <button type="button" className="user-account-div dropdown-trigger"><FaUser id="user-account-icon" /></button>
-              {
-                accountIsClicked && (
-                  <div className="account-dropdown-menu">
-                    <NavLink to="/setting" className="account-dropdown-item">
-                      Setting
-                    </NavLink>
-                    <button type="button" onClick={handleLogOut} className="account-dropdown-item">
-                      Logout
-                    </button>
-                    {
-                      isOfficer && (
-                        <button className="account-dropdown-item" onClick={() => { navigate("/officer") }}>
-                          To Officer Board
-                        </button>
-                      )
-                    }
-                  </div>
-                )
-              }
-            </div>
-          ) :
-            <NavLink to="/sign-in" className="sign-in">
-              Sign-in
-            </NavLink>
-        }
+
+        <div className="search-and-signin-section">
+          <div className="search-icon-div">
+            <LuSearch id="search-icon" />
+          </div>
+          {
+            user ? (
+              <div className="navbar-dropdown" onClick={() => setAccountIsClicked((accountState) => !accountState)}>
+                <button type="button" className="user-account-div dropdown-trigger"><FaUser id="user-account-icon" /></button>
+                {
+                  accountIsClicked && (
+                    <div className="account-dropdown-menu">
+                      <NavLink to="/setting" className="account-dropdown-item">
+                        Setting
+                      </NavLink>
+                      <button type="button" onClick={handleLogOut} className="account-dropdown-item">
+                        Logout
+                      </button>
+                      {
+                        isOfficer && (
+                          <button className="account-dropdown-item" onClick={() => { navigate("/officer") }}>
+                            To Officer Board
+                          </button>
+                        )
+                      }
+                    </div>
+                  )
+                }
+              </div>
+            ) :
+              <NavLink to="/sign-in" className="sign-in">
+                Sign-in
+              </NavLink>
+          }
+        </div>
+
+        <button
+          type="button"
+          className="mobile-menu-trigger"
+          onClick={() => setIsMobileMenuOpen((open) => !open)}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <LuX id="mobile-menu-icon" /> : <LuMenu id="mobile-menu-icon" />}
+        </button>
       </div>
 
-      <button
-        type="button"
-        className="mobile-menu-trigger"
-        onClick={() => setIsMobileMenuOpen((open) => !open)}
-        aria-label="Toggle menu"
-      >
-        {isMobileMenuOpen ? <LuX id="mobile-menu-icon" /> : <LuMenu id="mobile-menu-icon" />}
-      </button>
-    </div>
-
-    <div className={`mobile-menu ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
+      <div className={`mobile-menu ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
         <NavLink to="/events" className="mobile-nav-link" onClick={closeMobileMenu}>
           Events
         </NavLink>
         <NavLink to="/products" className="mobile-nav-link" onClick={closeMobileMenu}>
           Products
         </NavLink>
-        <NavLink to="/officers" className="mobile-nav-link" onClick={closeMobileMenu}>
+        <NavLink to="/our-team" className="mobile-nav-link" onClick={closeMobileMenu}>
           Our Team
         </NavLink>
         <NavLink to="/apply" className="mobile-nav-link" onClick={closeMobileMenu}>
@@ -211,9 +224,9 @@ return (
             Sign-in
           </NavLink>
         )}
-    </div>
-  </nav>
-);
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;

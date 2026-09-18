@@ -102,20 +102,21 @@ public class SecurityConfig {
                                         "/api/users/forgot-password",
                                         "/api/users/reset-password",
                                         "/api/application-roles/open",
+                                        "/api/application-roles/recruitment-status",
                                         "/uploads/**")
                                 .permitAll()
                                 // ── Officer recruitment builder ─────────────────
                                 .requestMatchers("/api/application-roles/**")
                                 .hasAnyAuthority("officer", "president")
                                 // ── Student application submission and self-service ─
-                                .requestMatchers(HttpMethod.POST, "/api/applications")
-                                .hasAuthority("student")
-                                .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
-                                .hasAuthority("student")
+                                .requestMatchers(HttpMethod.POST, "/api/applications/start/**")
+                                .authenticated()
+                                .requestMatchers(HttpMethod.GET, "/api/applications/mine", "/api/applications/mine/**")
+                                .authenticated()
                                 .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
-                                .hasAuthority("student")
-                                .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
-                                .hasAuthority("student")
+                                .authenticated()
+                                .requestMatchers(HttpMethod.POST, "/api/applications/mine/*/submit")
+                                .authenticated()
                                 // ── Officer application review ──────────────────
                                 .requestMatchers("/api/applications/**")
                                 .hasAnyAuthority("officer", "president")
@@ -147,7 +148,7 @@ public class SecurityConfig {
                                         "/api/products/**",
                                         "/api/our-team/**",
                                         "/api/sponsors/**"
-                                ) 
+                                )
                                 .permitAll()
                                 // ── Write endpoints (officers and presidents only) ─
                                 // Also covers POST/PUT/DELETE .../questions.

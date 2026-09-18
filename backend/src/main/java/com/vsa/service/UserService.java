@@ -1,13 +1,15 @@
 package com.vsa.service;
 
-import com.vsa.controller.ApplicationDtos;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.vsa.dto.response.UserProfileResponse;
 import com.vsa.model.User;
 import com.vsa.repository.UserRepository;
 import com.vsa.security.JwtUtil;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 /**
  * Service class for managing User authentication and account operations.
@@ -53,12 +55,12 @@ public class UserService {
    * @return The user's profile
    * @throws IllegalArgumentException If no user with the given email exists
    */
-  public ApplicationDtos.UserProfileResponse getProfile(String email) {
+  public UserProfileResponse getProfile(String email) {
     User user =
         userRepository
             .findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException("Authenticated user was not found"));
-    return new ApplicationDtos.UserProfileResponse(
+    return new UserProfileResponse(
         user.getUid(),
         user.getFirstName(),
         user.getLastName(),

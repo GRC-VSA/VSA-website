@@ -1,11 +1,7 @@
 package com.vsa.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -26,37 +21,29 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @Table(
-    name = "application_answers",
+    name = "application_question_options",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "application_answers_application_id_question_id_key",
-            columnNames = {"application_id", "question_id"}
+            name = "uq_application_question_option_order",
+            columnNames = {"question_id", "display_order"}
         )
     }
 )
-public class ApplicationAnswer {
+public class ApplicationQuestionOption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answer_id")
-    private Long answerId;
+    @Column(name = "option_id")
+    private Long optionId;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "application_id", nullable = false)
-    private OfficerApplication application;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "question_id", nullable = false)
     private ApplicationQuestion question;
 
-    @Column(name = "answer_text", columnDefinition = "TEXT")
-    private String answerText;
+    @Column(name = "option_text", nullable = false, length = 500)
+    private String optionText;
 
-    @OneToMany(
-        mappedBy = "answer",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private List<ApplicationAnswerOption> selectedOptions = new ArrayList<>();
+    @Column(name = "display_order", nullable = false)
+    private int displayOrder;
 }

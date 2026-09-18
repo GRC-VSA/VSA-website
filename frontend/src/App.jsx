@@ -24,9 +24,11 @@ import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
 import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
 import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
 import ApplyPage from "./guest_pages/ApplyPage.jsx";
+
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
 import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
+import EditApplicationForm from "./officer_pages/recruitment/EditApplicationForm.jsx";
 import ToDoPage from "./officer_pages/ToDoPage.jsx";
 import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
 import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
@@ -94,6 +96,7 @@ function App() {
           <Route path="events/create-event" element={<CreateEventPage />} />
           <Route path="events/manage-event" element={<ManageEventPage />} />
           <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
+          <Route path="recruitment/edit-form" element={<EditApplicationForm/>}/>
         </Route>
       </Routes>
     </EventsProvider>
