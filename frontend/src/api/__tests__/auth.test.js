@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
     loginUser,
     registerUser,
-    verifyEmailToken,
+    verifyEmailCode,
     sendForgotPasswordEmail,
     resetPassword,
 } from "../auth";
@@ -49,19 +49,52 @@ describe("Auth API Services", () => {
         });
     });
 
-    describe("verifyEmailToken", () => {
-        it("should return response text upon successful email verification", async () => {
+    describe("verifyEmailCode", () => {
+
+        it("should return verification result upon successful email verification", async () => {
+
+            const responseData = {
+                token: "sample-jwt-token",
+                message: "Email verified successfully"
+            };
+
             fetch.mockResolvedValueOnce({
                 ok: true,
-                text: async () => "Email verified successfully",
+                json: async () => responseData
             });
 
-            const result = await verifyEmailToken("sample-token");
+
+            const result =
+                await verifyEmailCode({
+                    verificationId: "verification-123",
+                    code: "123456"
+                });
+
 
             expect(fetch).toHaveBeenCalledWith(
-                expect.stringContaining("/api/users/verify?token=sample-token")
+                expect.stringContaining(
+                    "/api/users/verify"
+                ),
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        verificationId:
+                            "verification-123",
+
+                        code:
+                            "123456"
+                    })
+                }
             );
-            expect(result).toBe("Email verified successfully");
+
+
+            expect(result)
+                .toEqual(responseData);
         });
     });
 });
