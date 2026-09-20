@@ -146,6 +146,17 @@
     border-radius: 14px;
 }
 
+.item-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.item-icon svg {
+    fill: #ECE0A6;
+    scale: 1.1;
+}
+
 .search-and-signin-section {
     justify-self: end;
     display: flex;
@@ -231,7 +242,7 @@
 
     display: flex;
     align-items: center;
-
+    gap: 15px;
     color: #ECE0A6;
     text-decoration: none;
     cursor: pointer;
@@ -245,6 +256,12 @@
 .account-dropdown-item:hover {
     background-color: #ECE0A6;
     color: #AB3130;
+}
+
+.account-dropdown-item:hover .item-icon {
+    svg {
+        fill: #AB3130;
+    }
 }
 
 .mobile-menu-trigger {

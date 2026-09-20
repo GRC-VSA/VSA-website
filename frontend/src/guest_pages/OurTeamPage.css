@@ -69,7 +69,7 @@
     background-color: #C22E2D;
 }
 
-.horizontal-slash + span {
+.our-team-hero-description {
     margin-top: 32px;
     max-width: 430px;
     font-size: 1rem;
@@ -773,7 +773,8 @@
         font-size: 3.2rem;
     }
 
-    .horizontal-slash + span {
+    .our-team-hero-description {
+        margin-top: 15px;
         font-size: 0.9rem;
     }
 
