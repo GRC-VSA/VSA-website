@@ -50,51 +50,35 @@ describe("Auth API Services", () => {
     });
 
     describe("verifyEmailCode", () => {
-
-        it("should return verification result upon successful email verification", async () => {
-
-            const responseData = {
-                token: "sample-jwt-token",
-                message: "Email verified successfully"
-            };
-
+        it("should return the JSON response upon successful email verification", async () => {
+            const mockResponse = { token: "a-valid-jwt" };
             fetch.mockResolvedValueOnce({
                 ok: true,
-                json: async () => responseData
+                json: async () => mockResponse,
             });
 
-
-            const result =
-                await verifyEmailCode({
-                    verificationId: "verification-123",
-                    code: "123456"
-                });
-
+            const result = await verifyEmailCode({ verificationId: "vid-123", code: "ABCDEFGH" });
 
             expect(fetch).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "/api/users/verify"
-                ),
-                {
+                expect.stringContaining("/api/users/verify"),
+                expect.objectContaining({
                     method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        verificationId:
-                            "verification-123",
-
-                        code:
-                            "123456"
-                    })
-                }
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ verificationId: "vid-123", code: "ABCDEFGH" }),
+                })
             );
+            expect(result).toEqual(mockResponse);
+        });
 
+        it("should throw an error with backend error message when verification fails", async () => {
+            fetch.mockResolvedValueOnce({
+                ok: false,
+                text: async () => "Invalid code.",
+            });
 
-            expect(result)
-                .toEqual(responseData);
+            await expect(
+                verifyEmailCode({ verificationId: "vid-123", code: "WRONGCODE" })
+            ).rejects.toThrow("Invalid code.");
         });
     });
 });
