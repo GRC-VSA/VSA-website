@@ -587,8 +587,20 @@
     line-height: 1.45;
 }
 
+.application-save-success {
+    margin: 0 0 10px;
+    color: #198754;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
 
+.application-already-submitted {
+    margin: 10px 0 0;
 
+    color: #e3b22b;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
 
 /* =========================================================
    BUTTON AREA

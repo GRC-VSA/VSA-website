@@ -11,7 +11,8 @@ import {
     getOpenApplicationRoles,
     startApplication,
     saveApplication,
-    submitApplication
+    submitApplication,
+    getMyApplications
 } from "../api/Application";
 
 
@@ -24,7 +25,7 @@ const ApplyPage = () => {
     const [selectedRoleId, setSelectedRoleId] = useState("");
 
     const [application, setApplication] = useState(null);
-
+    const [myApplications, setMyApplications] = useState([]);
     /*
      * {
      *   questionId: {
@@ -38,6 +39,7 @@ const ApplyPage = () => {
     const [currentStep, setCurrentStep] = useState(0);
 
     const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState("");
 
 
@@ -67,11 +69,11 @@ const ApplyPage = () => {
                 }
 
 
-                const openRoles =
-                    await getOpenApplicationRoles();
+                const [openRoles, existingApplications] =
+                    await Promise.all([getOpenApplicationRoles(), getMyApplications()]);
 
                 setRoles(openRoles);
-
+                setMyApplications(existingApplications);
             }
             catch (error) {
 
@@ -100,12 +102,11 @@ const ApplyPage = () => {
     // ROLE / SECTION INFORMATION
     // =========================================================
 
-    const selectedRole =
-        roles.find(role =>
-            role.applicationRoleId ===
-            Number(selectedRoleId)
-        );
+    const selectedRole = roles.find(role => role.applicationRoleId === Number(selectedRoleId));
+    const completedApplicationForSelectedRole = myApplications.find(application =>
+        application.applicationRoleId === Number(selectedRoleId) && application.status === "COMPLETED");
 
+    const alreadySubmitted = Boolean(completedApplicationForSelectedRole);
 
     /*
      * Get to Know You exists on every role.
@@ -181,7 +182,7 @@ const ApplyPage = () => {
     // =========================================================
 
     const handleRoleChange = (event) => {
-
+        setSaveSuccess(false);
         const roleId =
             event.target.value;
 
@@ -201,7 +202,7 @@ const ApplyPage = () => {
     // =========================================================
 
     const handleTextAnswerChange = (questionId, value) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => ({
 
             ...previous,
@@ -227,7 +228,7 @@ const ApplyPage = () => {
         questionId,
         optionId
     ) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => ({
 
             ...previous,
@@ -255,7 +256,7 @@ const ApplyPage = () => {
         optionId,
         checked
     ) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => {
 
             const existingOptions =
@@ -477,15 +478,21 @@ const ApplyPage = () => {
         async () => {
 
             try {
-
+                if (alreadySubmitted) {
+                    return;
+                }
                 setSaving(true);
                 setError("");
-
+                setSaveSuccess(false);
 
                 const { currentApplication, currentAnswers } = await ensureApplicationStarted();
-                console.log("APPLICATION:", currentApplication);
-                console.log("SECTIONS:", sections);
-                console.log("CURRENT STEP:", currentStep);
+                // console.log("APPLICATION:", currentApplication);
+                // console.log("SECTIONS:", sections);
+                // console.log("CURRENT STEP:", currentStep);
+                console.log(
+                    "STATUS BEFORE SAVE:",
+                    currentApplication.status
+                );
 
 
                 /*
@@ -509,11 +516,10 @@ const ApplyPage = () => {
                         )
                     );
 
-
                 setApplication(
                     savedApplication
                 );
-
+                setSaveSuccess(true);
             }
             catch (error) {
 
@@ -535,7 +541,9 @@ const ApplyPage = () => {
     const handleNext = (event) => {
 
         event.preventDefault();
-
+        if (alreadySubmitted) {
+            return;
+        }
         if (!selectedRoleId) {
             setError(
                 "Please select the officer role you are applying for."
@@ -589,7 +597,9 @@ const ApplyPage = () => {
         async (event) => {
 
             event.preventDefault();
-
+            if (alreadySubmitted) {
+                return;
+            }
 
             try {
                 setSaving(true);
@@ -614,6 +624,11 @@ const ApplyPage = () => {
                 );
 
                 setApplication(submittedApplication);
+                setMyApplications(previous => {
+                    const withoutCurrentApplication =
+                        previous.filter(application => application.applicationId !== submittedApplication.applicationId);
+                    return [...withoutCurrentApplication, submittedApplication];
+                });
 
             }
             catch (error) {
@@ -871,7 +886,7 @@ const ApplyPage = () => {
                                                             ]
                                                         }
 
-                                                        disabled={saving}
+                                                        disabled={saving || alreadySubmitted}
 
                                                         onTextChange={
                                                             handleTextAnswerChange
@@ -943,6 +958,11 @@ const ApplyPage = () => {
                                                         )}
 
                                                     </select>
+                                                    {alreadySubmitted && (
+                                                        <p className="application-already-submitted">
+                                                            You have already submitted an application for this role.
+                                                        </p>
+                                                    )}
 
                                                 </div>
 
@@ -951,7 +971,11 @@ const ApplyPage = () => {
 
                                     </div>
 
-
+                                    {
+                                        saveSuccess && (
+                                            <p className="application-save-success">Application progress has been saved!</p>
+                                        )
+                                    }
                                     <div className="application-actions">
 
 
@@ -973,10 +997,7 @@ const ApplyPage = () => {
                                             type="button"
                                             className="application-save-button"
                                             onClick={handleSaveProgress}
-                                            disabled={
-                                                saving ||
-                                                !selectedRoleId
-                                            }
+                                            disabled={saving || !selectedRoleId || alreadySubmitted}
                                         >
 
                                             {
@@ -997,7 +1018,7 @@ const ApplyPage = () => {
                                                     <button
                                                         type="submit"
                                                         className="application-next-button"
-                                                        disabled={saving}
+                                                        disabled={saving || alreadySubmitted}
                                                     >
 
                                                         Next
@@ -1017,7 +1038,7 @@ const ApplyPage = () => {
                                                         <button
                                                             type="submit"
                                                             className="application-submit-button"
-                                                            disabled={saving}
+                                                            disabled={saving || alreadySubmitted}
                                                         >
 
                                                             Submit Application
