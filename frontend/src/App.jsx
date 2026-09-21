@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import { EventsProvider } from "./context/EventsContext.jsx";
-
+import { RecruitmentApplicantsProvider } from "./context/RecruitmentApplicantsContext.jsx";
 import GuestLayout from "./layouts/GuestLayout.jsx"
 import OfficerLayout from "./layouts/OfficerLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -69,15 +69,14 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/events" element={<EventsPage />} />
-          <Route path="/our-team" element={<OurTeamPage/>} />
+          <Route path="/our-team" element={<OurTeamPage />} />
           {/* <Route path="old-events" element={<OldEventsPage />} /> */}
           <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
           <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/apply" element={<ApplyPage />} />
-          <Route path="/sponsors" element={<SponsorsPage/>} />
+          <Route path="/sponsors" element={<SponsorsPage />} />
         </Route>
-
 
         <Route
           path="/officer"
@@ -85,7 +84,9 @@ function App() {
             //Add and configure roles heree ----|------------|
             //                                  V            V
             <ProtectedRoute allowedRoles={["officer", "president"]}>
-              <OfficerLayout />
+              <RecruitmentApplicantsProvider>
+                <OfficerLayout />
+              </RecruitmentApplicantsProvider>
             </ProtectedRoute>
           }>
           <Route index element={<OverallBoard />} />
@@ -98,10 +99,11 @@ function App() {
           <Route path="events/create-event" element={<CreateEventPage />} />
           <Route path="events/manage-event" element={<ManageEventPage />} />
           <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
-          <Route path="recruitment/applicants/:applicationId" element={<ApplicantDetail/>}/>
-          <Route path="recruitment/applicants" element={<ViewApplicants/>}/>
-          <Route path="recruitment/edit-form" element={<EditApplicationForm/>}/>
+          <Route path="recruitment/applicants/:applicationId" element={<ApplicantDetail />} />
+          <Route path="recruitment/applicants" element={<ViewApplicants />} />
+          <Route path="recruitment/edit-form" element={<EditApplicationForm />} />
         </Route>
+
       </Routes>
     </EventsProvider>
   );

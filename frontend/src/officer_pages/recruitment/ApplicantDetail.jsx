@@ -1,27 +1,39 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {getSubmittedApplicationReview} from "../../api/Application.js";
+// import {getSubmittedApplicationReview} from "../../api/Application.js";
+
+import { useRecruitmentApplicants } from "../../context/RecruitmentApplicantsContext.jsx";
 import "./ApplicantDetail.css";
 
 const ApplicantDetail = () => {
-
     const { applicationId } = useParams();
 
-    const [application, setApplication] = useState(null);
+    const {reviews, loadApplicationReview} = useRecruitmentApplicants();
 
-    const [loading, setLoading] = useState(true);
+    const application = reviews[String(applicationId)] || null;
+
+    const [loading, setLoading] = useState(!application);
 
     const [error, setError] = useState("");
 
 
     useEffect(() => {
+        if (!applicationId) {
+            setError("Application ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (application) {
+            setLoading(false);
+            return;
+        }
         async function loadApplication() {
+
             try {
                 setLoading(true);
                 setError("");
-                const data = await getSubmittedApplicationReview(applicationId);
-                setApplication(data);
+                await loadApplicationReview(applicationId);
             }
             catch (err) {
                 setError(err.message || "Failed to load application.");
@@ -31,7 +43,12 @@ const ApplicantDetail = () => {
             }
         }
         loadApplication();
-    }, [applicationId]);
+    }, [
+        applicationId,
+        application,
+        loadApplicationReview
+    ]);
+
 
     if (loading) {
         return (
@@ -73,52 +90,51 @@ const ApplicantDetail = () => {
             <div className="applicant-review-sections">
 
                 {application.sections.map((section, sectionIndex) => (
-                        <section key={section.sectionId} className="applicant-review-section">
-                            <div className="applicant-review-section-header">
-                                <span className="applicant-section-number">
-                                    SECTION {sectionIndex + 1}
-                                </span>
+                    <section key={section.sectionId} className="applicant-review-section">
+                        <div className="applicant-review-section-header">
+                            <span className="applicant-section-number">
+                                SECTION {sectionIndex + 1}
+                            </span>
 
-                                <h2>{section.sectionHeading}</h2>
-                                {
-                                    section.sectionDescription && (
-                                        <p>{section.sectionDescription}</p>
-                                    )
-                                }
-                            </div>
+                            <h2>{section.sectionHeading}</h2>
+                            {
+                                section.sectionDescription && (
+                                    <p>{section.sectionDescription}</p>
+                                )
+                            }
+                        </div>
 
-                            <div className="applicant-review-section-body">
+                        <div className="applicant-review-section-body">
 
-                                {section.questions.map(question => 
-                                    {
-                                        questionNumber += 1;
-                                        return (
-                                            <QuestionReview key={question.questionId} number={questionNumber} question={question} />
-                                        );
-                                    }
-                                )}
+                            {section.questions.map(question => {
+                                questionNumber += 1;
+                                return (
+                                    <QuestionReview key={question.questionId} number={questionNumber} question={question} />
+                                );
+                            }
+                            )}
 
-                                {
-                                    sectionIndex === 0 && (
-                                        <div className="applicant-role-row">
+                            {
+                                sectionIndex === 0 && (
+                                    <div className="applicant-role-row">
 
-                                            <div className="applicant-role-label">
-                                                Role Applying For:
-                                            </div>
-
-                                            <div className="applicant-role-value">
-                                                {application.roleName}
-                                            </div>
-
+                                        <div className="applicant-role-label">
+                                            Role Applying For:
                                         </div>
-                                    )
-                                }
 
-                            </div>
+                                        <div className="applicant-role-value">
+                                            {application.roleName}
+                                        </div>
 
-                        </section>
+                                    </div>
+                                )
+                            }
 
-                    )
+                        </div>
+
+                    </section>
+
+                )
                 )}
 
             </div>
@@ -128,7 +144,7 @@ const ApplicantDetail = () => {
 };
 
 
-const QuestionReview = ({number, question}) => {
+const QuestionReview = ({ number, question }) => {
 
     const isChoice = question.questionType === "single_choice" || question.questionType === "multiple_choice";
     return (
@@ -154,8 +170,8 @@ const QuestionReview = ({number, question}) => {
             </div>
 
             {
-                isChoice ? (<ChoiceAnswer question={question}/>)
-                        : (<TextAnswer question={question}/>)
+                isChoice ? (<ChoiceAnswer question={question} />)
+                    : (<TextAnswer question={question} />)
             }
 
         </div>
@@ -163,7 +179,7 @@ const QuestionReview = ({number, question}) => {
 }
 
 
-const TextAnswer = ({question}) => {
+const TextAnswer = ({ question }) => {
 
     const answer = question.answerText?.trim();
     return (
@@ -185,7 +201,7 @@ const TextAnswer = ({question}) => {
 }
 
 
-const ChoiceAnswer = ({question}) => {
+const ChoiceAnswer = ({ question }) => {
 
     const selectedOptions = question.selectedOptions || [];
     const options = question.options || [];
@@ -199,9 +215,9 @@ const ChoiceAnswer = ({question}) => {
                 const selected = selectedOptions.includes(option);
                 return (
                     <div key={option} className="applicant-choice-option">
-                        <span className={multiple ? (selected ? "applicant-checkbox selected" : "applicant-checkbox" )
-                                    : (selected ? "applicant-radio selected" : "applicant-radio")
-                            }
+                        <span className={multiple ? (selected ? "applicant-checkbox selected" : "applicant-checkbox")
+                            : (selected ? "applicant-radio selected" : "applicant-radio")
+                        }
                             aria-hidden="true"
                         />
 

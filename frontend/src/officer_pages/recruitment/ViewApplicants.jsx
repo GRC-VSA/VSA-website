@@ -1,72 +1,76 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getApplicationOverview, getApplicationRoles, getCompletedApplications } from "../../api/Application.js";
+// Commented out because no longer directly fetch API with these
+// import { getApplicationOverview, getApplicationRoles, getCompletedApplications } from "../../api/Application.js";
 
+// We use context with cache. Faster.
+import { useRecruitmentApplicants } from "../../context/RecruitmentApplicantsContext.jsx";
 import "./ViewApplicants.css";
 
 const ViewApplicants = () => {
     const navigate = useNavigate();
-    const [overview, setOverview] = useState({
-        totalApplicants: 0,
-        averageApplicationSeconds: 0
-    });
+    // const [overview, setOverview] = useState({
+    //     totalApplicants: 0,
+    //     averageApplicationSeconds: 0
+    // });
 
-    const [applications, setApplications] = useState([]);
+    // const [applications, setApplications] = useState([]);
 
-    const [roles, setRoles] = useState([]);
+    // const [roles, setRoles] = useState([]);
 
     const [selectedRoleId, setSelectedRoleId] = useState("all");
 
-    const [loading, setLoading] = useState(true);
-
     const [error, setError] = useState("");
+    const {
+        overview,
+        applications,
+        roles,
+
+        hasLoadedApplicants,
+        loadApplicantsData,
+
+        prefetchApplicationReviews
+    } = useRecruitmentApplicants();
 
     useEffect(() => {
-        async function loadApplicantsPage() {
+        loadApplicantsData().catch(err => {
+            setError(err.message || "Failed to load applications.");
+        });
+    }, [loadApplicantsData]);
 
-            try {
-                setLoading(true);
-                setError("");
-                const [overviewData, applicationData, roleData] = await Promise.all([
-                    getApplicationOverview(),
-                    getCompletedApplications(),
-                    getApplicationRoles()
-                ]);
-                setOverview(overviewData);
-                setApplications(applicationData);
-                setRoles(roleData);
-            }
-            catch (err) {
-                setError(err.message || "Failed to load applications.");
-            }
-            finally {
-                setLoading(false);
-            }
+
+    const filteredApplications = useMemo(() => {
+        if (selectedRoleId === "all") {
+            return applications;
         }
-        loadApplicantsPage();
-    }, []);
+        return applications.filter(application => Number(application.applicationRoleId) === Number(selectedRoleId));
+    }, [applications, selectedRoleId]);
 
+    useEffect(() => {
+        if (filteredApplications.length === 0) {
+            return;
+        }
+        const firstTwoApplicationIds = filteredApplications.slice(0, 2).map(
+            application => application.applicationId
+        );
 
-    const filteredApplications =
-        useMemo(() => {
-
-            if (selectedRoleId === "all") {
-                return applications;
-            }
-            return applications.filter(application => Number(application.applicationRoleId) === Number(selectedRoleId));
-        }, [applications, selectedRoleId]);
-
-
+        prefetchApplicationReviews(firstTwoApplicationIds);
+    }, [filteredApplications, prefetchApplicationReviews]);
     const handleApplicationClick = (applicationId) => {
         navigate(`/officer/recruitment/applicants/${applicationId}`);
     }
 
-    if (loading) {
-
+    if (!hasLoadedApplicants) {
         return (
             <main className="view-applicants-page">
-                <p>Loading applications...</p>
+                {error ? (
+                    <div className="applicants-error">
+                        {error}
+                    </div>
+                ) : (
+                    <p>Loading applications...</p>
+                )}
             </main>
         );
     }
@@ -181,6 +185,21 @@ const ViewApplicants = () => {
                                             className="application-row"
                                             tabIndex="0"
                                             onClick={() => handleApplicationClick(application.applicationId)}
+                                            onMouseEnter={() => {
+                                                const nextApplication = filteredApplications[index + 1];
+                                                prefetchApplicationReviews([
+                                                    application.applicationId,
+                                                    nextApplication?.applicationId
+                                                ]);
+                                            }}
+
+                                            onFocus={() => {
+                                                const nextApplication = filteredApplications[index + 1];
+                                                prefetchApplicationReviews([
+                                                    application.applicationId,
+                                                    nextApplication?.applicationId
+                                                ]);
+                                            }}
                                             onKeyDown={
                                                 event => {
                                                     if (event.key === "Enter" || event.key === " ") {
@@ -239,18 +258,18 @@ const formatSubmittedAt = (submittedAt) => {
 
 
     const time = date.toLocaleTimeString("en-US",
-            {
-                hour: "numeric",
-                minute: "2-digit"
-            }
+        {
+            hour: "numeric",
+            minute: "2-digit"
+        }
     );
 
 
     const day = date.toLocaleDateString("en-US",
-            {
-                month: "short",
-                day: "numeric"
-            }
+        {
+            month: "short",
+            day: "numeric"
+        }
     );
 
     return `${time} - ${day}`;
