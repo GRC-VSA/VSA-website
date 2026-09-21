@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { getMyApplications } from "../api/Application.js";
-
+// import { getMyApplications } from "../api/Application.js";
+import { useMyApplications } from "../context/MyApplicationsContext.jsx";
 import "./MyApplicationsPage.css";
 
 
@@ -10,7 +10,9 @@ const MyApplicationsPage = () => {
 
     const navigate = useNavigate();
 
-    const [applications, setApplications] = useState([]);
+    // const [applications, setApplications] = useState([]);
+
+    const { applications, loadMyApplications, loadApplicationReview } = useMyApplications();
 
     const [loading, setLoading] = useState(true);
 
@@ -18,44 +20,15 @@ const MyApplicationsPage = () => {
 
 
     useEffect(() => {
-
-        const loadApplications = async () => {
-
-            try {
-
-                setLoading(true);
-                setError("");
-
-                const applicationData =
-                    await getMyApplications();
-
-                setApplications(
-                    applicationData
-                );
-
-            }
-            catch (error) {
-
+        if (applications !== null) {
+            return;
+        }
+        loadMyApplications()
+            .catch(error => {
                 console.error(error);
-
-                setError(
-                    error.message ||
-                    "Failed to load your applications."
-                );
-
-            }
-            finally {
-
-                setLoading(false);
-
-            }
-        };
-
-
-        loadApplications();
-
-    }, []);
-
+                setError(error.message || "Failed to load your applications.");
+            });
+    }, [applications, loadMyApplications]);
 
     const handleResume = (
         applicationId
@@ -79,16 +52,13 @@ const MyApplicationsPage = () => {
     };
 
 
-    if (loading) {
+    if (applications === null && !error) {
 
         return (
-
             <main className="my-applications-page">
-
                 <p>
                     Loading applications...
                 </p>
-
             </main>
 
         );
@@ -255,11 +225,9 @@ const MyApplicationsPage = () => {
                                             <button
                                                 type="button"
                                                 className="my-application-view-button"
-                                                onClick={() =>
-                                                    handleView(
-                                                        application.applicationId
-                                                    )
-                                                }
+                                                onMouseEnter={() => loadApplicationReview(application.applicationId).catch(() => { })}
+                                                onFocus={() => loadApplicationReview(application.applicationId).catch(() => { })}
+                                                onClick={() => handleView(application.applicationId)}
                                             >
 
                                                 View Application

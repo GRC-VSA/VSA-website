@@ -80,6 +80,126 @@
     overflow: hidden;
 }
 
+.application-resume-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 2000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+.application-resume-modal {
+    width: min(520px, 100%);
+
+    padding: 30px;
+
+    background: white;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+
+.application-resume-eyebrow {
+    color: #c22e2d;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+
+.application-resume-modal h2 {
+    margin:
+        8px 0 10px;
+}
+
+
+.application-resume-modal>p {
+    margin-bottom: 24px;
+
+    color: #666;
+
+    line-height: 1.6;
+}
+
+
+.application-resume-drafts {
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.application-resume-draft {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 14px 16px;
+
+    background: #f6f6f6;
+
+    border-radius: 10px;
+}
+
+
+.application-resume-draft div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 3px;
+}
+
+
+.application-resume-draft span {
+    color: #777;
+
+    font-size: 0.8rem;
+}
+
+
+.application-resume-draft button {
+    padding: 9px 16px;
+
+    color: white;
+    background: #c22e2d;
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.application-resume-dismiss {
+    width: 100%;
+
+    margin-top: 18px;
+    padding: 10px;
+
+    color: #555;
+    background: transparent;
+
+    border: none;
+
+    cursor: pointer;
+}
 
 /* =========================================================
    MAIN APPLICATION CARD
@@ -179,7 +299,7 @@
 
     font-family: inherit;
 
-    font-size: clamp(2.1rem, 4vw, 3.25rem);
+    font-size: clamp(2.1rem, 3.7vw, 3.25rem);
 
     font-weight: 700;
 

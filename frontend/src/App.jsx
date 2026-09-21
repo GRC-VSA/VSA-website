@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { EventsProvider } from "./context/EventsContext.jsx";
 import { RecruitmentApplicantsProvider } from "./context/RecruitmentApplicantsContext.jsx";
+import { MyApplicationsProvider } from "./context/MyApplicationsContext.jsx";
 import GuestLayout from "./layouts/GuestLayout.jsx"
 import OfficerLayout from "./layouts/OfficerLayout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -25,6 +26,7 @@ import RegistrationVerificationPage from "./guest_pages/RegistrationVerification
 import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
 import ApplyPage from "./guest_pages/ApplyPage.jsx";
 import MyApplicationsPage from "./guest_pages/MyApplications.jsx";
+import MyApplicationDetail from "./guest_pages/MyApplicationDetail.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
@@ -75,9 +77,12 @@ function App() {
           <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
           <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/apply" element={<ApplyPage />} />
           <Route path="/sponsors" element={<SponsorsPage />} />
-          <Route path="/my-applications" element={<MyApplicationsPage/>}/>
+          <Route element={<MyApplicationsProvider />}>
+            <Route path="/apply" element={<ApplyPage />} />
+            <Route path="/my-applications" element={<MyApplicationsPage />} />
+            <Route path="/my-applications/:applicationId" element={<MyApplicationDetail />} />
+          </Route>
         </Route>
 
         <Route

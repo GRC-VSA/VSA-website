@@ -1,0 +1,232 @@
+.my-application-detail-page {
+    width: min(950px, calc(100% - 40px));
+    min-height: 70vh;
+
+    margin: 0 auto 300px auto;
+    padding-top: 140px;
+}
+
+
+.my-application-back-button {
+    margin-bottom: 30px;
+    padding: 0;
+
+    color: #ab3130;
+    background: none;
+
+    border: none;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.my-application-detail-header {
+    margin-bottom: 24px;
+}
+
+
+.my-application-detail-header>span {
+    color: #c22e2d;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+
+.my-application-detail-header h1 {
+    margin: 8px 0;
+}
+
+
+.my-application-detail-header p {
+    margin: 0;
+
+    color: #666;
+}
+
+
+.my-application-detail-status {
+    margin-bottom: 32px;
+    padding: 14px 18px;
+
+    color: #176b36;
+    background: #dff3e6;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+}
+
+
+.my-application-detail-sections {
+    display: flex;
+    flex-direction: column;
+
+    gap: 28px;
+}
+
+
+.my-application-detail-section {
+    overflow: hidden;
+
+    background: white;
+
+    border: 1px solid #e1e1e1;
+    border-radius: 16px;
+}
+
+
+.my-application-section-header {
+    padding: 24px 28px;
+
+    color: white;
+    background: #ab3130;
+}
+
+
+.my-application-section-header>span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+
+.my-application-section-header h2 {
+    margin: 5px 0;
+}
+
+
+.my-application-section-header p {
+    margin: 5px 0 0;
+
+    opacity: 0.85;
+}
+
+
+.my-application-question-list {
+    padding: 28px;
+}
+
+
+.my-application-question {
+    margin-bottom: 28px;
+}
+
+
+.my-application-question:last-child {
+    margin-bottom: 0;
+}
+
+
+.my-application-question-title {
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    font-weight: 600;
+}
+
+
+.my-application-question-title p {
+    margin: 0;
+}
+
+
+.my-application-required {
+    margin-left: 3px;
+
+    color: #c22e2d;
+}
+
+
+.my-application-answer {
+    padding: 13px 15px;
+
+    white-space: pre-wrap;
+
+    background: #f5f5f5;
+
+    border-radius: 8px;
+}
+
+
+.my-application-answer.empty {
+    color: #888;
+
+    font-style: italic;
+}
+
+
+.my-application-choice-answers {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.my-application-choice-answers {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.my-application-option {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 11px 14px;
+
+    background: #f5f5f5;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+}
+
+
+.my-application-option.selected {
+    color: #ab3130;
+    background: #fff3f3;
+
+    border-color: #c22e2d;
+
+    font-weight: 600;
+}
+
+
+.my-application-option-marker {
+    width: 18px;
+
+    flex-shrink: 0;
+
+    text-align: center;
+}
+
+.my-application-detail-error {
+    color: #c22e2d;
+}
+
+
+@media (max-width: 700px) {
+
+    .my-application-detail-page {
+        width: calc(100% - 28px);
+
+        padding-top: 120px;
+    }
+
+
+    .my-application-section-header,
+    .my-application-question-list {
+        padding: 20px;
+    }
+
+}

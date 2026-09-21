@@ -5,7 +5,8 @@ import "./ApplyPage.css";
 import noapplication from "../assets/guest/noapplication.png";
 import applicationBackground from "../assets/guest/officer-application-background.png";
 import { FaCheckCircle } from "react-icons/fa";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMyApplications } from "../context/MyApplicationsContext.jsx";
 
 import {
     getRecruitmentStatus,
@@ -20,16 +21,26 @@ import {
 
 const ApplyPage = () => {
 
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const resumeApplicationId = searchParams.get("resume");
+    const {
+        applications: cachedApplications,
+        loadMyApplications,
+        upsertApplication
+    } = useMyApplications();
+    const myApplications = cachedApplications || [];
     const [loading, setLoading] = useState(true);
     const [recruitmentOpen, setRecruitmentOpen] = useState(false);
 
     const [roles, setRoles] = useState([]);
     const [selectedRoleId, setSelectedRoleId] = useState("");
-
     const [application, setApplication] = useState(null);
-    const [myApplications, setMyApplications] = useState([]);
+
+
+
+    const [showDraftPrompt, setShowDraftPrompt] =
+        useState(false);
     /*
      * {
      *   questionId: {
@@ -74,11 +85,9 @@ const ApplyPage = () => {
 
 
                 const [openRoles, existingApplications] =
-                    await Promise.all([getOpenApplicationRoles(), getMyApplications()]);
+                    await Promise.all([getOpenApplicationRoles(), loadMyApplications()]);
 
                 setRoles(openRoles);
-                setMyApplications(existingApplications);
-
                 if (resumeApplicationId) {
 
                     const applicationData = await getMyApplication(Number(resumeApplicationId));
@@ -96,11 +105,17 @@ const ApplyPage = () => {
                     setAnswers(convertApplicationAnswers(applicationData));
 
                     const savedSectionIndex = role.sections.findIndex(section =>
-                                section.sectionId ===
-                                applicationData.currentSectionId
+                        section.sectionId ===
+                        applicationData.currentSectionId
                     );
 
                     setCurrentStep(savedSectionIndex >= 0 ? savedSectionIndex : 0);
+                }
+                if (!resumeApplicationId) {
+                    const hasIncompleteApplication = existingApplications.some(application => application.status === "IN_PROGRESS");
+                    if (hasIncompleteApplication) {
+                        setShowDraftPrompt(true);
+                    }
                 }
             }
             catch (error) {
@@ -125,6 +140,11 @@ const ApplyPage = () => {
 
     }, [resumeApplicationId]);
 
+    const incompleteApplications = myApplications.filter(application =>
+        application.status === "IN_PROGRESS"
+        &&
+        roles.some(role => role.applicationRoleId === application.applicationRoleId)
+    );
 
     // =========================================================
     // ROLE / SECTION INFORMATION
@@ -137,11 +157,11 @@ const ApplyPage = () => {
     const alreadySubmitted = Boolean(completedApplicationForSelectedRole);
 
     /*
-     * Get to Know You exists on every role.
-     *
-     * We find it independently so Step 1 can render
-     * BEFORE a role is selected.
-     */
+    * Get to Know You exists on every role.
+    *
+    * We find it independently so Step 1 can render
+    * BEFORE a role is selected.
+    */
     const getToKnowYouSection =
         roles
             .flatMap(
@@ -156,14 +176,14 @@ const ApplyPage = () => {
 
 
     /*
-     * Before role selection:
-     *
-     * sections = [Get to Know You]
-     *
-     * After role selection:
-     *
-     * sections = all sections belonging to that role
-     */
+    * Before role selection:
+    *
+    * sections = [Get to Know You]
+    *
+    * After role selection:
+    *
+    * sections = all sections belonging to that role
+    */
     const sections =
         selectedRole
             ? selectedRole.sections || []
@@ -185,10 +205,10 @@ const ApplyPage = () => {
     // =========================================================
 
     /*
-     * Before the user selects a role, we don't actually
-     * know how many steps there are because each role can
-     * have different sections.
-     */
+    * Before the user selects a role, we don't actually
+    * know how many steps there are because each role can
+    * have different sections.
+    */
     const progressLabel =
         selectedRole
             ? `Step ${currentStep + 1} of ${sections.length}`
@@ -329,6 +349,14 @@ const ApplyPage = () => {
         });
     };
 
+    const handleResumeDraft = (applicationId) => {
+        setShowDraftPrompt(false);
+        navigate(`/apply?resume=${applicationId}`);
+    };
+
+    const handleDismissDraftPrompt = () => {
+        setShowDraftPrompt(false);
+    };
 
     // =========================================================
     // CONVERT BACKEND ANSWERS
@@ -546,6 +574,7 @@ const ApplyPage = () => {
                 setApplication(
                     savedApplication
                 );
+                upsertApplication(savedApplication);
                 setSaveSuccess(true);
             }
             catch (error) {
@@ -651,12 +680,7 @@ const ApplyPage = () => {
                 );
 
                 setApplication(submittedApplication);
-                setMyApplications(previous => {
-                    const withoutCurrentApplication =
-                        previous.filter(application => application.applicationId !== submittedApplication.applicationId);
-                    return [...withoutCurrentApplication, submittedApplication];
-                });
-
+                upsertApplication(submittedApplication);
             }
             catch (error) {
 
@@ -764,7 +788,111 @@ const ApplyPage = () => {
                     `url(${applicationBackground})`
             }}
         >
+            {showDraftPrompt &&
+                incompleteApplications.length > 0 && (
 
+                    <div className="application-resume-modal-overlay">
+
+                        <div
+                            className="application-resume-modal"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="resume-application-title"
+                        >
+
+                            <span className="application-resume-eyebrow">
+                                SAVED APPLICATION
+                            </span>
+
+
+                            <h2 id="resume-application-title">
+
+                                {
+                                    incompleteApplications.length === 1
+
+                                        ? "You have an incomplete application"
+
+                                        : "You have incomplete applications"
+                                }
+
+                            </h2>
+
+
+                            <p>
+
+                                {
+                                    incompleteApplications.length === 1
+
+                                        ? `You have an incomplete application for the ${incompleteApplications[0].roleName
+                                        } role. Do you want to continue applying?`
+
+                                        : "Choose an application to continue where you left off."
+                                }
+
+                            </p>
+
+
+                            <div className="application-resume-drafts">
+
+                                {
+                                    incompleteApplications.map(
+                                        draft => (
+
+                                            <div
+                                                key={
+                                                    draft.applicationId
+                                                }
+                                                className="application-resume-draft"
+                                            >
+
+                                                <div>
+
+                                                    <strong>
+                                                        {draft.roleName}
+                                                    </strong>
+
+                                                    <span>
+                                                        Application in progress
+                                                    </span>
+
+                                                </div>
+
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleResumeDraft(
+                                                            draft.applicationId
+                                                        )
+                                                    }
+                                                >
+                                                    Continue
+                                                </button>
+
+                                            </div>
+
+                                        )
+                                    )
+                                }
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="application-resume-dismiss"
+                                onClick={
+                                    handleDismissDraftPrompt
+                                }
+                            >
+                                Start a new application
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                )}
             <div className="officer-application-card">
 
 
