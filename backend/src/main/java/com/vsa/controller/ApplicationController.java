@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vsa.dto.request.SaveApplicationRequest;
+import com.vsa.dto.response.ApplicationOverviewResponse;
+import com.vsa.dto.response.ApplicationReviewResponse;
 import com.vsa.dto.response.OfficerApplicationResponse;
 import com.vsa.model.OfficerApplicationStatus;
 import com.vsa.service.ApplicationService;
@@ -44,7 +46,6 @@ public class ApplicationController {
         return applicationService.getMyApplication(principal.getName(), applicationId);
     }
 
-
     @PutMapping("/mine/{applicationId}")
     public OfficerApplicationResponse saveApplication(
             Principal principal,
@@ -63,11 +64,20 @@ public class ApplicationController {
         return applicationService.submitApplication(principal.getName(), applicationId, request);
     }
 
+    @GetMapping("/overview")
+    public ApplicationOverviewResponse getApplicationOverview() {
+        return applicationService.getApplicationOverview();
+    }
+
     @GetMapping
     public List<OfficerApplicationResponse> getAllApplications(@RequestParam(required = false) OfficerApplicationStatus status) {
         return applicationService.getAllApplications(status);
     }
 
+    @GetMapping("/{applicationId}/review")
+    public ApplicationReviewResponse getSubmittedApplicationReview(@PathVariable Integer applicationId) {
+        return applicationService.getSubmittedApplicationReview(applicationId);
+    }
 
     @GetMapping("/{applicationId}")
     public OfficerApplicationResponse getApplication(@PathVariable Integer applicationId) {

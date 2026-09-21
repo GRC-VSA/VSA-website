@@ -197,6 +197,8 @@
     border-radius: 15px;
     padding: 3px 20px;
     transition: 0.2s ease-in;
+    width: 105px;
+    box-sizing: border-box;
 }
 
 .sign-in:hover {

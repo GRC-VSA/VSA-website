@@ -1,9 +1,12 @@
 package com.vsa.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -27,7 +30,11 @@ import com.vsa.dto.request.SaveRoleRequest;
 import com.vsa.dto.request.SaveSectionRequest;
 import com.vsa.dto.response.ApplicationAnswerResponse;
 import com.vsa.dto.response.ApplicationBuilderResponse;
+import com.vsa.dto.response.ApplicationOverviewResponse;
 import com.vsa.dto.response.ApplicationQuestionResponse;
+import com.vsa.dto.response.ApplicationReviewResponse;
+import com.vsa.dto.response.ApplicationReviewResponse.QuestionReviewResponse;
+import com.vsa.dto.response.ApplicationReviewResponse.SectionReviewResponse;
 import com.vsa.dto.response.ApplicationRoleResponse;
 import com.vsa.dto.response.ApplicationSectionResponse;
 import com.vsa.dto.response.OfficerApplicationResponse;
@@ -1648,6 +1655,124 @@ public class ApplicationService {
                 )
         );
     }
+
+    public ApplicationOverviewResponse getApplicationOverview() {
+
+        // Application overview board only display COMPLETED applications for greater good and hide uncompleted application
+    List<OfficerApplication> completedApplications = 
+        officerApplicationRepository.findByStatusOrderByCreatedAtDesc(OfficerApplicationStatus.COMPLETED);
+
+        //Application overview also shows total applications by getting the size of "completedApplications"
+    long totalApplicants = completedApplications.size();
+
+
+    if (totalApplicants == 0) {
+        return new ApplicationOverviewResponse(0, 0);
+    }
+
+    long totalApplicationSeconds = completedApplications.stream().mapToLong(application -> Duration.between(
+                                            application.getCreatedAt(),
+                                            application.getSubmittedAt()
+                                        ).getSeconds()
+                                )
+                        .sum();
+    long averageApplicationSeconds = Math.round(totalApplicationSeconds / (double) totalApplicants);
+    return new ApplicationOverviewResponse(totalApplicants, averageApplicationSeconds);
+}
+
+        public ApplicationReviewResponse getSubmittedApplicationReview(Integer applicationId) {
+        OfficerApplication application =  requireApplication(applicationId);
+
+        if (application.getStatus() != OfficerApplicationStatus.COMPLETED) {
+                throw new IllegalArgumentException("Only completed applications can be reviewed.");
+        }
+
+        User user = application.getUser();
+        List<ApplicationAnswer> answers = answerRepository.findByApplicationApplicationId(applicationId);
+
+        Map<Long, Integer> sectionOrder = new LinkedHashMap<>();
+
+        for (ApplicationSectionRole relation : sectionRoleRepository
+                    .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application.getApplicationRole().getApplicationRoleId())) {
+
+        sectionOrder.put(relation.getSection().getSectionId(), relation.getDisplayOrder());
+    }
+
+
+    /*
+     * Group saved answers by the section their question
+     * belongs to.
+     */
+        Map<ApplicationSection, List<ApplicationAnswer>> answersBySection =
+            answers.stream().collect(Collectors.groupingBy(answer -> answer.getQuestion().getSection()));
+
+        List<SectionReviewResponse> sections = answersBySection.entrySet().stream()
+                .sorted(Comparator.comparingInt(entry -> sectionOrder.getOrDefault(entry.getKey().getSectionId(), Integer.MAX_VALUE)))
+                .map(entry -> {ApplicationSection section = entry.getKey();
+
+                List<QuestionReviewResponse> questions = entry.getValue().stream()
+                                        .sorted(Comparator.comparingInt(answer -> answer.getQuestion().getOrderNum()))
+                                        .map(answer -> {ApplicationQuestion question = answer.getQuestion();
+                                            List<String> selectedOptions = answer
+                                                            .getSelectedOptions()
+                                                            .stream()
+                                                            .sorted(Comparator.comparingInt(selected -> selected.getOption().getDisplayOrder()))
+                                                            .map(selected -> selected.getOption().getOptionText())
+                                                            .toList();
+
+                        return new QuestionReviewResponse(
+
+                                question.getQuestionId(),
+
+                                question.getQuestionText(),
+
+                                question.getQuestionType(),
+
+                                question.isRequired(),
+
+                                question.getOrderNum(),
+
+                                answer.getAnswerText(),
+
+                                selectedOptions);
+                        })
+                        .toList();
+
+                return new SectionReviewResponse(
+                        section.getSectionId(),
+
+                        section.getSectionHeading(),
+
+                                        section.getSectionDescription(),
+
+                                        questions
+                                );
+                        })
+
+                    .toList();
+
+
+    return new ApplicationReviewResponse(
+
+            application.getApplicationId(),
+
+            application.getApplicationRole().getApplicationRoleId(),
+
+            application.getApplicationRole().getName(),
+
+            user.getFirstName(),
+
+            user.getLastName(),
+
+            user.getEmail(),
+
+            application.getCreatedAt(),
+
+            application.getSubmittedAt(),
+            
+            sections
+    );
+}
 
     // =========================================================
     // ANSWER SAVING

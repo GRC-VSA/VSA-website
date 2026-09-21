@@ -33,6 +33,7 @@ import ToDoPage from "./officer_pages/ToDoPage.jsx";
 import CreateEventPage from "./officer_pages/CreateEventPage.jsx";
 import ManageEventPage from "./officer_pages/ManageEventPage.jsx";
 import CreateRegistrationPage from "./officer_pages/CreateRegistrationPage.jsx";
+import ViewApplicants from "./officer_pages/recruitment/ViewApplicants.jsx";
 
 import AvailabilityListPage from "./officer_pages/availability/AvailabilityListPage.jsx";
 import AvailabilityDetailPage from "./officer_pages/availability/AvailabilityDetailPage.jsx";
@@ -96,6 +97,7 @@ function App() {
           <Route path="events/create-event" element={<CreateEventPage />} />
           <Route path="events/manage-event" element={<ManageEventPage />} />
           <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
+          <Route path="recruitment/applicants" element={<ViewApplicants/>}/>
           <Route path="recruitment/edit-form" element={<EditApplicationForm/>}/>
         </Route>
       </Routes>
