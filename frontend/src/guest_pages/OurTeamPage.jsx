@@ -331,7 +331,7 @@ const OurTeamPage = () => {
 
                     <div className="horizontal-slash"></div>
 
-                    <span>
+                    <span className="our-team-hero-description">
                         Meet the passionate people behind VSA
                         that make dreams come true
                     </span>

@@ -570,3 +570,65 @@ export async function saveApplicationBuilder(payload) {
 
     return response.json();
 }
+
+export async function getApplicationOverview() {
+
+    const response = await fetch(
+        `${API_BASE_URL}/api/applications/overview`,
+        {
+            headers: {
+                ...getTokenforAuthHeader()
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            await getErrorMessage(
+                response,
+                "Failed to fetch application overview."
+            )
+        );
+    }
+
+    return response.json();
+}
+
+
+export async function getCompletedApplications() {
+
+    const response = await fetch(`${API_BASE_URL}/api/applications?status=COMPLETED`,
+        {
+            headers: {
+                ...getTokenforAuthHeader()
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            await getErrorMessage(
+                response,
+                "Failed to fetch submitted applications."
+            )
+        );
+    }
+
+    return response.json();
+}
+
+export async function getSubmittedApplicationReview(applicationId) {
+
+    const response = await fetch(`${API_BASE_URL}/api/applications/${applicationId}/review`,
+        {
+            headers: {
+                ...getTokenforAuthHeader()
+            }
+        }
+    );
+    
+    if (!response.ok) {
+        throw new Error(await getErrorMessage(response, "Failed to fetch application."));
+    }
+    return response.json();
+}

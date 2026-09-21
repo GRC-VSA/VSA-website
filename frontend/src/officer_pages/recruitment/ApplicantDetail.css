@@ -1,0 +1,349 @@
+.applicant-detail-page {
+    --review-red: #b63231;
+    --review-bright-red: #c92e2f;
+    --review-background: #f4f5f6;
+    --review-answer: #e5e5e5;
+    --review-border: #d53b39;
+    --review-gold: #ece0a6;
+
+    width: 100%;
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    padding: clamp(34px, 5vw, 70px) clamp(28px, 6vw, 90px) 70px;
+
+    background: var(--review-background);
+
+    font-family: "Poppins", sans-serif;
+
+    color: #111;
+}
+
+
+.applicant-detail-page-header {
+    margin-bottom: 36px;
+}
+
+.applicant-detail-eyebrow {
+    display: block;
+    margin-bottom: 8px;
+    color: #c22e2d;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+.applicant-detail-page-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 2.6rem);
+    line-height: 1.1;
+    color: #000;
+}
+
+
+.applicant-review-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+}
+
+.applicant-review-section {
+    overflow: hidden;
+    border-radius: 22px;
+    background: #fff;
+}
+
+
+.applicant-review-section-header {
+    padding: 28px 42px 26px;
+    background: var(--review-red);
+    color: white;
+}
+
+.applicant-section-number {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--review-gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.applicant-review-section-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.applicant-review-section-header p {
+    margin: 5px 0 0;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.45;
+}
+
+
+.applicant-review-section-body {
+    padding: 28px 42px 34px;
+    border-left: 1px dashed var(--review-border);
+    border-right: 1px dashed var(--review-border);
+    border-bottom: 1px dashed var(--review-border);
+
+    border-radius: 0 0 22px 22px;
+}
+
+.applicant-question {
+    margin-bottom: 32px;
+}
+
+.applicant-question:last-child {
+    margin-bottom: 0;
+}
+
+.applicant-question-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.applicant-question-number {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: var(--review-bright-red);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.applicant-question-text {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.applicant-required {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: #fbe5e5;
+    color: var(--review-bright-red);
+    font-size: 0.58rem;
+    font-weight: 500;
+}
+
+.applicant-text-answer {
+    margin-left: 40px;
+    min-height: 45px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    padding: 11px 34px;
+    border-radius: 5px;
+    background: var(--review-answer);
+    color: #2d2d2d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.applicant-text-answer-long {
+    min-height: 100px;
+    align-items: flex-start;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    white-space: pre-wrap;
+}
+
+.applicant-answer-empty {
+    color: #888;
+    font-style: italic;
+}
+
+
+.applicant-role-row {
+    display: inline-flex;
+    margin-top: 3px;
+    margin-left: 0;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.applicant-role-label {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 22px;
+    background: var(--review-bright-red);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.applicant-role-value {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 22px;
+    background: #dfdfdf;
+    color: var(--review-bright-red);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.applicant-choice-answer {
+    margin-left: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.applicant-choice-option {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    font-size: 0.9rem;
+}
+
+
+
+.applicant-radio {
+    width: 19px;
+    height: 19px;
+    box-sizing: border-box;
+    border: 1.5px solid #111;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.applicant-radio.selected::after {
+    content: "";
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.applicant-checkbox {
+    width: 19px;
+    height: 19px;
+    box-sizing: border-box;
+    border: 1.5px solid #111;
+    border-radius: 3px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.applicant-checkbox.selected {
+    background: #000;
+}
+
+.applicant-checkbox.selected::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 9px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    top: 2px;
+    left: 6px;
+    transform: rotate(45deg);
+}
+
+.applicant-choice-text.selected {
+    font-weight: 700;
+}
+
+.applicant-detail-error {
+    padding: 15px 18px;
+    border-radius: 10px;
+    background: #ffecec;
+    color: #ab3130;
+}
+
+@media (max-width: 800px) {
+
+    .applicant-review-section-header {
+        padding: 25px 28px;
+    }
+
+    .applicant-review-section-body {
+        padding: 26px 28px 32px;
+    }
+
+    .applicant-text-answer,
+    .applicant-choice-answer {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .applicant-detail-page {
+        padding: 28px 16px 50px;
+    }
+
+    .applicant-review-sections {
+        gap: 24px;
+    }
+
+    .applicant-review-section {
+        border-radius: 16px;
+    }
+
+    .applicant-review-section-header {
+        padding: 22px 20px;
+    }
+
+    .applicant-review-section-body {
+        padding: 24px 20px 28px;
+    }
+
+    .applicant-question-heading {
+        align-items: flex-start;
+        gap: 9px;
+    }
+
+    .applicant-question-text {
+        font-size: 0.9rem;
+    }
+
+    .applicant-required {
+        margin-top: 3px;
+    }
+
+    .applicant-text-answer {
+        padding: 11px 16px;
+        font-size: 0.82rem;
+    }
+
+    .applicant-text-answer-long {
+        min-height: 90px;
+    }
+
+    .applicant-role-row {
+        width: 100%;
+    }
+
+    .applicant-role-label,
+    .applicant-role-value {
+        padding: 0 14px;
+        font-size: 0.78rem;
+    }
+
+    .applicant-role-value {
+        flex: 1;
+    }
+}
