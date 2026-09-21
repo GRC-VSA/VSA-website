@@ -54,6 +54,8 @@ public record ApplicationReviewResponse(
 
         String answerText,
 
+        List<String> options,
+
         List<String> selectedOptions
 
     ) {}

@@ -1394,23 +1394,22 @@ public class ApplicationService {
         // int displayOrder = 1;
 
         for (int index = 0; index < options.size(); index++) {
-                String optionText = options.get(index);
-                int displayOrder = index + 1;
-                if (index < currentOption.size()) {
-                        ApplicationQuestionOption option = currentOption.get(index);
-                        option.setOptionText(optionText);
-                }
-                else {
-                        ApplicationQuestionOption option = new ApplicationQuestionOption();
-                        option.setQuestion(question);
-                        option.setOptionText(optionText);
-                        option.setDisplayOrder(displayOrder);
-                        currentOption.add(option);
-                }
+            String optionText = options.get(index);
+            int displayOrder = index + 1;
+            if (index < currentOption.size()) {
+                ApplicationQuestionOption option = currentOption.get(index);
+                option.setOptionText(optionText);
+            } else {
+                ApplicationQuestionOption option = new ApplicationQuestionOption();
+                option.setQuestion(question);
+                option.setOptionText(optionText);
+                option.setDisplayOrder(displayOrder);
+                currentOption.add(option);
+            }
         }
 
         while (currentOption.size() > options.size()) {
-                currentOption.remove(currentOption.size() - 1);
+            currentOption.remove(currentOption.size() - 1);
         }
     }
 
@@ -1659,120 +1658,104 @@ public class ApplicationService {
     public ApplicationOverviewResponse getApplicationOverview() {
 
         // Application overview board only display COMPLETED applications for greater good and hide uncompleted application
-    List<OfficerApplication> completedApplications = 
-        officerApplicationRepository.findByStatusOrderByCreatedAtDesc(OfficerApplicationStatus.COMPLETED);
+        List<OfficerApplication> completedApplications
+                = officerApplicationRepository.findByStatusOrderByCreatedAtDesc(OfficerApplicationStatus.COMPLETED);
 
         //Application overview also shows total applications by getting the size of "completedApplications"
-    long totalApplicants = completedApplications.size();
+        long totalApplicants = completedApplications.size();
 
+        if (totalApplicants == 0) {
+            return new ApplicationOverviewResponse(0, 0);
+        }
 
-    if (totalApplicants == 0) {
-        return new ApplicationOverviewResponse(0, 0);
+        long totalApplicationSeconds = completedApplications.stream().mapToLong(application -> Duration.between(
+                application.getCreatedAt(),
+                application.getSubmittedAt()
+        ).getSeconds()
+        )
+                .sum();
+        long averageApplicationSeconds = Math.round(totalApplicationSeconds / (double) totalApplicants);
+        return new ApplicationOverviewResponse(totalApplicants, averageApplicationSeconds);
     }
 
-    long totalApplicationSeconds = completedApplications.stream().mapToLong(application -> Duration.between(
-                                            application.getCreatedAt(),
-                                            application.getSubmittedAt()
-                                        ).getSeconds()
-                                )
-                        .sum();
-    long averageApplicationSeconds = Math.round(totalApplicationSeconds / (double) totalApplicants);
-    return new ApplicationOverviewResponse(totalApplicants, averageApplicationSeconds);
-}
-
-        public ApplicationReviewResponse getSubmittedApplicationReview(Integer applicationId) {
-        OfficerApplication application =  requireApplication(applicationId);
+    public ApplicationReviewResponse getSubmittedApplicationReview(Integer applicationId) {
+        OfficerApplication application = requireApplication(applicationId);
 
         if (application.getStatus() != OfficerApplicationStatus.COMPLETED) {
-                throw new IllegalArgumentException("Only completed applications can be reviewed.");
+            throw new IllegalArgumentException("Only completed applications can be reviewed.");
         }
 
         User user = application.getUser();
         List<ApplicationAnswer> answers = answerRepository.findByApplicationApplicationId(applicationId);
 
         Map<Long, Integer> sectionOrder = new LinkedHashMap<>();
-
         for (ApplicationSectionRole relation : sectionRoleRepository
-                    .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application.getApplicationRole().getApplicationRoleId())) {
+                .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application.getApplicationRole().getApplicationRoleId())) {
 
-        sectionOrder.put(relation.getSection().getSectionId(), relation.getDisplayOrder());
-    }
+            sectionOrder.put(relation.getSection().getSectionId(), relation.getDisplayOrder());
+
+        }
 
 
-    /*
+        /*
      * Group saved answers by the section their question
      * belongs to.
-     */
-        Map<ApplicationSection, List<ApplicationAnswer>> answersBySection =
-            answers.stream().collect(Collectors.groupingBy(answer -> answer.getQuestion().getSection()));
+         */
+        Map<ApplicationSection, List<ApplicationAnswer>> answersBySection
+                = answers.stream().collect(Collectors.groupingBy(answer -> answer.getQuestion().getSection()));
 
         List<SectionReviewResponse> sections = answersBySection.entrySet().stream()
                 .sorted(Comparator.comparingInt(entry -> sectionOrder.getOrDefault(entry.getKey().getSectionId(), Integer.MAX_VALUE)))
-                .map(entry -> {ApplicationSection section = entry.getKey();
+                .map(entry -> {
+                    ApplicationSection section = entry.getKey();
 
-                List<QuestionReviewResponse> questions = entry.getValue().stream()
-                                        .sorted(Comparator.comparingInt(answer -> answer.getQuestion().getOrderNum()))
-                                        .map(answer -> {ApplicationQuestion question = answer.getQuestion();
-                                            List<String> selectedOptions = answer
-                                                            .getSelectedOptions()
-                                                            .stream()
-                                                            .sorted(Comparator.comparingInt(selected -> selected.getOption().getDisplayOrder()))
-                                                            .map(selected -> selected.getOption().getOptionText())
-                                                            .toList();
+                    List<QuestionReviewResponse> questions = entry.getValue().stream()
+                            .sorted(Comparator.comparingInt(answer -> answer.getQuestion().getOrderNum()))
+                            .map(answer -> {
+                                ApplicationQuestion question = answer.getQuestion();
+                                List<String> options = question.getOptions().stream().sorted(
+                                        Comparator.comparingInt(ApplicationQuestionOption::getDisplayOrder)
+                                ).map(ApplicationQuestionOption::getOptionText).toList();
+                                List<String> selectedOptions = answer
+                                        .getSelectedOptions()
+                                        .stream()
+                                        .sorted(Comparator.comparingInt(selected -> selected.getOption().getDisplayOrder()))
+                                        .map(selected -> selected.getOption().getOptionText())
+                                        .toList();
 
-                        return new QuestionReviewResponse(
+                                return new QuestionReviewResponse(
+                                        question.getQuestionId(),
+                                        question.getQuestionText(),
+                                        question.getQuestionType(),
+                                        question.isRequired(),
+                                        question.getOrderNum(),
+                                        answer.getAnswerText(),
+                                        options,
+                                        selectedOptions);
+                            })
+                            .toList();
 
-                                question.getQuestionId(),
+                    return new SectionReviewResponse(
+                            section.getSectionId(),
+                            section.getSectionHeading(),
+                            section.getSectionDescription(),
+                            questions
+                    );
+                })
+                .toList();
 
-                                question.getQuestionText(),
-
-                                question.getQuestionType(),
-
-                                question.isRequired(),
-
-                                question.getOrderNum(),
-
-                                answer.getAnswerText(),
-
-                                selectedOptions);
-                        })
-                        .toList();
-
-                return new SectionReviewResponse(
-                        section.getSectionId(),
-
-                        section.getSectionHeading(),
-
-                                        section.getSectionDescription(),
-
-                                        questions
-                                );
-                        })
-
-                    .toList();
-
-
-    return new ApplicationReviewResponse(
-
-            application.getApplicationId(),
-
-            application.getApplicationRole().getApplicationRoleId(),
-
-            application.getApplicationRole().getName(),
-
-            user.getFirstName(),
-
-            user.getLastName(),
-
-            user.getEmail(),
-
-            application.getCreatedAt(),
-
-            application.getSubmittedAt(),
-            
-            sections
-    );
-}
+        return new ApplicationReviewResponse(
+                application.getApplicationId(),
+                application.getApplicationRole().getApplicationRoleId(),
+                application.getApplicationRole().getName(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                application.getCreatedAt(),
+                application.getSubmittedAt(),
+                sections
+        );
+    }
 
     // =========================================================
     // ANSWER SAVING
