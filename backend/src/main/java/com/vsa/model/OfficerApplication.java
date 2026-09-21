@@ -29,13 +29,13 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @Table(
-    name = "officer_applications",
-    uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uq_officer_applications_uid_role",
-            columnNames = {"uid", "application_role_id"}
-        )
-    }
+        name = "officer_applications",
+        uniqueConstraints = {
+            @UniqueConstraint(
+                    name = "uq_officer_applications_uid_role",
+                    columnNames = {"uid", "application_role_id"}
+            )
+        }
 )
 public class OfficerApplication {
 
@@ -46,28 +46,28 @@ public class OfficerApplication {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-        name = "uid",
-        referencedColumnName = "uid",
-        nullable = false
+            name = "uid",
+            referencedColumnName = "uid",
+            nullable = false
     )
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
-        name = "application_role_id",
-        nullable = false
+            name = "application_role_id",
+            nullable = false
     )
     private ApplicationRole applicationRole;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private OfficerApplicationStatus status =
-        OfficerApplicationStatus.IN_PROGRESS;
+    private OfficerApplicationStatus status
+            = OfficerApplicationStatus.IN_PROGRESS;
 
     @Column(
-        name = "created_at",
-        nullable = false,
-        updatable = false
+            name = "created_at",
+            nullable = false,
+            updatable = false
     )
     private LocalDateTime createdAt;
 
@@ -78,11 +78,14 @@ public class OfficerApplication {
     private LocalDateTime submittedAt;
 
     @OneToMany(
-        mappedBy = "application",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+            mappedBy = "application",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
     )
     private List<ApplicationAnswer> answers = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_section_id")
+    private ApplicationSection currentSection;
 
     @PrePersist
     void onCreate() {

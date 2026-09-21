@@ -96,7 +96,7 @@ export async function getMyApplication(applicationId) {
 }
 
 
-export async function saveApplication(applicationId, answers) {
+export async function saveApplication(applicationId, answers, currentSectionId) {
     const response = await fetch(`${API_BASE_URL}/api/applications/mine/${applicationId}`,
         {
             method: "PUT",
@@ -105,6 +105,7 @@ export async function saveApplication(applicationId, answers) {
                 ...getTokenforAuthHeader()
             },
             body: JSON.stringify({
+                currentSectionId,
                 answers
             })
         }

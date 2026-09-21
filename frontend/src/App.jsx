@@ -24,6 +24,7 @@ import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
 import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
 import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
 import ApplyPage from "./guest_pages/ApplyPage.jsx";
+import MyApplicationsPage from "./guest_pages/MyApplications.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
@@ -76,6 +77,7 @@ function App() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/apply" element={<ApplyPage />} />
           <Route path="/sponsors" element={<SponsorsPage />} />
+          <Route path="/my-applications" element={<MyApplicationsPage/>}/>
         </Route>
 
         <Route

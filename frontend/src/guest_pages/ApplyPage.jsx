@@ -5,6 +5,7 @@ import "./ApplyPage.css";
 import noapplication from "../assets/guest/noapplication.png";
 import applicationBackground from "../assets/guest/officer-application-background.png";
 import { FaCheckCircle } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
 
 import {
     getRecruitmentStatus,
@@ -12,12 +13,15 @@ import {
     startApplication,
     saveApplication,
     submitApplication,
-    getMyApplications
+    getMyApplications,
+    getMyApplication
 } from "../api/Application";
 
 
 const ApplyPage = () => {
 
+    const [searchParams] = useSearchParams();
+    const resumeApplicationId = searchParams.get("resume");
     const [loading, setLoading] = useState(true);
     const [recruitmentOpen, setRecruitmentOpen] = useState(false);
 
@@ -74,6 +78,30 @@ const ApplyPage = () => {
 
                 setRoles(openRoles);
                 setMyApplications(existingApplications);
+
+                if (resumeApplicationId) {
+
+                    const applicationData = await getMyApplication(Number(resumeApplicationId));
+                    if (applicationData.status !== "IN_PROGRESS") {
+                        throw new Error("This application has already been submitted.");
+                    }
+
+                    const role = openRoles.find(role => role.applicationRoleId === applicationData.applicationRoleId);
+                    if (!role) {
+                        throw new Error("This officer role is no longer available.");
+                    }
+
+                    setSelectedRoleId(String(applicationData.applicationRoleId));
+                    setApplication(applicationData);
+                    setAnswers(convertApplicationAnswers(applicationData));
+
+                    const savedSectionIndex = role.sections.findIndex(section =>
+                                section.sectionId ===
+                                applicationData.currentSectionId
+                    );
+
+                    setCurrentStep(savedSectionIndex >= 0 ? savedSectionIndex : 0);
+                }
             }
             catch (error) {
 
@@ -95,7 +123,7 @@ const ApplyPage = () => {
 
         loadApplicationPage();
 
-    }, []);
+    }, [resumeApplicationId]);
 
 
     // =========================================================
@@ -511,9 +539,8 @@ const ApplyPage = () => {
                 const savedApplication =
                     await saveApplication(
                         currentApplication.applicationId,
-                        buildAnswerPayload(
-                            currentAnswers
-                        )
+                        buildAnswerPayload(currentAnswers),
+                        currentSection.sectionId
                     );
 
                 setApplication(

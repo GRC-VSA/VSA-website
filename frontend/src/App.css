@@ -2,3 +2,7 @@ a {
     text-decoration: none;
     color: inherit;
 }
+
+.page-footer-space-extra {
+    margin-bottom: 200px;
+}

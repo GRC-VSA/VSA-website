@@ -1505,10 +1505,29 @@ public class ApplicationService {
                 application
         );
 
-        saveAnswers(
-                application,
-                request.answers()
-        );
+        if (request.currentSectionId() != null) {
+            Long currentSectionId = request.currentSectionId();
+
+            boolean sectionBelongsToRole = sectionRoleRepository
+                            .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application
+                                            .getApplicationRole()
+                                            .getApplicationRoleId()
+                            )
+                            .stream()
+                            .anyMatch(relation -> relation
+                                            .getSection()
+                                            .getSectionId()
+                                            .equals(currentSectionId)
+                            );
+
+            if (!sectionBelongsToRole) {
+                throw new IllegalArgumentException("The current section does not belong to this application role.");
+            }
+            ApplicationSection currentSection = requireSection(currentSectionId);
+            application.setCurrentSection(currentSection);
+        }
+
+        saveAnswers(application, request.answers());
 
         /*
          * Explicitly mark the parent application as changed
@@ -2593,6 +2612,11 @@ public class ApplicationService {
                 user.getEmail(),
                 application.getStatus(),
                 answers,
+                application.getCurrentSection() == null
+                ? null
+                : application
+                        .getCurrentSection()
+                        .getSectionId(),
                 application.getCreatedAt(),
                 application.getUpdatedAt(),
                 application.getSubmittedAt()

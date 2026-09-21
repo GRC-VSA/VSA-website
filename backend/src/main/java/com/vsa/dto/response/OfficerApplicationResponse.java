@@ -25,6 +25,8 @@ public record OfficerApplicationResponse(
 
     List<ApplicationAnswerResponse> answers,
 
+    Long currentSectionId,
+    
     LocalDateTime createdAt,
 
     LocalDateTime updatedAt,

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 
 public record SaveApplicationRequest(
 
+    Long currentSectionId,
+    
     @NotNull
     List<@Valid ApplicationAnswerRequest> answers
 
