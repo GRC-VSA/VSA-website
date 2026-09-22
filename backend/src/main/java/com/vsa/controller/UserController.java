@@ -20,12 +20,12 @@ import com.vsa.dto.request.AccountResendRequest;
 import com.vsa.dto.request.AccountVerificationRequest;
 import com.vsa.dto.request.ChangeEmailRequest;
 import com.vsa.dto.request.ChangePasswordRequest;
+import com.vsa.dto.request.RegisterUserRequest;
 import com.vsa.dto.request.UpdateProfileRequest;
 import com.vsa.dto.request.VerifyEmailChangeRequest;
 import com.vsa.dto.response.AccountVerificationStartResponse;
 import com.vsa.dto.response.EmailChangeStartResponse;
 import com.vsa.dto.response.UserProfileResponse;
-import com.vsa.model.User;
 import com.vsa.service.UserService;
 
 import jakarta.validation.Valid;
@@ -78,8 +78,8 @@ public class UserController {
    * @return ResponseEntity with status 201 (Created) and the verification session details
    */
   @PostMapping("/register")
-  public ResponseEntity<AccountVerificationStartResponse> registerUser(@RequestBody User user) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(user));
+  public ResponseEntity<AccountVerificationStartResponse> registerUser(@RequestBody RegisterUserRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(request));
   }
 
   /**
