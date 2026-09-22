@@ -38,8 +38,13 @@ const Navbar = () => {
       )
     }
   }
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
+  const closeMobileMenu = (event, pageName) => {
+    setIsMobileMenuOpen(false);
+    if (pageName !== "apply") {
+      return;
+    }
+    handleApplyClick(event);
+  }
   let isOfficer = false;
   if (user !== null) {
     if (user.role === "officer" || user.role === "president") {
@@ -99,7 +104,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-background" ref={navbarBackgroundRef}>
-        <NavLink to="/" className="logo-div" onClick={closeMobileMenu}>
+        <NavLink to="/" className="logo-div" onClick={(event) => closeMobileMenu(event, "homepage")}>
           <img src={VSA_coloredlogo} alt={"vsa-logo-red"} className="logo"></img>
         </NavLink>
 
@@ -200,19 +205,27 @@ const Navbar = () => {
       </div>
 
       <div className={`mobile-menu ${isMobileMenuOpen ? "mobile-menu-open" : ""}`}>
-        <NavLink to="/events" className="mobile-nav-link" onClick={closeMobileMenu}>
+        <NavLink to="/events" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "events")}>
           Events
         </NavLink>
-        <NavLink to="/products" className="mobile-nav-link" onClick={closeMobileMenu}>
+        <NavLink to="/products" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "products")}>
           Products
         </NavLink>
-        <NavLink to="/our-team" className="mobile-nav-link" onClick={closeMobileMenu}>
+        <NavLink to="/our-team" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "our-team")}>
           Our Team
         </NavLink>
-        <NavLink to="/apply" className="mobile-nav-link" onClick={closeMobileMenu}>
+        {
+          /* Next dev, plz also change closeMobileMenu logic if you change mobile code here.
+             Backend requires guests to sign-in and be authenticated to view the apply page.
+             So always navigate guests to sign-in page if they are unauthenticated as they click on
+             the apply page
+             closeMobileMenu(event, "apply") will navigate them to signin page
+          */
+        }
+        <NavLink to="/apply" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "apply")}>
           Apply
         </NavLink>
-        <NavLink to="/sponsors" className="mobile-nav-link" onClick={closeMobileMenu}>
+        <NavLink to="/sponsors" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "sponsors")}>
           Sponsors
         </NavLink>
 
@@ -220,16 +233,19 @@ const Navbar = () => {
 
         {user ? (
           <>
-            <NavLink to="/setting" className="mobile-nav-link" onClick={closeMobileMenu}>
-              Setting
+            <NavLink to="/profile" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "profile")}>
+              Profile
+            </NavLink>
+            <NavLink to="/my-applications" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "my-application")}>
+              Applications
             </NavLink>
             {isOfficer && (
               <button
                 type="button"
                 className="mobile-nav-link mobile-nav-button"
-                onClick={() => { closeMobileMenu(); navigate("/officer"); }}
+                onClick={(event) => { closeMobileMenu(event, "others"); replaceLocation("/officer"); }}
               >
-                To Officer Board
+                Officer site
               </button>
             )}
             <button type="button" className="mobile-nav-link mobile-nav-button" onClick={handleLogOut}>
@@ -237,7 +253,7 @@ const Navbar = () => {
             </button>
           </>
         ) : (
-          <NavLink to="/sign-in" className="mobile-nav-link" onClick={closeMobileMenu}>
+          <NavLink to="/sign-in" className="mobile-nav-link" onClick={(event) => closeMobileMenu(event, "sign-in")}>
             Sign-in
           </NavLink>
         )}
