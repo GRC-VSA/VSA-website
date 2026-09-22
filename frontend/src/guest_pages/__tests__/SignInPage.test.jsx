@@ -5,7 +5,6 @@ import {
     fireEvent,
     waitFor
 } from "@testing-library/react";
-
 import { MemoryRouter } from "react-router-dom";
 import {
     describe,
@@ -41,7 +40,6 @@ vi.mock("react-router-dom", async () => {
         useNavigate: () =>
             mockNavigate,
     };
-
 });
 
 
@@ -112,7 +110,7 @@ describe("SignInPage", () => {
         async () => {
 
             mockLogin.mockResolvedValueOnce({
-                role: "officer"
+                role: "officer",
             });
 
 
@@ -127,7 +125,7 @@ describe("SignInPage", () => {
                 screen.getByLabelText(/Email/i),
                 {
                     target: {
-                        value: "officer@vsa.com"
+                        value: "officer@vsa.com",
                     },
                 }
             );
@@ -137,7 +135,7 @@ describe("SignInPage", () => {
                 screen.getByLabelText(/Password/i),
                 {
                     target: {
-                        value: "password123"
+                        value: "password123",
                     },
                 }
             );
@@ -153,17 +151,19 @@ describe("SignInPage", () => {
 
             await waitFor(() => {
 
-                expect(mockLogin)
-                    .toHaveBeenCalledWith({
-                        email: "officer@vsa.com",
-                        password: "password123",
-                    });
+                expect(
+                    mockLogin
+                ).toHaveBeenCalledWith({
+                    email: "officer@vsa.com",
+                    password: "password123",
+                });
 
 
-                expect(replaceLocation)
-                    .toHaveBeenCalledWith(
-                        "/officer"
-                    );
+                expect(
+                    replaceLocation
+                ).toHaveBeenCalledWith(
+                    "/officer"
+                );
 
             });
 
@@ -193,7 +193,7 @@ describe("SignInPage", () => {
                 screen.getByLabelText(/Email/i),
                 {
                     target: {
-                        value: "wrong@vsa.com"
+                        value: "wrong@vsa.com",
                     },
                 }
             );
@@ -203,7 +203,7 @@ describe("SignInPage", () => {
                 screen.getByLabelText(/Password/i),
                 {
                     target: {
-                        value: "badpass"
+                        value: "badpass",
                     },
                 }
             );

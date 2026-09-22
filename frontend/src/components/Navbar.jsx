@@ -4,6 +4,7 @@ import { LuSearch, LuMenu, LuX } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
+import { replaceLocation } from "../utils/navigation.js";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png"
 import "./Navbar.css";
 
@@ -21,18 +22,18 @@ const Navbar = () => {
   const handleLogOut = () => {
     logout();
     setIsMobileMenuOpen(false);
-    window.location.replace("/");
+    replaceLocation("/");
   }
 
   const handleApplyClick = (event) => {
     event.preventDefault();
     if (!isAuthenticated) {
 
-      window.location.replace(
+      replaceLocation(
         `/sign-in?redirect=/apply&from=${encodeURIComponent(currentPage)}`
       )
     } else {
-      window.location.replace(
+      replaceLocation(
         "/apply"
       )
     }
