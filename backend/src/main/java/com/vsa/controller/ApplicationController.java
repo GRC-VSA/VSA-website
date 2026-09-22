@@ -41,6 +41,7 @@ public class ApplicationController {
         return applicationService.getMyApplications(principal.getName());
     }
 
+    //This endpoint is for resuming an IN_PROGRESS application.
     @GetMapping("/mine/{applicationId}")
     public OfficerApplicationResponse getMyApplication(Principal principal, @PathVariable Integer applicationId) {
         return applicationService.getMyApplication(principal.getName(), applicationId);
@@ -53,6 +54,18 @@ public class ApplicationController {
             @Valid @RequestBody SaveApplicationRequest request
     ) {
         return applicationService.saveApplication(principal.getName(), applicationId, request);
+    }
+
+    // This endpoint is for users to review their submitted applications. Those are read-only.
+    @GetMapping("/mine/{applicationId}/review")
+    public ApplicationReviewResponse getMySubmittedApplicationReview(
+            Principal principal,
+            @PathVariable Integer applicationId
+    ) {
+        return applicationService.getMySubmittedApplicationReview(
+                principal.getName(),
+                applicationId
+        );
     }
 
     @PostMapping("/mine/{applicationId}/submit")

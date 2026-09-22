@@ -5,26 +5,123 @@ import "./ApplyPage.css";
 import noapplication from "../assets/guest/noapplication.png";
 import applicationBackground from "../assets/guest/officer-application-background.png";
 import { FaCheckCircle } from "react-icons/fa";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMyApplications } from "../context/MyApplicationsContext.jsx";
 
 import {
     getRecruitmentStatus,
     getOpenApplicationRoles,
     startApplication,
     saveApplication,
-    submitApplication
+    submitApplication,
+    getMyApplications,
+    getMyApplication
 } from "../api/Application";
 
+import BackToVSAButton from "../components/BackToVSAButton.jsx";
 
+const convertApplicationAnswers = (
+    applicationData
+) => {
+
+    const restoredAnswers = {};
+
+
+    for (
+        const answer of applicationData.answers || []
+    ) {
+
+        restoredAnswers[
+            answer.questionId
+        ] = {
+
+            answerText:
+                answer.answerText ?? "",
+
+            optionIds:
+                answer.selectedOptionIds || []
+
+        };
+    }
+
+
+    return restoredAnswers;
+};
 const ApplyPage = () => {
 
-    const [loading, setLoading] = useState(true);
-    const [recruitmentOpen, setRecruitmentOpen] = useState(false);
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const resumeApplicationId = searchParams.get("resume");
+    const {
+        applications: cachedApplications,
+        applicationsById,
+        applyPageData,
+        loadMyApplications,
+        loadMyApplication,
+        loadApplyPageData,
+        upsertApplication
+    } = useMyApplications();
+    const cachedResumeApplication =
+        resumeApplicationId
+            ? applicationsById[
+            String(resumeApplicationId)
+            ]
+            : null;
+    const initialRoles =
+        applyPageData?.openRoles || [];
 
-    const [roles, setRoles] = useState([]);
-    const [selectedRoleId, setSelectedRoleId] = useState("");
+    const initialRole =
+        cachedResumeApplication
+            ? initialRoles.find(
+                role =>
+                    role.applicationRoleId ===
+                    cachedResumeApplication.applicationRoleId
+            )
+            : null;
+    const initialStep =
+        initialRole
+            ? initialRole.sections.findIndex(
+                section =>
+                    section.sectionId ===
+                    cachedResumeApplication.currentSectionId
+            )
+            : 0;
+    const myApplications = cachedApplications || [];
+    const [loading, setLoading] =
+        useState(
+            !applyPageData ||
+            (
+                resumeApplicationId &&
+                !cachedResumeApplication
+            )
+        );
+    const [recruitmentOpen, setRecruitmentOpen] =
+        useState(
+            applyPageData
+                ?.recruitmentStatus
+                ?.recruitmentOpen
+            ?? false
+        );
+    const [roles, setRoles] =
+        useState(
+            initialRoles
+        );
+    const [selectedRoleId, setSelectedRoleId] =
+        useState(
+            cachedResumeApplication
+                ? String(
+                    cachedResumeApplication.applicationRoleId
+                )
+                : ""
+        );
+    const [application, setApplication] =
+        useState(
+            cachedResumeApplication || null
+        );
 
-    const [application, setApplication] = useState(null);
 
+    const [showDraftPrompt, setShowDraftPrompt] =
+        useState(false);
     /*
      * {
      *   questionId: {
@@ -33,11 +130,23 @@ const ApplyPage = () => {
      *   }
      * }
      */
-    const [answers, setAnswers] = useState({});
+    const [answers, setAnswers] =
+        useState(
+            cachedResumeApplication
+                ? convertApplicationAnswers(
+                    cachedResumeApplication
+                )
+                : {}
+        );
 
-    const [currentStep, setCurrentStep] = useState(0);
-
+    const [currentStep, setCurrentStep] =
+        useState(
+            initialStep >= 0
+                ? initialStep
+                : 0
+        );
     const [saving, setSaving] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState("");
 
 
@@ -49,37 +158,229 @@ const ApplyPage = () => {
 
         const loadApplicationPage = async () => {
 
+            /*
+             * NORMAL NAVIGATION:
+             *
+             * MyApplicationsPage already preloaded everything
+             * before navigating here.
+             *
+             * Since the component state was initialized from
+             * the Context cache, there is nothing else to wait for.
+             */
+            if (
+                applyPageData &&
+                (
+                    !resumeApplicationId ||
+                    cachedResumeApplication
+                )
+            ) {
+
+                setLoading(false);
+                return;
+
+            }
+
+
+            /*
+             * DIRECT NAVIGATION / PAGE REFRESH:
+             *
+             * Example:
+             * /apply
+             *
+             * or:
+             * /apply?resume=5
+             *
+             * The Context cache may be empty, so load the
+             * required data here.
+             */
             try {
 
                 setLoading(true);
                 setError("");
 
-                const status =
-                    await getRecruitmentStatus();
+
+                const [
+                    loadedApplyPageData,
+                    loadedApplication
+                ] = await Promise.all([
+
+                    loadApplyPageData(),
+
+                    resumeApplicationId
+                        ? loadMyApplication(
+                            Number(
+                                resumeApplicationId
+                            )
+                        )
+                        : Promise.resolve(null),
+
+                    /*
+                     * We don't need the returned value here.
+                     * loadMyApplications() puts the list
+                     * into the shared Context cache.
+                     */
+                    loadMyApplications()
+
+                ]);
+
+
+                // ================================================
+                // RECRUITMENT STATUS
+                // ================================================
+
+                const recruitmentIsOpen =
+                    loadedApplyPageData
+                        .recruitmentStatus
+                        .recruitmentOpen;
+
 
                 setRecruitmentOpen(
-                    status.recruitmentOpen
+                    recruitmentIsOpen
                 );
 
 
-                if (!status.recruitmentOpen) {
+                /*
+                 * If recruitment is closed, the normal
+                 * "recruitment closed" UI can render.
+                 */
+                if (!recruitmentIsOpen) {
                     return;
                 }
 
 
-                const openRoles =
-                    await getOpenApplicationRoles();
+                // ================================================
+                // ROLES / SECTIONS / QUESTIONS
+                // ================================================
 
-                setRoles(openRoles);
+                const openRoles =
+                    loadedApplyPageData.openRoles || [];
+
+
+                setRoles(
+                    openRoles
+                );
+
+
+                // ================================================
+                // NORMAL /apply
+                // ================================================
+
+                /*
+                 * No ?resume=...
+                 *
+                 * Nothing else needs to be restored.
+                 */
+                if (!resumeApplicationId) {
+                    return;
+                }
+
+
+                // ================================================
+                // RESUME APPLICATION
+                // ================================================
+
+                if (!loadedApplication) {
+
+                    throw new Error(
+                        "Application could not be loaded."
+                    );
+
+                }
+
+
+                /*
+                 * A completed application should not be
+                 * resumed through the editable Apply page.
+                 */
+                if (
+                    loadedApplication.status !==
+                    "IN_PROGRESS"
+                ) {
+
+                    throw new Error(
+                        "This application has already been submitted."
+                    );
+
+                }
+
+
+                // ================================================
+                // FIND THE APPLICATION'S ROLE
+                // ================================================
+
+                const role =
+                    openRoles.find(
+                        role =>
+                            role.applicationRoleId ===
+                            loadedApplication.applicationRoleId
+                    );
+
+
+                /*
+                 * The role might have stopped recruiting after
+                 * the student originally started the application.
+                 */
+                if (!role) {
+
+                    throw new Error(
+                        "This officer role is no longer available."
+                    );
+
+                }
+
+
+                // ================================================
+                // RESTORE APPLICATION
+                // ================================================
+
+                setApplication(
+                    loadedApplication
+                );
+
+
+                setSelectedRoleId(
+                    String(
+                        loadedApplication
+                            .applicationRoleId
+                    )
+                );
+
+
+                setAnswers(
+                    convertApplicationAnswers(
+                        loadedApplication
+                    )
+                );
+
+
+                // ================================================
+                // RESTORE LAST SAVED SECTION
+                // ================================================
+
+                const savedSectionIndex =
+                    (role.sections || [])
+                        .findIndex(
+                            section =>
+                                section.sectionId ===
+                                loadedApplication.currentSectionId
+                        );
+
+
+                setCurrentStep(
+                    savedSectionIndex >= 0
+                        ? savedSectionIndex
+                        : 0
+                );
 
             }
             catch (error) {
 
                 console.error(error);
 
+
                 setError(
                     error.message ||
-                    "Failed to load officer applications."
+                    "Failed to load officer application."
                 );
 
             }
@@ -88,31 +389,43 @@ const ApplyPage = () => {
                 setLoading(false);
 
             }
+
         };
 
 
         loadApplicationPage();
 
-    }, []);
+    }, [
+        applyPageData,
+        cachedResumeApplication,
+        resumeApplicationId,
+        loadApplyPageData,
+        loadMyApplication,
+        loadMyApplications
+    ]);
 
+    const incompleteApplications = myApplications.filter(application =>
+        application.status === "IN_PROGRESS"
+        &&
+        roles.some(role => role.applicationRoleId === application.applicationRoleId)
+    );
 
     // =========================================================
     // ROLE / SECTION INFORMATION
     // =========================================================
 
-    const selectedRole =
-        roles.find(role =>
-            role.applicationRoleId ===
-            Number(selectedRoleId)
-        );
+    const selectedRole = roles.find(role => role.applicationRoleId === Number(selectedRoleId));
+    const completedApplicationForSelectedRole = myApplications.find(application =>
+        application.applicationRoleId === Number(selectedRoleId) && application.status === "COMPLETED");
 
+    const alreadySubmitted = Boolean(completedApplicationForSelectedRole);
 
     /*
-     * Get to Know You exists on every role.
-     *
-     * We find it independently so Step 1 can render
-     * BEFORE a role is selected.
-     */
+    * Get to Know You exists on every role.
+    *
+    * We find it independently so Step 1 can render
+    * BEFORE a role is selected.
+    */
     const getToKnowYouSection =
         roles
             .flatMap(
@@ -127,14 +440,14 @@ const ApplyPage = () => {
 
 
     /*
-     * Before role selection:
-     *
-     * sections = [Get to Know You]
-     *
-     * After role selection:
-     *
-     * sections = all sections belonging to that role
-     */
+    * Before role selection:
+    *
+    * sections = [Get to Know You]
+    *
+    * After role selection:
+    *
+    * sections = all sections belonging to that role
+    */
     const sections =
         selectedRole
             ? selectedRole.sections || []
@@ -156,10 +469,10 @@ const ApplyPage = () => {
     // =========================================================
 
     /*
-     * Before the user selects a role, we don't actually
-     * know how many steps there are because each role can
-     * have different sections.
-     */
+    * Before the user selects a role, we don't actually
+    * know how many steps there are because each role can
+    * have different sections.
+    */
     const progressLabel =
         selectedRole
             ? `Step ${currentStep + 1} of ${sections.length}`
@@ -181,7 +494,7 @@ const ApplyPage = () => {
     // =========================================================
 
     const handleRoleChange = (event) => {
-
+        setSaveSuccess(false);
         const roleId =
             event.target.value;
 
@@ -201,7 +514,7 @@ const ApplyPage = () => {
     // =========================================================
 
     const handleTextAnswerChange = (questionId, value) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => ({
 
             ...previous,
@@ -227,7 +540,7 @@ const ApplyPage = () => {
         questionId,
         optionId
     ) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => ({
 
             ...previous,
@@ -255,7 +568,7 @@ const ApplyPage = () => {
         optionId,
         checked
     ) => {
-
+        setSaveSuccess(false);
         setAnswers(previous => {
 
             const existingOptions =
@@ -300,38 +613,19 @@ const ApplyPage = () => {
         });
     };
 
+    const handleResumeDraft = (applicationId) => {
+        setShowDraftPrompt(false);
+        navigate(`/apply?resume=${applicationId}`);
+    };
+
+    const handleDismissDraftPrompt = () => {
+        setShowDraftPrompt(false);
+    };
 
     // =========================================================
     // CONVERT BACKEND ANSWERS
     // =========================================================
 
-    const convertApplicationAnswers = (
-        applicationData
-    ) => {
-
-        const restoredAnswers = {};
-
-
-        for (
-            const answer of applicationData.answers || []
-        ) {
-
-            restoredAnswers[
-                answer.questionId
-            ] = {
-
-                answerText:
-                    answer.answerText ?? "",
-
-                optionIds:
-                    answer.selectedOptionIds || []
-
-            };
-        }
-
-
-        return restoredAnswers;
-    };
 
 
     // =========================================================
@@ -477,15 +771,21 @@ const ApplyPage = () => {
         async () => {
 
             try {
-
+                if (alreadySubmitted) {
+                    return;
+                }
                 setSaving(true);
                 setError("");
-
+                setSaveSuccess(false);
 
                 const { currentApplication, currentAnswers } = await ensureApplicationStarted();
-                console.log("APPLICATION:", currentApplication);
-                console.log("SECTIONS:", sections);
-                console.log("CURRENT STEP:", currentStep);
+                // console.log("APPLICATION:", currentApplication);
+                // console.log("SECTIONS:", sections);
+                // console.log("CURRENT STEP:", currentStep);
+                console.log(
+                    "STATUS BEFORE SAVE:",
+                    currentApplication.status
+                );
 
 
                 /*
@@ -504,16 +804,15 @@ const ApplyPage = () => {
                 const savedApplication =
                     await saveApplication(
                         currentApplication.applicationId,
-                        buildAnswerPayload(
-                            currentAnswers
-                        )
+                        buildAnswerPayload(currentAnswers),
+                        currentSection.sectionId
                     );
-
 
                 setApplication(
                     savedApplication
                 );
-
+                upsertApplication(savedApplication);
+                setSaveSuccess(true);
             }
             catch (error) {
 
@@ -535,7 +834,9 @@ const ApplyPage = () => {
     const handleNext = (event) => {
 
         event.preventDefault();
-
+        if (alreadySubmitted) {
+            return;
+        }
         if (!selectedRoleId) {
             setError(
                 "Please select the officer role you are applying for."
@@ -589,7 +890,9 @@ const ApplyPage = () => {
         async (event) => {
 
             event.preventDefault();
-
+            if (alreadySubmitted) {
+                return;
+            }
 
             try {
                 setSaving(true);
@@ -614,7 +917,7 @@ const ApplyPage = () => {
                 );
 
                 setApplication(submittedApplication);
-
+                upsertApplication(submittedApplication);
             }
             catch (error) {
 
@@ -714,7 +1017,6 @@ const ApplyPage = () => {
     // =========================================================
 
     return (
-
         <main
             className="officer-application-page page-footer-space"
             style={{
@@ -722,7 +1024,114 @@ const ApplyPage = () => {
                     `url(${applicationBackground})`
             }}
         >
+            <div className="to-website-btn">
+                <BackToVSAButton />
+            </div>
+            {showDraftPrompt &&
+                incompleteApplications.length > 0 && (
 
+                    <div className="application-resume-modal-overlay">
+
+                        <div
+                            className="application-resume-modal"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="resume-application-title"
+                        >
+
+                            <span className="application-resume-eyebrow">
+                                SAVED APPLICATION
+                            </span>
+
+
+                            <h2 id="resume-application-title">
+
+                                {
+                                    incompleteApplications.length === 1
+
+                                        ? "You have an incomplete application"
+
+                                        : "You have incomplete applications"
+                                }
+
+                            </h2>
+
+
+                            <p>
+
+                                {
+                                    incompleteApplications.length === 1
+
+                                        ? `You have an incomplete application for the ${incompleteApplications[0].roleName
+                                        } role. Do you want to continue applying?`
+
+                                        : "Choose an application to continue where you left off."
+                                }
+
+                            </p>
+
+
+                            <div className="application-resume-drafts">
+
+                                {
+                                    incompleteApplications.map(
+                                        draft => (
+
+                                            <div
+                                                key={
+                                                    draft.applicationId
+                                                }
+                                                className="application-resume-draft"
+                                            >
+
+                                                <div>
+
+                                                    <strong>
+                                                        {draft.roleName}
+                                                    </strong>
+
+                                                    <span>
+                                                        Application in progress
+                                                    </span>
+
+                                                </div>
+
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleResumeDraft(
+                                                            draft.applicationId
+                                                        )
+                                                    }
+                                                >
+                                                    Continue
+                                                </button>
+
+                                            </div>
+
+                                        )
+                                    )
+                                }
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                className="application-resume-dismiss"
+                                onClick={
+                                    handleDismissDraftPrompt
+                                }
+                            >
+                                Start a new application
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                )}
             <div className="officer-application-card">
 
 
@@ -871,7 +1280,7 @@ const ApplyPage = () => {
                                                             ]
                                                         }
 
-                                                        disabled={saving}
+                                                        disabled={saving || alreadySubmitted}
 
                                                         onTextChange={
                                                             handleTextAnswerChange
@@ -943,6 +1352,11 @@ const ApplyPage = () => {
                                                         )}
 
                                                     </select>
+                                                    {alreadySubmitted && (
+                                                        <p className="application-already-submitted">
+                                                            You have already submitted an application for this role.
+                                                        </p>
+                                                    )}
 
                                                 </div>
 
@@ -951,7 +1365,11 @@ const ApplyPage = () => {
 
                                     </div>
 
-
+                                    {
+                                        saveSuccess && (
+                                            <p className="application-save-success">Application progress has been saved!</p>
+                                        )
+                                    }
                                     <div className="application-actions">
 
 
@@ -973,10 +1391,7 @@ const ApplyPage = () => {
                                             type="button"
                                             className="application-save-button"
                                             onClick={handleSaveProgress}
-                                            disabled={
-                                                saving ||
-                                                !selectedRoleId
-                                            }
+                                            disabled={saving || !selectedRoleId || alreadySubmitted}
                                         >
 
                                             {
@@ -997,7 +1412,7 @@ const ApplyPage = () => {
                                                     <button
                                                         type="submit"
                                                         className="application-next-button"
-                                                        disabled={saving}
+                                                        disabled={saving || alreadySubmitted}
                                                     >
 
                                                         Next
@@ -1017,7 +1432,7 @@ const ApplyPage = () => {
                                                         <button
                                                             type="submit"
                                                             className="application-submit-button"
-                                                            disabled={saving}
+                                                            disabled={saving || alreadySubmitted}
                                                         >
 
                                                             Submit Application

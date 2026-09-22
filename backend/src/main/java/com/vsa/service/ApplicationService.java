@@ -1505,10 +1505,29 @@ public class ApplicationService {
                 application
         );
 
-        saveAnswers(
-                application,
-                request.answers()
-        );
+        if (request.currentSectionId() != null) {
+            Long currentSectionId = request.currentSectionId();
+
+            boolean sectionBelongsToRole = sectionRoleRepository
+                    .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application
+                            .getApplicationRole()
+                            .getApplicationRoleId()
+                    )
+                    .stream()
+                    .anyMatch(relation -> relation
+                    .getSection()
+                    .getSectionId()
+                    .equals(currentSectionId)
+                    );
+
+            if (!sectionBelongsToRole) {
+                throw new IllegalArgumentException("The current section does not belong to this application role.");
+            }
+            ApplicationSection currentSection = requireSection(currentSectionId);
+            application.setCurrentSection(currentSection);
+        }
+
+        saveAnswers(application, request.answers());
 
         /*
          * Explicitly mark the parent application as changed
@@ -1623,6 +1642,30 @@ public class ApplicationService {
         );
     }
 
+    public ApplicationReviewResponse getMySubmittedApplicationReview(
+            String email,
+            Integer applicationId
+    ) {
+
+        OfficerApplication application
+                = requireOwnedApplication(
+                        email,
+                        applicationId
+                );
+
+        if (application.getStatus()
+                != OfficerApplicationStatus.COMPLETED) {
+
+            throw new IllegalArgumentException(
+                    "Only submitted applications can be viewed."
+            );
+        }
+
+        return buildApplicationReviewResponse(
+                application
+        );
+    }
+
     // =========================================================
     // OFFICER APPLICATION REVIEW
     // =========================================================
@@ -1655,6 +1698,7 @@ public class ApplicationService {
         );
     }
 
+    //For officers to view overview of all completed applications
     public ApplicationOverviewResponse getApplicationOverview() {
 
         // Application overview board only display COMPLETED applications for greater good and hide uncompleted application
@@ -1678,22 +1722,26 @@ public class ApplicationService {
         return new ApplicationOverviewResponse(totalApplicants, averageApplicationSeconds);
     }
 
+    //For officers to view one completed application in detail
     public ApplicationReviewResponse getSubmittedApplicationReview(Integer applicationId) {
         OfficerApplication application = requireApplication(applicationId);
 
         if (application.getStatus() != OfficerApplicationStatus.COMPLETED) {
             throw new IllegalArgumentException("Only completed applications can be reviewed.");
         }
+        return buildApplicationReviewResponse(application);
+    }
+
+    private ApplicationReviewResponse buildApplicationReviewResponse(OfficerApplication application) {
 
         User user = application.getUser();
-        List<ApplicationAnswer> answers = answerRepository.findByApplicationApplicationId(applicationId);
+        List<ApplicationAnswer> answers = answerRepository.findByApplicationApplicationId(application.getApplicationId());
 
         Map<Long, Integer> sectionOrder = new LinkedHashMap<>();
         for (ApplicationSectionRole relation : sectionRoleRepository
                 .findByApplicationRoleApplicationRoleIdOrderByDisplayOrderAsc(application.getApplicationRole().getApplicationRoleId())) {
 
             sectionOrder.put(relation.getSection().getSectionId(), relation.getDisplayOrder());
-
         }
 
 
@@ -2593,6 +2641,11 @@ public class ApplicationService {
                 user.getEmail(),
                 application.getStatus(),
                 answers,
+                application.getCurrentSection() == null
+                ? null
+                : application
+                        .getCurrentSection()
+                        .getSectionId(),
                 application.getCreatedAt(),
                 application.getUpdatedAt(),
                 application.getSubmittedAt()

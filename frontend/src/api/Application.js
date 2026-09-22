@@ -95,8 +95,27 @@ export async function getMyApplication(applicationId) {
     return response.json();
 }
 
+export async function getMySubmittedApplicationReview(applicationId) {
+    const response = await fetch(`${API_BASE_URL}/api/applications/mine/${applicationId}/review`,
+        {
+            headers: {
+                ...getTokenforAuthHeader()
+            }
+        }
+    );
 
-export async function saveApplication(applicationId, answers) {
+    if (!response.ok) {
+        throw new Error(
+            await getErrorMessage(
+                response,
+                "Failed to fetch submitted application."
+            )
+        );
+    }
+
+    return response.json();
+}
+export async function saveApplication(applicationId, answers, currentSectionId) {
     const response = await fetch(`${API_BASE_URL}/api/applications/mine/${applicationId}`,
         {
             method: "PUT",
@@ -105,6 +124,7 @@ export async function saveApplication(applicationId, answers) {
                 ...getTokenforAuthHeader()
             },
             body: JSON.stringify({
+                currentSectionId,
                 answers
             })
         }

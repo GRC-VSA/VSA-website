@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";
 import useDocumentTitle from "../hooks/useDocumentTitle.js";
-
+import { replaceLocation } from "../utils/navigation.js";
 import "./AuthPages.css"
 
 const SignInPage = () => {
@@ -31,7 +31,7 @@ const SignInPage = () => {
         try {
             const user = await login({ email: form.email, password: form.password });
             if (user.role === "officer" || user.role === "president") {
-                navigate("/officer");
+                replaceLocation("/officer");
                 return;
             }
             const params = new URLSearchParams(window.location.search);
@@ -42,7 +42,7 @@ const SignInPage = () => {
                 return;
             }
 
-            navigate("/");
+            replaceLocation("/");
 
         } catch (err) {
             setError(err.message || "Invalid email or password");

@@ -1,0 +1,219 @@
+.my-applications-page {
+    width: min(1100px, calc(100% - 40px));
+    min-height: 70vh;
+
+    margin: 0 auto;
+    padding-top: 120px;
+}
+
+.my-applications-page-loading {
+    min-height: 70vh;
+    padding-top: 120px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-footer-space-extra {
+    margin-bottom: 500px;
+}
+
+.page-footer-space-extra-2 {
+    margin-bottom: 500px;
+}
+
+
+.my-applications-header {
+    margin-bottom: 40px;
+}
+
+
+.my-applications-header>span {
+    color: #c22e2d;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+
+.my-applications-header h1 {
+    margin: 8px 0 8px;
+
+    font-size: 2.5rem;
+}
+
+
+.my-applications-header p {
+    margin: 0;
+
+    color: #666;
+}
+
+
+.my-applications-list {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.my-application-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 28px 32px;
+
+    background: white;
+
+    border: 1px solid #e2e2e2;
+    border-radius: 18px;
+}
+
+
+.my-application-info {
+    flex: 1;
+}
+
+
+.my-application-title-row {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.my-application-title-row h2 {
+    margin: 0;
+
+    font-size: 1.3rem;
+}
+
+
+.my-application-status {
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+
+.my-application-status.in-progress {
+    color: #8a6500;
+
+    background: #fff3cd;
+}
+
+
+.my-application-status.completed {
+    color: #176b36;
+
+    background: #dff3e6;
+}
+
+
+.my-application-date {
+    margin: 8px 0 0;
+
+    color: #777;
+
+    font-size: 0.9rem;
+}
+
+
+.my-application-actions button {
+    min-width: 150px;
+
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-weight: 700;
+}
+
+
+.my-application-resume-button {
+    color: white;
+
+    background: #c22e2d;
+}
+
+
+.my-application-view-button {
+    color: #c22e2d;
+
+    background: #ece0a6;
+}
+
+
+.my-applications-error {
+    margin-bottom: 20px;
+
+    color: #c22e2d;
+}
+
+
+.my-applications-empty {
+    padding: 50px;
+
+    text-align: center;
+
+    background: white;
+
+    border: 1px solid #e2e2e2;
+    border-radius: 18px;
+}
+
+
+.my-applications-empty h2 {
+    margin-top: 0;
+}
+
+
+.my-applications-empty button {
+    margin-top: 14px;
+    padding: 11px 22px;
+
+    color: white;
+    background: #c22e2d;
+
+    border: none;
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+
+@media (max-width: 700px) {
+
+    .my-application-card {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .my-application-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .my-application-actions,
+    .my-application-actions button {
+        width: 100%;
+    }
+
+}
