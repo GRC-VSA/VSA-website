@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LuSearch, LuMenu, LuX } from "react-icons/lu";
+import { LuSearch, LuMenu, LuX, LuChevronDown } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -151,7 +151,20 @@ const Navbar = () => {
           {
             user ? (
               <div className="navbar-dropdown" onClick={() => setAccountIsClicked((accountState) => !accountState)}>
-                <button type="button" className="user-account-div dropdown-trigger"><FaUser id="user-account-icon" /></button>
+                <button type="button" className="user-account-div dropdown-trigger">
+                  { //If the user has profile image, display it. Otherwise, use FaUser icon.
+                    user.profileImageUrl ? (
+                      <img src={user.profileImageUrl} className="navbar-profile-image" />
+                    ) : (<FaUser id="user-account-icon" />)
+                  }
+
+                  { //Display user name if they haven't removed them
+                    user.firstName && user.lastName && (
+                      <span className="navbar-user-name">{user.firstName} {user.lastName}</span>
+                    )
+                  }
+                  <LuChevronDown className={`navbar-account-chevron ${accountIsClicked ? "navbar-account-chevron-open" : ""}`} />
+                </button>
                 {
                   accountIsClicked && (
                     <div className="account-dropdown-menu">
