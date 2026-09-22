@@ -59,7 +59,7 @@ const MyApplicationDetail = () => {
                         navigate("/my-applications")
                     }
                 >
-                    ← Back to My Applications
+                    ← Back to My Applications Portal
                 </button>
 
 
@@ -109,16 +109,16 @@ const MyApplicationDetail = () => {
                 </h1>
 
 
+            <div className="my-application-detail-status">
+                {/* Application submitted successfully */}
                 <p>
-                    Submitted {formatDate(application.submittedAt)}
+                    Submitted Successfully:  {formatDate(application.submittedAt)}
                 </p>
+            </div>
 
             </header>
 
 
-            <div className="my-application-detail-status">
-                Application submitted successfully
-            </div>
 
 
             <div className="my-application-detail-sections">

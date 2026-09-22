@@ -1,6 +1,9 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
-import { getMyApplications, getMySubmittedApplicationReview } from "../api/Application.js";
+import {
+    getMyApplications, getMyApplication, getMySubmittedApplicationReview,
+    getRecruitmentStatus, getOpenApplicationRoles
+} from "../api/Application.js";
 
 const MyApplicationsContext = createContext(null);
 
@@ -28,12 +31,22 @@ export const MyApplicationsProvider = () => {
     const [applications, setApplicationsState] = useState(null);
 
     const [reviewsById, setReviewsById] = useState({});
+    const applicationsByIdRef = useRef({});
 
+    const oneApplicationPromisesRef = useRef(new Map());
 
+    const [applicationsById, setApplicationsById] = useState({});
+
+    const applyPageDataRef = useRef(null);
+
+    const applyPagePromiseRef = useRef(null);
+
+    const [applyPageData, setApplyPageData] = useState(null);
     const setApplications = useCallback(nextApplications => {
         applicationsRef.current = nextApplications;
         setApplicationsState(nextApplications);
     }, []);
+
 
     // APPLICATION LIST CACHE
     const loadMyApplications = useCallback(async (forceRefresh = false) => {
@@ -90,11 +103,18 @@ export const MyApplicationsProvider = () => {
 
     // UPDATE ONE APPLICATION IN CACHE
     const upsertApplication = useCallback(application => {
+        const key = String(application.applicationId);
+        const nextApplicationsById = {
+            ...applicationsByIdRef.current,
+            [key]: application
+        };
+        applicationsByIdRef.current = nextApplicationsById;
+        setApplicationsById(nextApplicationsById);
         /*
-         * If the full list hasn't been loaded,
-         * don't pretend one application is the
-         * entire list.
-         */
+        * If the full list hasn't been loaded,
+        * don't pretend one application is the
+        * entire list.
+        */
         if (applicationsRef.current === null) {
             return;
         }
@@ -125,15 +145,81 @@ export const MyApplicationsProvider = () => {
         setApplications(nextApplications);
     }, [setApplications]);
 
+    const loadMyApplication = useCallback(async (applicationId) => {
+        const key = String(applicationId);
 
+
+        if (applicationsByIdRef.current[key]) {
+            return applicationsByIdRef.current[key];
+        }
+
+
+        const existingRequest = oneApplicationPromisesRef.current.get(key);
+        if (existingRequest) {
+            return existingRequest;
+        }
+
+
+        const request = getMyApplication(applicationId)
+            .then(data => {
+
+                const nextApplications = {
+                    ...applicationsByIdRef.current,
+                    [key]: data
+                };
+
+                applicationsByIdRef.current = nextApplications;
+                setApplicationsById(nextApplications);
+                return data;
+            })
+            .finally(() => {
+                oneApplicationPromisesRef.current.delete(key);
+            });
+
+
+        oneApplicationPromisesRef.current.set(key, request);
+        return request;
+    }, []);
+
+
+    const loadApplyPageData = useCallback(async () => {
+        if (applyPageDataRef.current) {
+            return applyPageDataRef.current;
+        }
+
+        if (applyPagePromiseRef.current) {
+            return applyPagePromiseRef.current;
+        }
+
+        const request = Promise.all([getRecruitmentStatus(), getOpenApplicationRoles()])
+            .then(
+                ([recruitmentStatus, openRoles]) => {
+                    const data = { recruitmentStatus, openRoles };
+                    applyPageDataRef.current = data;
+                    setApplyPageData(data);
+                    return data;
+                }
+            )
+            .finally(() => {
+                applyPagePromiseRef.current = null;
+            });
+
+
+        applyPagePromiseRef.current = request;
+        return request;
+
+    }, []);
     return (
         <MyApplicationsContext.Provider
             value={{
                 applications,
+                applicationsById,
+                applyPageData,
                 reviewsById,
-
+                loadMyApplication,
                 loadMyApplications,
                 loadApplicationReview,
+                loadApplyPageData,
                 upsertApplication
             }}
         >

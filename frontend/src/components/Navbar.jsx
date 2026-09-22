@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { LuSearch, LuMenu, LuX } from "react-icons/lu";
 import { FaUser } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png"
 import "./Navbar.css";
 
@@ -15,12 +15,13 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navbarBackgroundRef = useRef(null);
   const navbarPagesRef = useRef(null);
-
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPage = location.pathname + location.search;
   const handleLogOut = () => {
     logout();
     setIsMobileMenuOpen(false);
-    navigate("/");
+    window.location.replace("/");
   }
 
   const handleApplyClick = (event) => {
@@ -28,7 +29,7 @@ const Navbar = () => {
     if (!isAuthenticated) {
 
       window.location.replace(
-        "/sign-in?redirect=/apply"
+        `/sign-in?redirect=/apply&from=${encodeURIComponent(currentPage)}`
       )
     } else {
       window.location.replace(

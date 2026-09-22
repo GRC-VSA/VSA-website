@@ -4,6 +4,7 @@
 
 .apply-page {
     min-height: 100vh;
+    position: relative;
 }
 
 
@@ -24,6 +25,11 @@
     padding: 40px 24px;
 }
 
+.to-website-btn {
+    position: absolute;
+    bottom: 10%;
+    left: 5%;
+}
 
 .recruit-image-placeholder {
     width: min(420px, 85vw);
@@ -905,6 +911,14 @@
         padding: 120px 20px 80px;
         background-attachment: scroll;
         overflow: auto;
+    }
+
+    .to-website-btn {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.9rem;
     }
 
 

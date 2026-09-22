@@ -3,18 +3,18 @@
     min-height: 70vh;
 
     margin: 0 auto 300px auto;
-    padding-top: 140px;
+    padding-top: 100px;
 }
 
 
 .my-application-back-button {
     margin-bottom: 30px;
     padding: 0;
-
-    color: #ab3130;
-    background: none;
-
+    background-color: #ab3130;
+    color: white;
+    padding: 10px 15px;
     border: none;
+    border-radius: 5px;
 
     cursor: pointer;
 
@@ -43,8 +43,6 @@
 
 .my-application-detail-header p {
     margin: 0;
-
-    color: #666;
 }
 
 
@@ -57,7 +55,7 @@
 
     border-radius: 10px;
 
-    font-weight: 600;
+    font-weight: 400;
 }
 
 

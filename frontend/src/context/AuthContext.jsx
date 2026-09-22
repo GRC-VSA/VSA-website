@@ -7,6 +7,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true);
 
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
@@ -29,6 +30,8 @@ export function AuthProvider({ children }) {
                 setUser(null);
             }
         }
+        setAuthLoading(false);
+
     }, []);
 
     /*
@@ -40,7 +43,7 @@ export function AuthProvider({ children }) {
         - Store the token and the coressponding user in the localStorage of frontend. <-------- LATER, USE COOKIES TO STORE THIS FOR SERCURITY 
         - 
     */
-    const login = async ({ email, password })  => {
+    const login = async ({ email, password }) => {
         const data = await loginUser({ email, password });
         const decodedToken = jwtDecode(data.token);
 
@@ -89,7 +92,7 @@ export function AuthProvider({ children }) {
     const isAuthenticated = Boolean(token);
 
     return (
-        <AuthContext.Provider value={{user, token, isAuthenticated, login, loginWithToken, logout}}>
+        <AuthContext.Provider value={{ user, token, authLoading, isAuthenticated, login, loginWithToken, logout }}>
             {children}
         </AuthContext.Provider>
     );

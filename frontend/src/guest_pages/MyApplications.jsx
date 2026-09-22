@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // import { getMyApplications } from "../api/Application.js";
 import { useMyApplications } from "../context/MyApplicationsContext.jsx";
@@ -9,12 +9,10 @@ import "./MyApplicationsPage.css";
 const MyApplicationsPage = () => {
 
     const navigate = useNavigate();
-
+    const location = useLocation();
     // const [applications, setApplications] = useState([]);
 
-    const { applications, loadMyApplications, loadApplicationReview } = useMyApplications();
-
-    const [loading, setLoading] = useState(true);
+    const { applications, loadMyApplication, loadMyApplications, loadApplicationReview, loadApplyPageData } = useMyApplications();
 
     const [error, setError] = useState("");
 
@@ -29,33 +27,60 @@ const MyApplicationsPage = () => {
                 setError(error.message || "Failed to load your applications.");
             });
     }, [applications, loadMyApplications]);
-
-    const handleResume = (
-        applicationId
-    ) => {
-
-        navigate(
-            `/apply?resume=${applicationId}`
-        );
+    const [openingApplicationId, setOpeningApplicationId] = useState(null);
+    const handleResume = async (applicationId) => {
+        try {
+            setOpeningApplicationId(applicationId);
+            setError("");
+            await Promise.all([
+                loadMyApplication(applicationId),
+                loadApplyPageData()]);
+            navigate(`/apply?resume=${applicationId}`, {
+                state: {
+                    from:
+                        location.pathname +
+                        location.search
+                }
+            });
+        }
+        catch (err) {
+            console.error(err);
+            setError(err.message || "Failed to resume application");
+        }
+        finally {
+            setOpeningApplicationId(null);
+        }
 
     };
 
 
-    const handleView = (
-        applicationId
-    ) => {
+    const handleView = async (applicationId) => {
+        try {
+            setOpeningApplicationId(applicationId);
 
-        navigate(
-            `/my-applications/${applicationId}`
-        );
+            setError("");
+            await loadApplicationReview(applicationId);
 
+
+            navigate(`/my-applications/${applicationId}`);
+
+        }
+        catch (error) {
+            console.error(error);
+            setError(error.message || "Failed to open application.");
+
+        }
+        finally {
+            setOpeningApplicationId(null);
+
+        }
     };
 
 
     if (applications === null && !error) {
 
         return (
-            <main className="my-applications-page">
+            <main className="my-applications-page-loading page-footer-space-extra-2">
                 <p>
                     Loading applications...
                 </p>
@@ -206,15 +231,14 @@ const MyApplicationsPage = () => {
                                             <button
                                                 type="button"
                                                 className="my-application-resume-button"
-                                                onClick={() =>
-                                                    handleResume(
-                                                        application.applicationId
-                                                    )
-                                                }
+                                                disabled={openingApplicationId === application.applicationId}
+                                                onClick={() => handleResume(application.applicationId)}
                                             >
-
-                                                Resume
-
+                                                {
+                                                    openingApplicationId === application.applicationId
+                                                        ? "Opening..."
+                                                        : "Resume"
+                                                }
                                             </button>
 
                                         )}
@@ -225,12 +249,18 @@ const MyApplicationsPage = () => {
                                             <button
                                                 type="button"
                                                 className="my-application-view-button"
+                                                disabled={openingApplicationId === application.applicationId}
                                                 onMouseEnter={() => loadApplicationReview(application.applicationId).catch(() => { })}
                                                 onFocus={() => loadApplicationReview(application.applicationId).catch(() => { })}
                                                 onClick={() => handleView(application.applicationId)}
                                             >
 
-                                                View Application
+                                                {
+                                                    openingApplicationId ===
+                                                        application.applicationId
+                                                        ? "Opening..."
+                                                        : "View Application"
+                                                }
 
                                             </button>
 
@@ -283,6 +313,5 @@ const formatDate = (
     );
 
 };
-
 
 export default MyApplicationsPage;

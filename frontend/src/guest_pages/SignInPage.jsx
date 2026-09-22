@@ -31,7 +31,7 @@ const SignInPage = () => {
         try {
             const user = await login({ email: form.email, password: form.password });
             if (user.role === "officer" || user.role === "president") {
-                navigate("/officer");
+                window.location.replace("/officer");
                 return;
             }
             const params = new URLSearchParams(window.location.search);

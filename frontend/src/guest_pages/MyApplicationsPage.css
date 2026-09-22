@@ -6,8 +6,21 @@
     padding-top: 120px;
 }
 
+.my-applications-page-loading {
+    min-height: 70vh;
+    padding-top: 120px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .page-footer-space-extra {
-    margin-bottom: 300px;
+    margin-bottom: 500px;
+}
+
+.page-footer-space-extra-2 {
+    margin-bottom: 500px;
 }
 
 

@@ -18,7 +18,35 @@ import {
     getMyApplication
 } from "../api/Application";
 
+import BackToVSAButton from "../components/BackToVSAButton.jsx";
 
+const convertApplicationAnswers = (
+    applicationData
+) => {
+
+    const restoredAnswers = {};
+
+
+    for (
+        const answer of applicationData.answers || []
+    ) {
+
+        restoredAnswers[
+            answer.questionId
+        ] = {
+
+            answerText:
+                answer.answerText ?? "",
+
+            optionIds:
+                answer.selectedOptionIds || []
+
+        };
+    }
+
+
+    return restoredAnswers;
+};
 const ApplyPage = () => {
 
     const navigate = useNavigate();
@@ -26,17 +54,70 @@ const ApplyPage = () => {
     const resumeApplicationId = searchParams.get("resume");
     const {
         applications: cachedApplications,
+        applicationsById,
+        applyPageData,
         loadMyApplications,
+        loadMyApplication,
+        loadApplyPageData,
         upsertApplication
     } = useMyApplications();
+    const cachedResumeApplication =
+        resumeApplicationId
+            ? applicationsById[
+            String(resumeApplicationId)
+            ]
+            : null;
+    const initialRoles =
+        applyPageData?.openRoles || [];
+
+    const initialRole =
+        cachedResumeApplication
+            ? initialRoles.find(
+                role =>
+                    role.applicationRoleId ===
+                    cachedResumeApplication.applicationRoleId
+            )
+            : null;
+    const initialStep =
+        initialRole
+            ? initialRole.sections.findIndex(
+                section =>
+                    section.sectionId ===
+                    cachedResumeApplication.currentSectionId
+            )
+            : 0;
     const myApplications = cachedApplications || [];
-    const [loading, setLoading] = useState(true);
-    const [recruitmentOpen, setRecruitmentOpen] = useState(false);
-
-    const [roles, setRoles] = useState([]);
-    const [selectedRoleId, setSelectedRoleId] = useState("");
-    const [application, setApplication] = useState(null);
-
+    const [loading, setLoading] =
+        useState(
+            !applyPageData ||
+            (
+                resumeApplicationId &&
+                !cachedResumeApplication
+            )
+        );
+    const [recruitmentOpen, setRecruitmentOpen] =
+        useState(
+            applyPageData
+                ?.recruitmentStatus
+                ?.recruitmentOpen
+            ?? false
+        );
+    const [roles, setRoles] =
+        useState(
+            initialRoles
+        );
+    const [selectedRoleId, setSelectedRoleId] =
+        useState(
+            cachedResumeApplication
+                ? String(
+                    cachedResumeApplication.applicationRoleId
+                )
+                : ""
+        );
+    const [application, setApplication] =
+        useState(
+            cachedResumeApplication || null
+        );
 
 
     const [showDraftPrompt, setShowDraftPrompt] =
@@ -49,10 +130,21 @@ const ApplyPage = () => {
      *   }
      * }
      */
-    const [answers, setAnswers] = useState({});
+    const [answers, setAnswers] =
+        useState(
+            cachedResumeApplication
+                ? convertApplicationAnswers(
+                    cachedResumeApplication
+                )
+                : {}
+        );
 
-    const [currentStep, setCurrentStep] = useState(0);
-
+    const [currentStep, setCurrentStep] =
+        useState(
+            initialStep >= 0
+                ? initialStep
+                : 0
+        );
     const [saving, setSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState("");
@@ -66,65 +158,229 @@ const ApplyPage = () => {
 
         const loadApplicationPage = async () => {
 
+            /*
+             * NORMAL NAVIGATION:
+             *
+             * MyApplicationsPage already preloaded everything
+             * before navigating here.
+             *
+             * Since the component state was initialized from
+             * the Context cache, there is nothing else to wait for.
+             */
+            if (
+                applyPageData &&
+                (
+                    !resumeApplicationId ||
+                    cachedResumeApplication
+                )
+            ) {
+
+                setLoading(false);
+                return;
+
+            }
+
+
+            /*
+             * DIRECT NAVIGATION / PAGE REFRESH:
+             *
+             * Example:
+             * /apply
+             *
+             * or:
+             * /apply?resume=5
+             *
+             * The Context cache may be empty, so load the
+             * required data here.
+             */
             try {
 
                 setLoading(true);
                 setError("");
 
-                const status =
-                    await getRecruitmentStatus();
+
+                const [
+                    loadedApplyPageData,
+                    loadedApplication
+                ] = await Promise.all([
+
+                    loadApplyPageData(),
+
+                    resumeApplicationId
+                        ? loadMyApplication(
+                            Number(
+                                resumeApplicationId
+                            )
+                        )
+                        : Promise.resolve(null),
+
+                    /*
+                     * We don't need the returned value here.
+                     * loadMyApplications() puts the list
+                     * into the shared Context cache.
+                     */
+                    loadMyApplications()
+
+                ]);
+
+
+                // ================================================
+                // RECRUITMENT STATUS
+                // ================================================
+
+                const recruitmentIsOpen =
+                    loadedApplyPageData
+                        .recruitmentStatus
+                        .recruitmentOpen;
+
 
                 setRecruitmentOpen(
-                    status.recruitmentOpen
+                    recruitmentIsOpen
                 );
 
 
-                if (!status.recruitmentOpen) {
+                /*
+                 * If recruitment is closed, the normal
+                 * "recruitment closed" UI can render.
+                 */
+                if (!recruitmentIsOpen) {
                     return;
                 }
 
 
-                const [openRoles, existingApplications] =
-                    await Promise.all([getOpenApplicationRoles(), loadMyApplications()]);
+                // ================================================
+                // ROLES / SECTIONS / QUESTIONS
+                // ================================================
 
-                setRoles(openRoles);
-                if (resumeApplicationId) {
+                const openRoles =
+                    loadedApplyPageData.openRoles || [];
 
-                    const applicationData = await getMyApplication(Number(resumeApplicationId));
-                    if (applicationData.status !== "IN_PROGRESS") {
-                        throw new Error("This application has already been submitted.");
-                    }
 
-                    const role = openRoles.find(role => role.applicationRoleId === applicationData.applicationRoleId);
-                    if (!role) {
-                        throw new Error("This officer role is no longer available.");
-                    }
+                setRoles(
+                    openRoles
+                );
 
-                    setSelectedRoleId(String(applicationData.applicationRoleId));
-                    setApplication(applicationData);
-                    setAnswers(convertApplicationAnswers(applicationData));
 
-                    const savedSectionIndex = role.sections.findIndex(section =>
-                        section.sectionId ===
-                        applicationData.currentSectionId
+                // ================================================
+                // NORMAL /apply
+                // ================================================
+
+                /*
+                 * No ?resume=...
+                 *
+                 * Nothing else needs to be restored.
+                 */
+                if (!resumeApplicationId) {
+                    return;
+                }
+
+
+                // ================================================
+                // RESUME APPLICATION
+                // ================================================
+
+                if (!loadedApplication) {
+
+                    throw new Error(
+                        "Application could not be loaded."
                     );
 
-                    setCurrentStep(savedSectionIndex >= 0 ? savedSectionIndex : 0);
                 }
-                if (!resumeApplicationId) {
-                    const hasIncompleteApplication = existingApplications.some(application => application.status === "IN_PROGRESS");
-                    if (hasIncompleteApplication) {
-                        setShowDraftPrompt(true);
-                    }
+
+
+                /*
+                 * A completed application should not be
+                 * resumed through the editable Apply page.
+                 */
+                if (
+                    loadedApplication.status !==
+                    "IN_PROGRESS"
+                ) {
+
+                    throw new Error(
+                        "This application has already been submitted."
+                    );
+
                 }
+
+
+                // ================================================
+                // FIND THE APPLICATION'S ROLE
+                // ================================================
+
+                const role =
+                    openRoles.find(
+                        role =>
+                            role.applicationRoleId ===
+                            loadedApplication.applicationRoleId
+                    );
+
+
+                /*
+                 * The role might have stopped recruiting after
+                 * the student originally started the application.
+                 */
+                if (!role) {
+
+                    throw new Error(
+                        "This officer role is no longer available."
+                    );
+
+                }
+
+
+                // ================================================
+                // RESTORE APPLICATION
+                // ================================================
+
+                setApplication(
+                    loadedApplication
+                );
+
+
+                setSelectedRoleId(
+                    String(
+                        loadedApplication
+                            .applicationRoleId
+                    )
+                );
+
+
+                setAnswers(
+                    convertApplicationAnswers(
+                        loadedApplication
+                    )
+                );
+
+
+                // ================================================
+                // RESTORE LAST SAVED SECTION
+                // ================================================
+
+                const savedSectionIndex =
+                    (role.sections || [])
+                        .findIndex(
+                            section =>
+                                section.sectionId ===
+                                loadedApplication.currentSectionId
+                        );
+
+
+                setCurrentStep(
+                    savedSectionIndex >= 0
+                        ? savedSectionIndex
+                        : 0
+                );
+
             }
             catch (error) {
 
                 console.error(error);
 
+
                 setError(
                     error.message ||
-                    "Failed to load officer applications."
+                    "Failed to load officer application."
                 );
 
             }
@@ -133,12 +389,20 @@ const ApplyPage = () => {
                 setLoading(false);
 
             }
+
         };
 
 
         loadApplicationPage();
 
-    }, [resumeApplicationId]);
+    }, [
+        applyPageData,
+        cachedResumeApplication,
+        resumeApplicationId,
+        loadApplyPageData,
+        loadMyApplication,
+        loadMyApplications
+    ]);
 
     const incompleteApplications = myApplications.filter(application =>
         application.status === "IN_PROGRESS"
@@ -362,33 +626,6 @@ const ApplyPage = () => {
     // CONVERT BACKEND ANSWERS
     // =========================================================
 
-    const convertApplicationAnswers = (
-        applicationData
-    ) => {
-
-        const restoredAnswers = {};
-
-
-        for (
-            const answer of applicationData.answers || []
-        ) {
-
-            restoredAnswers[
-                answer.questionId
-            ] = {
-
-                answerText:
-                    answer.answerText ?? "",
-
-                optionIds:
-                    answer.selectedOptionIds || []
-
-            };
-        }
-
-
-        return restoredAnswers;
-    };
 
 
     // =========================================================
@@ -780,7 +1017,6 @@ const ApplyPage = () => {
     // =========================================================
 
     return (
-
         <main
             className="officer-application-page page-footer-space"
             style={{
@@ -788,6 +1024,9 @@ const ApplyPage = () => {
                     `url(${applicationBackground})`
             }}
         >
+            <div className="to-website-btn">
+                <BackToVSAButton />
+            </div>
             {showDraftPrompt &&
                 incompleteApplications.length > 0 && (
 
