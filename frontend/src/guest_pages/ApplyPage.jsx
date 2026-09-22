@@ -403,12 +403,17 @@ const ApplyPage = () => {
         loadMyApplication,
         loadMyApplications
     ]);
-
     const incompleteApplications = myApplications.filter(application =>
         application.status === "IN_PROGRESS"
         &&
         roles.some(role => role.applicationRoleId === application.applicationRoleId)
     );
+    useEffect(() => {
+        if (!resumeApplicationId && incompleteApplications.length > 0) {
+            setShowDraftPrompt(true);
+        }
+    }, [resumeApplicationId, incompleteApplications.length]);
+
 
     // =========================================================
     // ROLE / SECTION INFORMATION

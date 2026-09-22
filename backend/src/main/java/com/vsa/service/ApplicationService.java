@@ -1083,6 +1083,7 @@ public class ApplicationService {
                     "The Get to Know You section cannot be deleted."
             );
         }
+        officerApplicationRepository.clearCurrentSectionBySectionId(sectionId);
 
         boolean hasHistoricalAnswers
                 = section.getQuestions()
