@@ -45,7 +45,7 @@ describe("Auth API Services", () => {
 
             await expect(
                 loginUser({ email: "wrong@vsa.com", password: "badpassword" })
-            ).rejects.toThrow("Invalid credentials");
+            ).rejects.toThrow("Incorrect email or password.");
         });
     });
 
@@ -78,7 +78,7 @@ describe("Auth API Services", () => {
 
             await expect(
                 verifyEmailCode({ verificationId: "vid-123", code: "WRONGCODE" })
-            ).rejects.toThrow("Invalid code.");
+            ).rejects.toThrow("Could not verify the code.");
         });
     });
 });

@@ -27,8 +27,7 @@ export async function loginUser({ email, password }) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Login failed");
+        throw await apiError(res, "Incorrect email or password.");
     }
 
     return res.json();
@@ -54,8 +53,7 @@ export async function registerUser(registerData) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Registration failed");
+        throw await apiError(res, "Registration failed. Please try again.");
     }
 
     return res.json();
@@ -80,8 +78,7 @@ export async function verifyEmailCode({ verificationId, code }) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Email verification failed");
+        throw await apiError(res, "Could not verify the code.");
     }
 
     return res.json();
@@ -105,8 +102,7 @@ export async function resendVerificationCode(email) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Could not send a new code");
+        throw await apiError(res, "Could not send a new code.");
     }
 
     return res.json();
@@ -124,8 +120,7 @@ export async function sendForgotPasswordEmail(email) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Failed to send reset email");
+        throw await apiError(res, "Could not send the reset email.");
     }
 
     return res.text();
@@ -144,9 +139,30 @@ export async function resetPassword({ token, newPassword }) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Password reset failed");
+        throw await apiError(res, "Could not reset your password.");
     }
 
     return res.text();
+}
+
+async function apiError(res, fallbackMessage) {
+    const raw = await res.text().catch(() => "");
+    let body;
+    try {
+        body = JSON.parse(raw);
+    } catch {
+        body = null;
+    }
+
+    const serverMessage = typeof body?.message === "string" ? body.message.trim() : "";
+
+    const message = res.status === 429
+        ? "Too many attempts. Please wait and try again."
+        : res.status >= 500
+            ? "Something went wrong on our side. Please try again later."
+            : serverMessage || fallbackMessage;
+
+    const error = new Error(message);
+    error.status = res.status;
+    return error;
 }
