@@ -84,9 +84,7 @@ const SponsorsPage = () => {
 
 
     function handleAddMode() {
-
         setFormError("");
-
         setFormData({
             name: "",
             year: "",
