@@ -238,7 +238,7 @@
 
 .profile-crop-modal>label {
     display: grid;
-    gap: 7px;
+    /* gap: 7px; */
     margin-top: 18px;
     font-size: 0.93rem;
     font-weight: 600;

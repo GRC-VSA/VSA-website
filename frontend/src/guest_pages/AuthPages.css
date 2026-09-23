@@ -204,7 +204,6 @@
     --vsa-gold: #ece0a6;
     --vsa-black: #000000;
     --vsa-white: #ffffff;
-
     font-family: 'Poppins', sans-serif;
 
     width: 100%;
@@ -258,6 +257,12 @@
     position: relative;
     flex: 1 1 48%;
     overflow: hidden;
+}
+
+.back-button {
+    position: absolute;
+    bottom: 8%;
+    left: 5%;
 }
 
 .auth-photo {
@@ -580,9 +585,11 @@
     .verify-email-card h1 {
         font-size: 28px;
     }
-    .auth-logo-image{
+
+    .auth-logo-image {
         width: 150px;
     }
+
     .auth-page {
         height: auto;
         min-height: 100dvh;
@@ -607,6 +614,16 @@
 
     .auth-photo-overlay {
         inset: 0;
+    }
+
+    .back-button {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 250px;
+        padding: 10px 5px;
+        font-size: 0.9rem;
     }
 
     .auth-form-panel {

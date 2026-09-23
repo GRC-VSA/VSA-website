@@ -6,6 +6,8 @@ import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";
 import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import { replaceLocation } from "../utils/navigation.js";
+import BackToVSAButton from "../components/BackToVSAButton.jsx";
+
 import "./AuthPages.css"
 
 const SignInPage = () => {
@@ -50,9 +52,9 @@ const SignInPage = () => {
             setLoading(false);
         }
     }
-
     return (
         <div className="auth-page">
+
             <div className="auth-card order-photo-last">
                 <AuthPhotoPanel />
                 <div className="auth-form-panel">
@@ -99,7 +101,7 @@ const SignInPage = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
