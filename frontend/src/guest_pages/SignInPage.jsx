@@ -6,7 +6,6 @@ import AuthToggle from "../components/AuthToggle.jsx";
 import AuthPhotoPanel from "../components/AuthPhotoPanel.jsx";
 import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import { replaceLocation } from "../utils/navigation.js";
-import BackToVSAButton from "../components/BackToVSAButton.jsx";
 
 import "./AuthPages.css"
 

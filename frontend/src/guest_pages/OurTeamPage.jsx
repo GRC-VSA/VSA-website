@@ -6,6 +6,7 @@ import { IoMdMail } from "react-icons/io";
 import ourteamcover from "../assets/guest/ourteamcover2.jpg";
 import "./OurTeamPage.css";
 import { getOurTeam, createOfficer, deleteOfficer } from "../api/OurTeam.js";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import PhotoCropper from "../components/PhotoCropper.jsx";
 
@@ -13,7 +14,7 @@ import PhotoCropper from "../components/PhotoCropper.jsx";
 const OurTeamPage = () => {
 
     const { user } = useAuth();
-
+    useDocumentTitle("Our Team");
     const canManage =
         user?.role === "officer" || user?.role === "president";
 

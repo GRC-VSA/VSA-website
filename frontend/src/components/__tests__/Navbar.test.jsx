@@ -133,17 +133,22 @@ describe("Navbar Component", () => {
 
             expect(
                 screen.getAllByText(
-                    "Setting"
+                    "Profile"
                 )[0]
             ).toBeInTheDocument();
 
 
             expect(
                 screen.getAllByText(
-                    "To Officer Board"
+                    "Officer site"
                 )[0]
             ).toBeInTheDocument();
 
+            expect(
+                screen.getAllByText(
+                    "Applications"
+                )[0]
+            ).toBeInTheDocument();
 
             expect(
                 screen.getAllByText(
