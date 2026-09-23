@@ -27,7 +27,7 @@ import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
 import ApplyPage from "./guest_pages/ApplyPage.jsx";
 import MyApplicationsPage from "./guest_pages/MyApplications.jsx";
 import MyApplicationDetail from "./guest_pages/MyApplicationDetail.jsx";
-
+import ProfilePage from "./guest_pages/ProfilePage.jsx";
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
 import EventBoard from "./officer_pages/dashboard/EventBoard.jsx";
@@ -83,6 +83,7 @@ function App() {
             <Route path="/my-applications" element={<MyApplicationsPage />} />
             <Route path="/my-applications/:applicationId" element={<MyApplicationDetail />} />
           </Route>
+          <Route path="/profile" element={<ProfilePage/>}/>
         </Route>
 
         <Route

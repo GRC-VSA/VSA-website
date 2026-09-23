@@ -73,7 +73,7 @@ describe("RegisterPage", () => {
                 lastName: "Luu",
                 email: "jane@vsa.com",
                 phone: "",
-                passwordHash: "password123",
+                password: "password123",
             });
             expect(mockNavigate).toHaveBeenCalledWith("/verify", {
                 replace: true,

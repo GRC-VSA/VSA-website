@@ -7,12 +7,13 @@ import {
 } from "../api/Sponsor.js";
 
 import { useAuth } from "../context/AuthContext.jsx";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 
 import "./SponsorsPage.css";
 
 
 const SponsorsPage = () => {
-
+    useDocumentTitle("Sponsors");
     const { user } = useAuth();
 
     const canManage =
@@ -84,9 +85,7 @@ const SponsorsPage = () => {
 
 
     function handleAddMode() {
-
         setFormError("");
-
         setFormData({
             name: "",
             year: "",

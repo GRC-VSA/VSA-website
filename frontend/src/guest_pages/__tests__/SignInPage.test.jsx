@@ -92,7 +92,7 @@ describe("SignInPage", () => {
         ).toBeInTheDocument();
 
         expect(
-            screen.getByLabelText(/Password/i)
+            screen.getByLabelText("Password", { exact: true, selector: "input" })
         ).toBeInTheDocument();
 
         expect(
@@ -132,7 +132,7 @@ describe("SignInPage", () => {
 
 
             fireEvent.change(
-                screen.getByLabelText(/Password/i),
+                screen.getByLabelText("Password", { exact: true, selector: "input" }),
                 {
                     target: {
                         value: "password123",
@@ -200,7 +200,7 @@ describe("SignInPage", () => {
 
 
             fireEvent.change(
-                screen.getByLabelText(/Password/i),
+                screen.getByLabelText("Password", { exact: true, selector: "input" }),
                 {
                     target: {
                         value: "badpass",

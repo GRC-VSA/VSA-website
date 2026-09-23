@@ -7,6 +7,7 @@ import applicationBackground from "../assets/guest/officer-application-backgroun
 import { FaCheckCircle } from "react-icons/fa";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMyApplications } from "../context/MyApplicationsContext.jsx";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 
 import {
     getRecruitmentStatus,
@@ -48,7 +49,7 @@ const convertApplicationAnswers = (
     return restoredAnswers;
 };
 const ApplyPage = () => {
-
+    useDocumentTitle("Apply");
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const resumeApplicationId = searchParams.get("resume");

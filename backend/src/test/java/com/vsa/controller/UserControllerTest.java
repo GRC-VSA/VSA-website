@@ -1,25 +1,26 @@
 package com.vsa.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import com.vsa.dto.request.AccountResendRequest;
-import com.vsa.dto.request.AccountVerificationRequest;
-import com.vsa.dto.response.AccountVerificationStartResponse;
-import com.vsa.model.User;
-import com.vsa.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.vsa.dto.request.AccountResendRequest;
+import com.vsa.dto.request.AccountVerificationRequest;
+import com.vsa.dto.request.RegisterUserRequest;
+import com.vsa.dto.response.AccountVerificationStartResponse;
+import com.vsa.service.UserService;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
@@ -30,12 +31,13 @@ class UserControllerTest {
 
     @Test
     void registerUser_ReturnsVerificationStartResponse() {
-        User inputUser = new User();
+        RegisterUserRequest request = new RegisterUserRequest();
+
         AccountVerificationStartResponse startResponse = startResponse();
-        when(userService.registerUser(inputUser)).thenReturn(startResponse);
+        when(userService.registerUser(request)).thenReturn(startResponse);
 
         ResponseEntity<AccountVerificationStartResponse> response =
-                userController.registerUser(inputUser);
+                userController.registerUser(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(startResponse, response.getBody());

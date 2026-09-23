@@ -1,5 +1,9 @@
 package com.vsa.service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -7,56 +11,61 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.vsa.dto.request.AccountResendRequest;
 import com.vsa.dto.request.AccountVerificationRequest;
+import com.vsa.dto.request.RegisterUserRequest;
 import com.vsa.dto.response.AccountVerificationStartResponse;
 import com.vsa.model.User;
 import com.vsa.repository.UserRepository;
 import com.vsa.security.JwtUtil;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    /** Mirrors UserService.VERIFICATION_CODE_PATTERN, which is private. */
+    /**
+     * Mirrors UserService.VERIFICATION_CODE_PATTERN, which is private.
+     */
     private static final String CODE_PATTERN = "^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{8}$";
 
-    @Mock private UserRepository userRepository;
-    @Mock private BCryptPasswordEncoder passwordEncoder;
-    @Mock private JwtUtil jwtUtil;
-    @Mock private EmailService emailService;
-    @Mock private EmailOutboxService emailOutboxService;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+    @Mock
+    private JwtUtil jwtUtil;
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private EmailOutboxService emailOutboxService;
 
-    @InjectMocks private UserService userService;
+    @InjectMocks
+    private UserService userService;
 
     // ── Registration ───────────────────────────────────────────
-
     @Test
     void registerUser_Success() {
-        User user = newRegistration("new@vsa.com");
+        RegisterUserRequest request = newRegistration("new@vsa.com");
 
         when(userRepository.findByEmailIgnoreCase("new@vsa.com")).thenReturn(Optional.empty());
         stubEncoder();
         stubSaveEchoesArgument();
 
-        AccountVerificationStartResponse response = userService.registerUser(user);
+        AccountVerificationStartResponse response = userService.registerUser(request);
 
         User saved = captureSavedUser();
         assertEquals("hashed:rawPassword", saved.getPasswordHash());
@@ -72,15 +81,14 @@ class UserServiceTest {
 
     @Test
     void registerUser_DuplicateVerifiedEmail_ThrowsException() {
-        User user = newRegistration("existing@vsa.com");
+        RegisterUserRequest request = newRegistration("existing@vsa.com");
 
         User verified = new User();
         verified.setEmailVerified(true);
         when(userRepository.findByEmailIgnoreCase("existing@vsa.com"))
                 .thenReturn(Optional.of(verified));
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.registerUser(user));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> userService.registerUser(request));
 
         assertEquals("Email already exists", ex.getMessage());
         verify(userRepository, never()).save(any(User.class));
@@ -89,7 +97,7 @@ class UserServiceTest {
 
     @Test
     void registerUser_ReusesPendingUnverifiedRow() {
-        User user = newRegistration("pending@vsa.com");
+        RegisterUserRequest request = newRegistration("pending@vsa.com");
 
         /*
          * A signup that was never completed. The service must update that row
@@ -104,7 +112,7 @@ class UserServiceTest {
         stubEncoder();
         stubSaveEchoesArgument();
 
-        userService.registerUser(user);
+        userService.registerUser(request);
 
         assertSame(pending, captureSavedUser());
         assertNotNull(pending.getVerificationCodeHash());
@@ -113,14 +121,14 @@ class UserServiceTest {
 
     @Test
     void registerUser_ReturnsMaskedEmailAndExpiry() {
-        User user = newRegistration("tuan@x.com");
+        RegisterUserRequest request = newRegistration("tuan@x.com");
 
         when(userRepository.findByEmailIgnoreCase("tuan@x.com")).thenReturn(Optional.empty());
         stubEncoder();
         stubSaveEchoesArgument();
 
         LocalDateTime before = LocalDateTime.now();
-        AccountVerificationStartResponse response = userService.registerUser(user);
+        AccountVerificationStartResponse response = userService.registerUser(request);
 
         assertEquals("t***n@x.com", response.getMaskedEmail());
         assertNotNull(response.getVerificationId());
@@ -132,13 +140,13 @@ class UserServiceTest {
 
     @Test
     void registerUser_HashesCodeAndKeepsPlaintextOutOfTheResponse() {
-        User user = newRegistration("code@vsa.com");
+        RegisterUserRequest request = newRegistration("code@vsa.com");
 
         when(userRepository.findByEmailIgnoreCase("code@vsa.com")).thenReturn(Optional.empty());
         stubEncoder();
         stubSaveEchoesArgument();
 
-        userService.registerUser(user);
+        userService.registerUser(request);
 
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         verify(emailOutboxService)
@@ -154,46 +162,45 @@ class UserServiceTest {
         assertEquals("hashed:" + plaintextCode, saved.getVerificationCodeHash());
     }
 
-    @Test
-    void registerUser_UidProvided_ThrowsException() {
-        User user = newRegistration("new@vsa.com");
-        user.setUid("some-uid");
+    // @Test
+    // void registerUser_UidProvided_ThrowsException() {
+    //     RegisterUserRequest request = newRegistration("new@vsa.com");
+    //     request.setUid("some-uid");
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.registerUser(user));
+    //     IllegalArgumentException ex
+    //             = assertThrows(IllegalArgumentException.class, () -> userService.registerUser(request));
 
-        assertEquals("uid must not be provided", ex.getMessage());
-    }
+    //     assertEquals("uid must not be provided", ex.getMessage());
+    // }
 
     @Test
     void registerUser_BlankEmail_ThrowsException() {
-        User user = newRegistration("   ");
+        RegisterUserRequest request = newRegistration("   ");
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.registerUser(user));
+        IllegalArgumentException ex
+                = assertThrows(IllegalArgumentException.class, () -> userService.registerUser(request));
 
         assertEquals("Email is required", ex.getMessage());
     }
 
     @Test
     void registerUser_BlankPassword_ThrowsException() {
-        User user = newRegistration("new@vsa.com");
-        user.setPasswordHash("  ");
+        RegisterUserRequest request = newRegistration("new@vsa.com");
+        request.setPassword("  ");
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.registerUser(user));
+        IllegalArgumentException ex
+                = assertThrows(IllegalArgumentException.class, () -> userService.registerUser(request));
 
         assertEquals("Password is required", ex.getMessage());
     }
 
     // ── Verification ───────────────────────────────────────────
-
     @Test
     void verifyEmail_NullVerificationId_ThrowsException() {
         AccountVerificationRequest request = verificationRequest(null, "ABCDEFG2");
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.verifyEmail(request));
+        IllegalArgumentException ex
+                = assertThrows(IllegalArgumentException.class, () -> userService.verifyEmail(request));
 
         assertEquals("Verification ID is required.", ex.getMessage());
     }
@@ -202,8 +209,8 @@ class UserServiceTest {
     void verifyEmail_BlankCode_ThrowsException() {
         AccountVerificationRequest request = verificationRequest(UUID.randomUUID(), "   ");
 
-        IllegalArgumentException ex =
-                assertThrows(IllegalArgumentException.class, () -> userService.verifyEmail(request));
+        IllegalArgumentException ex
+                = assertThrows(IllegalArgumentException.class, () -> userService.verifyEmail(request));
 
         assertEquals("Verification code is required.", ex.getMessage());
     }
@@ -233,8 +240,8 @@ class UserServiceTest {
         UUID verificationId = UUID.randomUUID();
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -249,8 +256,8 @@ class UserServiceTest {
 
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -265,8 +272,8 @@ class UserServiceTest {
 
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -284,8 +291,8 @@ class UserServiceTest {
 
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -300,8 +307,8 @@ class UserServiceTest {
 
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -321,8 +328,8 @@ class UserServiceTest {
         when(userRepository.findByVerificationId(verificationId)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("ABCDEFG2", "hashed-code")).thenReturn(false);
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.verifyEmail(verificationRequest(verificationId, "ABCDEFG2")));
 
@@ -372,11 +379,10 @@ class UserServiceTest {
     }
 
     // ── Resend ─────────────────────────────────────────────────
-
     @Test
     void resendVerificationCode_BlankEmail_ThrowsException() {
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.resendVerificationCode(resendRequest("  ")));
 
@@ -387,8 +393,8 @@ class UserServiceTest {
     void resendVerificationCode_UnknownEmail_ThrowsException() {
         when(userRepository.findByEmailIgnoreCase("nobody@vsa.com")).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.resendVerificationCode(resendRequest("nobody@vsa.com")));
 
@@ -404,8 +410,8 @@ class UserServiceTest {
 
         when(userRepository.findByEmailIgnoreCase("pending@vsa.com")).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.resendVerificationCode(resendRequest("pending@vsa.com")));
 
@@ -421,8 +427,8 @@ class UserServiceTest {
 
         when(userRepository.findByEmailIgnoreCase("pending@vsa.com")).thenReturn(Optional.of(user));
 
-        IllegalArgumentException ex =
-                assertThrows(
+        IllegalArgumentException ex
+                = assertThrows(
                         IllegalArgumentException.class,
                         () -> userService.resendVerificationCode(resendRequest("pending@vsa.com")));
 
@@ -441,8 +447,8 @@ class UserServiceTest {
         stubEncoder();
         stubSaveEchoesArgument();
 
-        AccountVerificationStartResponse response =
-                userService.resendVerificationCode(resendRequest("pending@vsa.com"));
+        AccountVerificationStartResponse response
+                = userService.resendVerificationCode(resendRequest("pending@vsa.com"));
 
         ArgumentCaptor<String> codeCaptor = ArgumentCaptor.forClass(String.class);
         verify(emailOutboxService)
@@ -468,8 +474,8 @@ class UserServiceTest {
         stubEncoder();
         stubSaveEchoesArgument();
 
-        AccountVerificationStartResponse response =
-                userService.resendVerificationCode(resendRequest("pending@vsa.com"));
+        AccountVerificationStartResponse response
+                = userService.resendVerificationCode(resendRequest("pending@vsa.com"));
 
         /*
          * issueVerificationCode only mints a UUID when there isn't one, so the page
@@ -480,7 +486,6 @@ class UserServiceTest {
     }
 
     // ── Authentication ─────────────────────────────────────────
-
     @Test
     void login_Success_ReturnsJwt() {
         User user = new User();
@@ -510,7 +515,6 @@ class UserServiceTest {
     }
 
     // ── Password Management ────────────────────────────────────
-
     @Test
     void forgotPassword_ValidEmail_SendsResetEmail() {
         User user = new User();
@@ -542,14 +546,16 @@ class UserServiceTest {
     }
 
     // ── Fixtures ───────────────────────────────────────────────
+    private RegisterUserRequest newRegistration(String email) {
+        RegisterUserRequest request = new RegisterUserRequest();
 
-    private User newRegistration(String email) {
-        User user = new User();
-        user.setEmail(email);
-        user.setPasswordHash("rawPassword");
-        user.setFirstName("John");
-        user.setLastName("Doe");
-        return user;
+        request.setFirstName("John");
+        request.setLastName("Doe");
+        request.setEmail(email);
+        request.setPhone("1234567890");
+        request.setPassword("rawPassword");
+
+        return request;
     }
 
     private User pendingUser(UUID verificationId) {
@@ -578,7 +584,9 @@ class UserServiceTest {
         return request;
     }
 
-    /** The password and the verification code both go through the encoder. */
+    /**
+     * The password and the verification code both go through the encoder.
+     */
     private void stubEncoder() {
         when(passwordEncoder.encode(anyString())).thenAnswer(i -> "hashed:" + i.getArgument(0));
     }

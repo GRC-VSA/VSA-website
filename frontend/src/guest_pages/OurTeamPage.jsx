@@ -5,14 +5,16 @@ import { IoMdMail } from "react-icons/io";
 
 import ourteamcover from "../assets/guest/ourteamcover2.jpg";
 import "./OurTeamPage.css";
-import {getOurTeam, createOfficer, deleteOfficer} from "../api/OurTeam.js";
+import { getOurTeam, createOfficer, deleteOfficer } from "../api/OurTeam.js";
+import useDocumentTitle from "../hooks/useDocumentTitle.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import PhotoCropper from "../components/PhotoCropper.jsx";
 
 
 const OurTeamPage = () => {
 
     const { user } = useAuth();
-
+    useDocumentTitle("Our Team");
     const canManage =
         user?.role === "officer" || user?.role === "president";
 
@@ -39,6 +41,20 @@ const OurTeamPage = () => {
     });
 
     const [officerImage, setOfficerImage] = useState(null);
+
+    // const handleSaveAvatar = async (croppedFile) => {
+    //     setSaving(true);
+    //     setError("");
+    //     setSuccess("");
+
+    //     try {
+    //         await uploadCurrentUserAvatar(croppedFile);
+    //         await refreshProfile();
+    //         setSuccess("Profile photo updated.");
+    //     } finally {
+    //         setSaving(false);
+    //     }
+    // };
 
 
     const loadOfficers = async () => {
@@ -150,7 +166,7 @@ const OurTeamPage = () => {
             return;
         }
 
-        setCurrentGeneration( generations[currentGenerationIndex - 1]);
+        setCurrentGeneration(generations[currentGenerationIndex - 1]);
 
         setSelectedOfficer(null);
     };
@@ -292,8 +308,8 @@ const OurTeamPage = () => {
             await deleteOfficer(officerId);
 
             setOfficers((previousOfficers) =>
-                previousOfficers.filter( (officer) =>
-                        officer.ourTeamId !== officerId
+                previousOfficers.filter((officer) =>
+                    officer.ourTeamId !== officerId
                 )
             );
 
@@ -556,7 +572,7 @@ const OurTeamPage = () => {
 
                                 <label>
                                     Officer Image
-
+{/* 
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -564,6 +580,13 @@ const OurTeamPage = () => {
                                         onChange={
                                             handleImageChange
                                         }
+                                    />
+                                        // Inside profile-avatar-actions: */}
+                                    <PhotoCropper
+                                        onSave={setOfficerImage}
+                                        // disabled={saving}
+                                        buttonText="Choose officer image"
+                                        title="Adjust officer image"
                                     />
                                 </label>
 
@@ -728,8 +751,8 @@ const OurTeamPage = () => {
                                                             className="delete-officer-button"
                                                             onClick={(event) => handleDeleteOfficer(event, officer.ourTeamId)}
                                                             onKeyDown={(event) => {
-                                                                if ( event.key === "Enter" || event.key === " ") {
-                                                                    handleDeleteOfficer( event, officer.ourTeamId);
+                                                                if (event.key === "Enter" || event.key === " ") {
+                                                                    handleDeleteOfficer(event, officer.ourTeamId);
                                                                 }
                                                             }}
                                                         >
@@ -738,7 +761,7 @@ const OurTeamPage = () => {
                                                     )}
 
 
-                                                <img src={ officer.officerImage } alt={ officer.officerName } className="officer-card-image" />
+                                                <img src={officer.officerImage} alt={officer.officerName} className="officer-card-image" />
 
                                                 <div className="officer-card-info">
 

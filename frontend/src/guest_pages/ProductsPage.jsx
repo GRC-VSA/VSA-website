@@ -1,6 +1,8 @@
 import "./ProductsPage.css";
 import noproduct from "../assets/guest/noproduct.png"
+import useDocumentTitle from "../hooks/useDocumentTitle";
 const ProductsPage = () => {
+    useDocumentTitle("Products");
     return (
         <main className="product-page page-footer-space">
             <div className="product-coming-soon">
