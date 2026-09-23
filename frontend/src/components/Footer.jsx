@@ -1,6 +1,9 @@
 import React from "react";
 // import { useScrollReveal } from "../hooks/useScrollReveal.js";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { replaceLocation } from "../utils/navigation.js";
+
 import "./Footer.css";
 
 import logo from "../assets/guest/footerLogo.png";
@@ -9,6 +12,21 @@ import { FaArrowUp } from "react-icons/fa";
 const Footer = () => {
   // const sectionRef = useScrollReveal();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+  const currentPage = location.pathname + location.search;
+  const handleApplyClick = (event) => {
+    event.preventDefault();
+    if (!isAuthenticated) {
+      replaceLocation(
+        `/sign-in?redirect=/apply&from=${encodeURIComponent(currentPage)}`
+      )
+    } else {
+      replaceLocation(
+        "/apply"
+      )
+    }
+  }
 
   return (
     <footer className="home-footer">
@@ -69,7 +87,7 @@ const Footer = () => {
                 </div>
                 <span>Browse Events</span>
               </button>
-              <button type="button" className="pill-btn pill-btn--outline" onClick={() => navigate("/apply")}>
+              <button type="button" className="pill-btn pill-btn--outline" onClick={(event) => handleApplyClick(event)}>
                 <span>Apply Officer</span>
                 <div className="arrow-icon-circle circle-border">
                   <FaArrowUp className="arrow arrow-red" />
