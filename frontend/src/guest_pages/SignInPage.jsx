@@ -10,9 +10,9 @@ import "./AuthPages.css"
 
 const SignInPage = () => {
 
-    useDocumentTitle("Sign in - VSA")
-    const navigate = useNavigate();
-    const location = useLocation();
+    useDocumentTitle("Sign in")
+    // const navigate = useNavigate();
+    // const location = useLocation();
     const { login } = useAuth();
 
     const [form, setForm] = useState({ email: "", password: "" });
