@@ -1,0 +1,83 @@
+.unsaved-changes-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(0, 0, 0, 0.5);
+}
+
+
+.unsaved-changes-modal {
+    width: min(460px, 100%);
+
+    padding: 28px;
+
+    border-radius: 12px;
+
+    background: white;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.24);
+}
+
+
+.unsaved-changes-modal h2 {
+    margin: 0 0 10px;
+
+    font-size: 1.35rem;
+}
+
+
+.unsaved-changes-modal p {
+    margin: 0;
+
+    color: #666;
+
+    line-height: 1.6;
+}
+
+
+.unsaved-changes-actions {
+    margin-top: 24px;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+}
+
+
+.unsaved-changes-actions button {
+    padding: 10px 16px;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+
+.unsaved-changes-stay {
+    border: 1px solid #d6d6d6;
+
+    background: white;
+
+    color: #333;
+}
+
+
+.unsaved-changes-leave {
+    border: 1px solid #AB3130;
+
+    background: #AB3130;
+
+    color: white;
+}

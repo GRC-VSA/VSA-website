@@ -4,6 +4,7 @@ import com.vsa.model.User;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
  * Repository interface for User entity data access.
  *
  * <p>Extends JpaRepository to provide CRUD operations on User entities. Includes custom queries for
- * email, verification tokens, and reset tokens.
+ * email, verification sessions, and reset tokens.
  *
  * @author VSA Development Team
  */
@@ -27,14 +28,23 @@ public interface UserRepository extends JpaRepository<User, String> {
   Optional<User> findByEmail(String email);
 
   /**
-   * Finds a user by their email verification token.
+   * Finds a user by their email address, ignoring case.
    *
-   * <p>Used during the email verification process.
+   * <p>Used by registration and resend so "Tuan@x.com" and "tuan@x.com" resolve to the same
+   * pending account instead of colliding on the unique email constraint.
    *
-   * @param token The verification token
+   * @param email The user's email address
    * @return Optional containing the user if found
    */
-  Optional<User> findByVerificationToken(String token);
+  Optional<User> findByEmailIgnoreCase(String email);
+
+  /**
+   * Finds a user by their current email-verification session id.
+   *
+   * @param verificationId The verification session handle issued at registration
+   * @return Optional containing the user if found
+   */
+  Optional<User> findByVerificationId(UUID verificationId);
 
   /**
    * Finds a user by their password reset token.

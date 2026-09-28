@@ -50,51 +50,114 @@ public class EmailService {
   // ── Verification Emails ────────────────────────────────────
 
   /**
-   * Sends email verification email after user registration.
+   * Sends the signup email-verification code.
    *
-   * <p>Contains a verification link that the user must click to verify their email address.
+   * <p>Code-based rather than a click-through link: a link opened on a phone would finish the
+   * signup on the phone, stranding the browser the user actually started in. A code can be carried
+   * back to whichever device they began on.
+   *
+   * <p>The account stays unverified, and unable to log in, until this code is submitted to the
+   * account verification endpoint.
    *
    * @param toEmail Recipient's email address
    * @param firstName Recipient's first name
-   * @param token Verification token to be used in the verification link
+   * @param verificationCode Eight-character verification code
    */
-  public void sendVerificationEmail(String toEmail, String firstName, String token) {
-    String verifyUrl = buildFrontendUrl("/verify?token=" + token);
-
+  public void sendAccountVerificationCodeEmail(
+          String toEmail, String firstName, String verificationCode) {
     String body =
             """
                 %s
                 <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
                     <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Welcome, %s!</h3>
-                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Thank you for joining the GRC Vietnamese Student Association! Please verify your email to complete your registration and unlock all features.</p>
+                    <p style="color: %s; margin: 0 0 16px 0; line-height: 1.6;">
+                        Thank you for joining the GRC Vietnamese Student Association! Enter the code below on the sign-up page to verify your email and finish creating your account.
+                    </p>
+    
                     <div style="text-align: center; margin: 24px 0;">
-                        <a href="%s" style="
+                        <div style="
                             display: inline-block;
                             background-color: %s;
                             color: %s;
-                            padding: 14px 40px;
-                            text-decoration: none;
+                            padding: 16px 28px;
                             border-radius: 8px;
-                            font-weight: 600;
-                            font-size: 15px;
-                            transition: background-color 0.2s;
-                        ">Verify My Email</a>
+                            font-size: 28px;
+                            font-weight: 700;
+                            letter-spacing: 6px;
+                        ">%s</div>
                     </div>
-                    <p style="color: %s; font-size: 13px; margin: 0;">This link will expire in 24 hours.</p>
+    
+                    <p style="color: %s; font-size: 13px; margin: 20px 0 0 0;">
+                        This code expires in 15 minutes. If you didn't sign up for VSA, you can safely ignore this email.
+                    </p>
                 </div>
                 """
                     .formatted(
-                            getEmailHeader("Welcome to VSA!"),
+                            getEmailHeader("Verify Your Email"),
                             ACCENT_COLOR,
                             PRIMARY_COLOR,
                             firstName,
                             TEXT_DARK,
-                            verifyUrl,
                             PRIMARY_COLOR,
                             TEXT_LIGHT,
+                            verificationCode,
                             TEXT_MUTED);
 
-    sendEmail(toEmail, "VSA - Verify Your Email", body);
+    sendEmail(toEmail, "VSA - Your Verification Code", body);
+  }
+
+  /**
+   * Sends the code confirming a change of account email.
+   *
+   * <p>Goes to the proposed new address, since that address is what's being proven. The account
+   * keeps its existing email until this code comes back, so a mistyped address simply expires
+   * instead of locking anyone out.
+   *
+   * @param toEmail The proposed new email address
+   * @param firstName Recipient's first name
+   * @param verificationCode Eight-character verification code
+   */
+  public void sendEmailChangeCodeEmail(
+          String toEmail, String firstName, String verificationCode) {
+    String body =
+            """
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, confirm your new email</h3>
+                    <p style="color: %s; margin: 0 0 16px 0; line-height: 1.6;">
+                        You asked to use this address for your VSA account. Enter the code below to confirm the change.
+                    </p>
+    
+                    <div style="text-align: center; margin: 24px 0;">
+                        <div style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 16px 28px;
+                            border-radius: 8px;
+                            font-size: 28px;
+                            font-weight: 700;
+                            letter-spacing: 6px;
+                        ">%s</div>
+                    </div>
+    
+                    <p style="color: %s; font-size: 13px; margin: 20px 0 0 0;">
+                        This code expires in 15 minutes. If you didn't request this change, you can ignore this email — your account keeps its current address.
+                    </p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Confirm Your New Email"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            firstName,
+                            TEXT_DARK,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            verificationCode,
+                            TEXT_MUTED);
+
+    sendEmail(toEmail, "VSA - Confirm Your New Email", body);
   }
 
   // ── Event Registration Emails ──────────────────────────────

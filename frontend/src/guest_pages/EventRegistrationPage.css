@@ -6,15 +6,14 @@
     background-position: center;
     background-repeat: no-repeat;
 }
+
 #to-website-button {
     position: absolute;
-    top: 10%;
-    left: 5%;
+    bottom: 5%;
+    left: 6%;
 
     width: 320px;
     height: 56px;
-
-    /* Reserve space for the 48px icon */
     padding: 0 20px 0 68px;
 
     border: solid 1.5px #AB3130;
@@ -82,7 +81,8 @@
     outline: 3px solid #AB3130;
     outline-offset: 3px;
 }
- /*
+
+/*
 #to-website-button {
     position: absolute;
     top: 10%;
@@ -419,5 +419,19 @@ textarea::placeholder {
 
     .registration-form-body button {
         height: 50px;
+    }
+
+    #to-website-button {
+        position: absolute;
+        top: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 220px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+    .to-website-icon {
+        width: 30px;
+        height: 30px;
     }
 }

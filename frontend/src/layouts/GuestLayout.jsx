@@ -12,6 +12,7 @@ const GuestLayout = () => {
         "/forgot-password",
         "/reset-password",
         "/verify",
+        "/apply",
     ];
     
     const isRegistrationPage = matchPath("/events/:eventId/registration-form", location.pathname);

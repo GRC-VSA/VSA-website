@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import VSA_coloredlogo from "../assets/guest/VSA_coloredlogo.png";
-
+import BackToVSAButton from "./BackToVSAButton";
 // Import your cover photos
 import cover1 from "../assets/guest/auth/BeggingLoginPageCover.png";
 import cover2 from "../assets/guest/auth/CheatingLoginPageCover.png";
@@ -26,8 +26,10 @@ const AuthPhotoPanel = ({ altText = "VSA Cover Photo" }) => {
                     <span>Photo</span>
                 </div>
             )}
-
             <div className="auth-photo-overlay" />
+            <div className="back-button">
+                <BackToVSAButton />
+            </div>
 
             <Link to="/" className="auth-logo-link">
                 <img

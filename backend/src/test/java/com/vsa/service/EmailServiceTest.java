@@ -34,8 +34,8 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendVerificationEmail_TriggersMailSender() {
-        emailService.sendVerificationEmail("user@vsa.com", "John", "token123");
+    void sendAccountVerificationCodeEmail_TriggersMailSender() {
+        emailService.sendAccountVerificationCodeEmail("user@vsa.com", "John", "ABCDEFG2");
         verify(javaMailSender).send(any(MimeMessage.class));
     }
 
@@ -66,6 +66,6 @@ class EmailServiceTest {
 
         assertThrows(
                 RuntimeException.class,
-                () -> emailService.sendVerificationEmail("user@vsa.com", "John", "token123"));
+                () -> emailService.sendAccountVerificationCodeEmail("user@vsa.com", "John", "ABCDEFG2"));
     }
 }

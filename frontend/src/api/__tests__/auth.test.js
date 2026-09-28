@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
     loginUser,
     registerUser,
-    verifyEmailToken,
+    verifyEmailCode,
     sendForgotPasswordEmail,
     resetPassword,
 } from "../auth";
@@ -45,23 +45,40 @@ describe("Auth API Services", () => {
 
             await expect(
                 loginUser({ email: "wrong@vsa.com", password: "badpassword" })
-            ).rejects.toThrow("Invalid credentials");
+            ).rejects.toThrow("Incorrect email or password.");
         });
     });
 
-    describe("verifyEmailToken", () => {
-        it("should return response text upon successful email verification", async () => {
+    describe("verifyEmailCode", () => {
+        it("should return the JSON response upon successful email verification", async () => {
+            const mockResponse = { token: "a-valid-jwt" };
             fetch.mockResolvedValueOnce({
                 ok: true,
-                text: async () => "Email verified successfully",
+                json: async () => mockResponse,
             });
 
-            const result = await verifyEmailToken("sample-token");
+            const result = await verifyEmailCode({ verificationId: "vid-123", code: "ABCDEFGH" });
 
             expect(fetch).toHaveBeenCalledWith(
-                expect.stringContaining("/api/users/verify?token=sample-token")
+                expect.stringContaining("/api/users/verify"),
+                expect.objectContaining({
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ verificationId: "vid-123", code: "ABCDEFGH" }),
+                })
             );
-            expect(result).toBe("Email verified successfully");
+            expect(result).toEqual(mockResponse);
+        });
+
+        it("should throw an error with backend error message when verification fails", async () => {
+            fetch.mockResolvedValueOnce({
+                ok: false,
+                text: async () => "Invalid code.",
+            });
+
+            await expect(
+                verifyEmailCode({ verificationId: "vid-123", code: "WRONGCODE" })
+            ).rejects.toThrow("Could not verify the code.");
         });
     });
 });

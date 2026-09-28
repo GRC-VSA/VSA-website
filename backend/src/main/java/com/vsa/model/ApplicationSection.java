@@ -1,9 +1,19 @@
 package com.vsa.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,26 +24,34 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "application_sections")
 public class ApplicationSection {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "section_id")
-  private Long sectionId;
 
-  @Column(name = "section_heading", nullable = false)
-  private String sectionHeading;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "section_id")
+    private Long sectionId;
 
-  @Column(name = "section_description", columnDefinition = "TEXT")
-  private String sectionDescription;
+    @Column(name = "section_heading", nullable = false)
+    private String sectionHeading;
 
-  @Column(name = "section_number", nullable = false)
-  private int sectionNumber;
+    @Column(name = "section_description", columnDefinition = "TEXT")
+    private String sectionDescription;
 
-  @JsonIgnore
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "application_role_id", nullable = false)
-  private ApplicationRole applicationRole;
+    @Column(name = "system_key", length = 100)
+    private String systemKey;
 
-  @OneToMany(mappedBy = "section", cascade = CascadeType.ALL, orphanRemoval = true)
-  @OrderBy("questionNumber ASC")
-  private List<ApplicationQuestion> questions = new ArrayList<>();
+    @OneToMany(
+        mappedBy = "section",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    @OrderBy("orderNum ASC")
+    private List<ApplicationQuestion> questions = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(
+        mappedBy = "section",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<ApplicationSectionRole> sectionRoles = new ArrayList<>();
 }

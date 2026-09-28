@@ -1,58 +1,105 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import VerifyEmailPage from "../VerifyEmailPage";
 import * as authApi from "../../api/auth";
+import * as AuthContextModule from "../../context/AuthContext.jsx";
 
 vi.mock("../../api/auth");
+vi.mock("../../context/AuthContext.jsx");
 
-const renderWithURL = (initialEntry) => {
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+    const actual = await vi.importActual("react-router-dom");
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+    };
+});
+
+const renderWithState = (state) => {
     return render(
-        <MemoryRouter initialEntries={[initialEntry]}>
-            <Routes>
-                <Route path="/verify-email" element={<VerifyEmailPage />} />
-            </Routes>
+        <MemoryRouter initialEntries={[{ pathname: "/verify", state }]}>
+            <VerifyEmailPage />
         </MemoryRouter>
     );
 };
 
 describe("VerifyEmailPage", () => {
+    const mockLoginWithToken = vi.fn();
+
     beforeEach(() => {
         vi.clearAllMocks();
-    });
-
-    it("displays missing token message if no token parameter is supplied in URL", async () => {
-        renderWithURL("/verify-email");
-
-        expect(await screen.findByText("Verification token is missing.")).toBeInTheDocument();
-        expect(authApi.verifyEmailToken).not.toHaveBeenCalled();
-    });
-
-    it("automatically verifies token on mount and displays success message", async () => {
-        authApi.verifyEmailToken.mockResolvedValueOnce("Verified successfully");
-
-        renderWithURL("/verify-email?token=valid-email-token-123");
-
-        await waitFor(() => {
-            expect(authApi.verifyEmailToken).toHaveBeenCalledWith("valid-email-token-123");
-            expect(
-                screen.getByText("Your email has been verified. You can now sign in.")
-            ).toBeInTheDocument();
+        vi.spyOn(AuthContextModule, "useAuth").mockReturnValue({
+            loginWithToken: mockLoginWithToken,
         });
     });
 
-    it("displays error message when token verification fails", async () => {
-        authApi.verifyEmailToken.mockRejectedValueOnce(
-            new Error("Email verification failed @.@ Bro be a nobody")
-        );
+    it("asks for email to recover the flow when there is no verificationId", () => {
+        renderWithState(undefined);
 
-        renderWithURL("/verify-email?token=invalid-token");
+        expect(
+            screen.getByText(/Enter the email you signed up with/i)
+        ).toBeInTheDocument();
+    });
+
+    it("signs the user in via AuthContext and navigates home on successful verification", async () => {
+        authApi.verifyEmailCode.mockResolvedValueOnce({ token: "a-valid-jwt" });
+
+        renderWithState({ verificationId: "vid-123", maskedEmail: "j***n@vsa.com" });
+
+        fireEvent.change(screen.getByLabelText(/Verification code/i), {
+            target: { value: "ABCDEFGH" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Verify and continue" }));
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Email verification failed @.@ Bro be a nobody")
-            ).toBeInTheDocument();
+            expect(authApi.verifyEmailCode).toHaveBeenCalledWith({
+                verificationId: "vid-123",
+                code: "ABCDEFGH",
+            });
+            expect(mockLoginWithToken).toHaveBeenCalledWith("a-valid-jwt");
+            expect(mockNavigate).toHaveBeenCalledWith("/", { replace: true });
         });
+    });
+
+    it("does not sign in or navigate when verification fails", async () => {
+        authApi.verifyEmailCode.mockRejectedValueOnce(new Error("Invalid code."));
+
+        renderWithState({ verificationId: "vid-123", maskedEmail: "j***n@vsa.com" });
+
+        fireEvent.change(screen.getByLabelText(/Verification code/i), {
+            target: { value: "ABCDEFGH" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Verify and continue" }));
+
+        await waitFor(() => {
+            expect(screen.getByText("Invalid code.")).toBeInTheDocument();
+        });
+
+        expect(mockLoginWithToken).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it("does not sign in or navigate when the response is missing a token", async () => {
+        authApi.verifyEmailCode.mockResolvedValueOnce({});
+
+        renderWithState({ verificationId: "vid-123", maskedEmail: "j***n@vsa.com" });
+
+        fireEvent.change(screen.getByLabelText(/Verification code/i), {
+            target: { value: "ABCDEFGH" },
+        });
+
+        fireEvent.click(screen.getByRole("button", { name: "Verify and continue" }));
+
+        await waitFor(() => {
+            expect(screen.getByText("Email verification failed.")).toBeInTheDocument();
+        });
+
+        expect(mockLoginWithToken).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
     });
 });

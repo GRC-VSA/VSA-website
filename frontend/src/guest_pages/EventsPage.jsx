@@ -238,10 +238,10 @@ const EventsPage = () => {
 
     return (
         <main id="event-page-main" className="page-footer-space" ref={sectionRef}>
-            <div id="cover-photo-container">
+            <div id="event-cover-photo-container">
                 <img src={coverPhoto} id="cover-photo"></img>
                 <div id="overlay"></div>
-                <div className="cover-photo-text">
+                <div className="event-cover-photo-text">
                     <span>VSA EVENTS</span>
                     <h1>Discover Events <br />that Bring
                         <span id="highlight-header"> Excitement</span>

@@ -54,17 +54,33 @@ describe("Footer Component", () => {
 
         expect(mockNavigate).toHaveBeenCalledWith("/events");
     });
+    const { mockAuth, mockReplaceLocation } = vi.hoisted(() => ({
+        mockAuth: { isAuthenticated: false },
+        mockReplaceLocation: vi.fn(),
+    }));
+    vi.mock("../../context/AuthContext.jsx", () => ({
+        useAuth: () => mockAuth,
+    }));
 
-    it("navigates to /apply when clicking 'Apply Officer'", () => {
+    vi.mock("../../utils/navigation.js", () => ({
+        replaceLocation: mockReplaceLocation,
+    }));
+
+    beforeEach(() => {
+        mockAuth.isAuthenticated = false;
+        mockReplaceLocation.mockClear();
+    });
+    it("sends signed-out users to sign-in before applying", () => {
         render(
             <MemoryRouter>
                 <Footer />
             </MemoryRouter>
         );
 
-        const applyBtn = screen.getByRole("button", { name: /Apply Officer/i });
-        fireEvent.click(applyBtn);
+        fireEvent.click(screen.getByRole("button", { name: /Apply Officer/i }));
 
-        expect(mockNavigate).toHaveBeenCalledWith("/apply");
+        expect(mockReplaceLocation).toHaveBeenCalledWith(
+            "/sign-in?redirect=/apply&from=%2F"
+        );
     });
 });

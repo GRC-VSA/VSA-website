@@ -190,8 +190,13 @@
    Sign In/ Sign Up Pages
 =========================== */
 
-.auth-card.order-photo-first { flex-direction: row; }
-.auth-card.order-photo-last { flex-direction: row-reverse; }
+.auth-card.order-photo-first {
+    flex-direction: row;
+}
+
+.auth-card.order-photo-last {
+    flex-direction: row-reverse;
+}
 
 .auth-page {
     --vsa-red: #ab3130;
@@ -199,7 +204,6 @@
     --vsa-gold: #ece0a6;
     --vsa-black: #000000;
     --vsa-white: #ffffff;
-
     font-family: 'Poppins', sans-serif;
 
     width: 100%;
@@ -253,6 +257,12 @@
     position: relative;
     flex: 1 1 48%;
     overflow: hidden;
+}
+
+.back-button {
+    position: absolute;
+    bottom: 8%;
+    left: 5%;
 }
 
 .auth-photo {
@@ -353,7 +363,7 @@
     display: block;
 
     transition: transform .2s ease,
-    opacity .2s ease;
+        opacity .2s ease;
 }
 
 .auth-logo-link:hover .auth-logo-image {
@@ -520,7 +530,88 @@
     background: var(--vsa-gold);
 }
 
+.verify-code-input {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5em;
+    /* letter-spacing adds trailing space after the last character, which throws
+       off the centering — pull it back by half an em */
+    text-indent: 0.5em;
+    font-family: "Courier New", monospace;
+    text-transform: uppercase;
+}
+
+.verify-resend-button {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--vsa-red, #ab3130);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.verify-resend-button:disabled {
+    color: #999;
+    cursor: default;
+}
+
+.verify-resend-button:not(:disabled):hover {
+    text-decoration: underline;
+}
+
+.auth-password-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-password-input {
+    position: relative;
+}
+
+.auth-password-input input {
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 54px;
+}
+
+.auth-form .auth-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: none;
+    color: #666;
+    cursor: pointer;
+}
+
+.auth-form .auth-password-toggle:hover {
+    transform: translateY(-50%);
+    background: none;
+}
+
+.auth-form .auth-password-toggle:focus-visible {
+    outline: none;
+    /* outline-offset: 2px; */
+}
+
 @media (max-width: 560px) {
+
     .reset-password-page,
     .verify-email-page,
     .forgot-password-page {
@@ -539,6 +630,10 @@
         font-size: 28px;
     }
 
+    .auth-logo-image {
+        width: 150px;
+    }
+
     .auth-page {
         height: auto;
         min-height: 100dvh;
@@ -552,6 +647,28 @@
 
     .auth-photo-panel {
         flex: 0 0 28dvh;
+    }
+
+    .auth-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 20%;
+    }
+
+    .auth-photo-overlay {
+        inset: 0;
+    }
+
+    .back-button {
+        /* position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 250px;
+        padding: 10px 5px;
+        font-size: 0.9rem; */
+        display: none;
     }
 
     .auth-form-panel {

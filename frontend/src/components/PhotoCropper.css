@@ -1,0 +1,130 @@
+.photo-cropper {
+    --photo-accent: #ab3130;
+    min-width: 0;
+    max-width: 100%;
+    font: inherit;
+}
+
+.photo-cropper *,
+.photo-cropper *::before,
+.photo-cropper *::after {
+    box-sizing: border-box;
+}
+
+.photo-cropper-trigger,
+.photo-cropper-actions button {
+    min-height: 42px;
+    padding: 9px 18px;
+    border: 1px solid #e8e0dc;
+    border-radius: 9px;
+    background: #fff;
+    color: #272323;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.photo-cropper-trigger {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.photo-cropper-trigger:hover:not(:disabled),
+.photo-cropper-actions button:first-child:hover:not(:disabled) {
+    border-color: var(--photo-accent);
+    background: #fcf4f1;
+}
+
+.photo-cropper button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.photo-cropper button:focus-visible,
+.photo-cropper input:focus-visible {
+    outline: 3px solid #e4b35b;
+    outline-offset: 2px;
+}
+
+.photo-cropper-overlay {
+    position: fixed;
+    z-index: 1200;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow-y: auto;
+    padding: 20px;
+    background: rgb(25 19 18 / 72%);
+}
+
+.photo-cropper-dialog {
+    width: min(100%, 520px);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: clamp(20px, 4vw, 30px);
+    border-radius: 16px;
+    background: #fff;
+    color: #272323;
+    box-shadow: 0 24px 70px rgb(0 0 0 / 22%);
+}
+
+.photo-cropper-dialog h2 {
+    margin: 0 0 18px;
+    font-size: 1.4rem;
+}
+
+.photo-cropper-area {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 42vh, 340px);
+    overflow: hidden;
+    border-radius: 10px;
+    background: #242020;
+}
+
+.photo-cropper-dialog > label {
+    display: grid;
+    gap: 7px;
+    margin-top: 18px;
+    font-size: 0.93rem;
+    font-weight: 600;
+}
+
+.photo-cropper-dialog input[type="range"] {
+    width: 100%;
+    margin: 0;
+    accent-color: var(--photo-accent);
+    cursor: pointer;
+}
+
+.photo-cropper-error {
+    margin: 12px 0 0;
+    color: #91271e;
+    font-size: 0.92rem;
+}
+
+.photo-cropper-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 26px;
+}
+
+.photo-cropper-actions button:last-child {
+    border-color: var(--photo-accent);
+    background: var(--photo-accent);
+    color: #fff;
+}
+
+.photo-cropper-actions button:last-child:hover:not(:disabled) {
+    border-color: #862624;
+    background: #862624;
+}
+
+@media (max-width: 380px) {
+    .photo-cropper-actions button {
+        flex: 1;
+    }
+}

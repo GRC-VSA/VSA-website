@@ -87,6 +87,10 @@ public class EmailOutboxProcessor {
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
 
                 case AVAILABILITY_EDIT_LINK -> sendAvailabilityEditLinkEmail(outbox, payload);
+
+                case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
+
+                case EMAIL_CHANGE_VERIFICATION -> sendEmailChangeVerificationEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -95,10 +99,12 @@ public class EmailOutboxProcessor {
             outbox.setLastError(null);
 
             /*
-             * Verification payload contains the plaintext code.
+             * Verification payloads contain the plaintext code.
              * Once successfully delivered, we no longer need to keep it.
              */
-            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION) {
+            if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.ACCOUNT_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION) {
                 outbox.setPayload("{}");
             }
 
@@ -157,6 +163,24 @@ public class EmailOutboxProcessor {
                 (String) payload.get("eventDate"),
                 (String) payload.get("startTime"),
                 (String) payload.get("location")
+        );
+    }
+
+    private void sendAccountVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendAccountVerificationCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendEmailChangeVerificationEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendEmailChangeCodeEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("verificationCode")
         );
     }
 

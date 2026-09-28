@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.vsa.security.IpRateLimitFilter;
 import com.vsa.security.JwtFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,8 @@ class SecurityConfigTest {
     @BeforeEach
     void setUp() {
         JwtFilter jwtFilter = mock(JwtFilter.class);
-        securityConfig = new SecurityConfig(jwtFilter);
+        IpRateLimitFilter ipRateLimitFilter = mock(IpRateLimitFilter.class);
+        securityConfig = new SecurityConfig(jwtFilter, ipRateLimitFilter);
         ReflectionTestUtils.setField(securityConfig, "frontendUrl", "http://localhost:3000");
     }
 

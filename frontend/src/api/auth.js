@@ -2,18 +2,18 @@ import { API_BASE_URL } from "./config";
 
 //Post
 /*******************************************************************************************************************
-Brief:
-- This function needs 2 parameters: email & password
-- It sends the email and password of the user input to backend through the API "/api/users/login",
-- and receives and also returns the JWT token for the account from backend.
+ Brief:
+ - This function needs 2 parameters: email & password
+ - It sends the email and password of the user input to backend through the API "/api/users/login",
+ - and receives and also returns the JWT token for the account from backend.
 
-Usage:
-- This function is used right when the user logs in
-- It is called by the "login" method in "../context/AuthContext.jsx"
-- This function returns the JWT token and the "login" method will decode that token and store it in localStorage
-- The login method is, then, called when the user hit "login" in button in "../pages/SignInPage.jsx"
+ Usage:
+ - This function is used right when the user logs in
+ - It is called by the "login" method in "../context/AuthContext.jsx"
+ - This function returns the JWT token and the "login" method will decode that token and store it in localStorage
+ - The login method is, then, called when the user hit "login" in button in "../pages/SignInPage.jsx"
 
-**********************************************************************************************************************/
+ **********************************************************************************************************************/
 export async function loginUser({ email, password }) {
     const res = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: "POST",
@@ -27,14 +27,22 @@ export async function loginUser({ email, password }) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Login failed");
+        throw await apiError(res, "Incorrect email or password.");
     }
 
     return res.json();
 }
 
-// Likewise, I aint have time to add comment for every of them (@.@)
+/*******************************************************************************************************************
+ Brief:
+ - Creates the account and asks the backend to email a verification code.
+ - Returns { verificationId, maskedEmail, expiresAt } -- NOT the created user.
+
+ Note:
+ - The account exists at this point but cannot log in until the code is verified.
+ - Hold on to verificationId: it is what identifies this verification attempt when
+ the user submits their code.
+ **********************************************************************************************************************/
 export async function registerUser(registerData) {
     const res = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: "POST",
@@ -45,22 +53,59 @@ export async function registerUser(registerData) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Registration failed");
+        throw await apiError(res, "Registration failed. Please try again.");
     }
 
     return res.json();
 }
 
-export async function verifyEmailToken(token) {
-    const res = await fetch(`${API_BASE_URL}/api/users/verify?token=${token}`);
+/*******************************************************************************************************************
+ Brief:
+ - Submits the code the user typed in from their verification email.
+ - Returns { token, message } -- the token logs them straight in, so there is no
+ need to send them back to the sign-in page afterwards.
+ **********************************************************************************************************************/
+export async function verifyEmailCode({ verificationId, code }) {
+    const res = await fetch(`${API_BASE_URL}/api/users/verify`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            verificationId,
+            code,
+        }),
+    });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Email verification failed @.@ Bro be a nobody");
+        throw await apiError(res, "Could not verify the code.");
     }
 
-    return res.text();
+    return res.json();
+}
+
+/*******************************************************************************************************************
+ Brief:
+ - Asks for a fresh verification code for a pending (unverified) account.
+ - Keyed by email rather than verificationId on purpose: this exists for the user
+ who closed the tab and no longer has a verificationId to send.
+ - Returns { verificationId, maskedEmail, expiresAt } -- always replace the
+ verificationId you were holding with this one.
+ **********************************************************************************************************************/
+export async function resendVerificationCode(email) {
+    const res = await fetch(`${API_BASE_URL}/api/users/resend-verification`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+    });
+
+    if (!res.ok) {
+        throw await apiError(res, "Could not send a new code.");
+    }
+
+    return res.json();
 }
 
 export async function sendForgotPasswordEmail(email) {
@@ -75,8 +120,7 @@ export async function sendForgotPasswordEmail(email) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Failed to send reset email");
+        throw await apiError(res, "Could not send the reset email.");
     }
 
     return res.text();
@@ -95,9 +139,30 @@ export async function resetPassword({ token, newPassword }) {
     });
 
     if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(errorText || "Password reset failed");
+        throw await apiError(res, "Could not reset your password.");
     }
 
     return res.text();
+}
+
+async function apiError(res, fallbackMessage) {
+    const raw = await res.text().catch(() => "");
+    let body;
+    try {
+        body = JSON.parse(raw);
+    } catch {
+        body = null;
+    }
+
+    const serverMessage = typeof body?.message === "string" ? body.message.trim() : "";
+
+    const message = res.status === 429
+        ? "Too many attempts. Please wait and try again."
+        : res.status >= 500
+            ? "Something went wrong on our side. Please try again later."
+            : serverMessage || fallbackMessage;
+
+    const error = new Error(message);
+    error.status = res.status;
+    return error;
 }

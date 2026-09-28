@@ -1,76 +1,99 @@
 package com.vsa.controller;
 
-import com.vsa.controller.ApplicationDtos.*;
-import com.vsa.model.ApplicantStatus;
-import com.vsa.service.ApplicationService;
-import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vsa.dto.request.SaveApplicationRequest;
+import com.vsa.dto.response.ApplicationOverviewResponse;
+import com.vsa.dto.response.ApplicationReviewResponse;
+import com.vsa.dto.response.OfficerApplicationResponse;
+import com.vsa.model.OfficerApplicationStatus;
+import com.vsa.service.ApplicationService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/applications")
 public class ApplicationController {
-  private final ApplicationService applicationService;
 
-  public ApplicationController(ApplicationService applicationService) {
-    this.applicationService = applicationService;
-  }
+    private final ApplicationService applicationService;
 
-  @PostMapping
-  public ResponseEntity<List<SubmittedApplicationResponse>> submit(
-      Principal principal, @Valid @RequestBody SubmitApplicationsRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(applicationService.submitApplications(principal.getName(), request));
-  }
+    public ApplicationController(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
 
-  @GetMapping("/mine")
-  public List<SubmittedApplicationResponse> getMine(Principal principal) {
-    return applicationService.getMyApplications(principal.getName());
-  }
+    @PostMapping("/start/{roleId}")
+    public OfficerApplicationResponse startApplication(Principal principal, @PathVariable Long roleId) {
+        return applicationService.startApplication(principal.getName(), roleId);
+    }
 
-  @GetMapping("/mine/{applicantId}")
-  public SubmittedApplicationResponse getMine(
-      Principal principal, @PathVariable Long applicantId) {
-    return applicationService.getMyApplication(principal.getName(), applicantId);
-  }
+    @GetMapping("/mine")
+    public List<OfficerApplicationResponse> getMyApplications(Principal principal) {
+        return applicationService.getMyApplications(principal.getName());
+    }
 
-  @PutMapping("/mine/{applicantId}")
-  public SubmittedApplicationResponse updateMine(
-      Principal principal,
-      @PathVariable Long applicantId,
-      @Valid @RequestBody UpdateApplicationRequest request) {
-    return applicationService.updateMyApplication(principal.getName(), applicantId, request);
-  }
+    //This endpoint is for resuming an IN_PROGRESS application.
+    @GetMapping("/mine/{applicationId}")
+    public OfficerApplicationResponse getMyApplication(Principal principal, @PathVariable Integer applicationId) {
+        return applicationService.getMyApplication(principal.getName(), applicationId);
+    }
 
-  @DeleteMapping("/mine/{applicantId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void withdraw(Principal principal, @PathVariable Long applicantId) {
-    applicationService.deleteMyApplication(principal.getName(), applicantId);
-  }
+    @PutMapping("/mine/{applicationId}")
+    public OfficerApplicationResponse saveApplication(
+            Principal principal,
+            @PathVariable Integer applicationId,
+            @Valid @RequestBody SaveApplicationRequest request
+    ) {
+        return applicationService.saveApplication(principal.getName(), applicationId, request);
+    }
 
-  @GetMapping
-  public List<SubmittedApplicationResponse> getAll(
-      @RequestParam(required = false) ApplicantStatus status) {
-    return applicationService.getAllApplications(status);
-  }
+    // This endpoint is for users to review their submitted applications. Those are read-only.
+    @GetMapping("/mine/{applicationId}/review")
+    public ApplicationReviewResponse getMySubmittedApplicationReview(
+            Principal principal,
+            @PathVariable Integer applicationId
+    ) {
+        return applicationService.getMySubmittedApplicationReview(
+                principal.getName(),
+                applicationId
+        );
+    }
 
-  @GetMapping("/{applicantId}")
-  public SubmittedApplicationResponse getOne(@PathVariable Long applicantId) {
-    return applicationService.getApplication(applicantId);
-  }
+    @PostMapping("/mine/{applicationId}/submit")
+    public OfficerApplicationResponse submitApplication(
+            Principal principal,
+            @PathVariable Integer applicationId,
+            @Valid @RequestBody SaveApplicationRequest request
+    ) {
+        return applicationService.submitApplication(principal.getName(), applicationId, request);
+    }
 
-  @PatchMapping("/{applicantId}/status")
-  public SubmittedApplicationResponse updateStatus(
-      @PathVariable Long applicantId, @Valid @RequestBody UpdateStatusRequest request) {
-    return applicationService.updateStatus(applicantId, request.status());
-  }
+    @GetMapping("/overview")
+    public ApplicationOverviewResponse getApplicationOverview() {
+        return applicationService.getApplicationOverview();
+    }
 
-  @DeleteMapping("/{applicantId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable Long applicantId) {
-    applicationService.deleteApplication(applicantId);
-  }
+    @GetMapping
+    public List<OfficerApplicationResponse> getAllApplications(@RequestParam(required = false) OfficerApplicationStatus status) {
+        return applicationService.getAllApplications(status);
+    }
+
+    @GetMapping("/{applicationId}/review")
+    public ApplicationReviewResponse getSubmittedApplicationReview(@PathVariable Integer applicationId) {
+        return applicationService.getSubmittedApplicationReview(applicationId);
+    }
+
+    @GetMapping("/{applicationId}")
+    public OfficerApplicationResponse getApplication(@PathVariable Integer applicationId) {
+        return applicationService.getApplication(applicationId);
+    }
 }

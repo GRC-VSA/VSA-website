@@ -1,0 +1,1667 @@
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.edit-application-form-page {
+    width: 100%;
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    padding: 42px 48px 80px;
+
+    background: #f6f6f7;
+
+    color: #222;
+}
+
+
+.edit-application-page-header {
+    max-width: 1200px;
+
+    margin: 0 auto 28px;
+}
+
+
+.edit-application-eyebrow {
+    margin: 0 0 6px;
+
+    color: #ab3130;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    letter-spacing: 0.18em;
+}
+
+
+.edit-application-page-header h1 {
+    margin: 0;
+
+    font-size: 2rem;
+    font-weight: 700;
+
+    color: #202020;
+}
+
+
+.edit-application-page-description {
+    max-width: 620px;
+
+    margin: 9px 0 0;
+
+    color: #737373;
+
+    font-size: 0.95rem;
+
+    line-height: 1.55;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.edit-application-loading {
+    padding: 60px;
+
+    text-align: center;
+
+    color: #777;
+}
+
+.edit-application-save-area {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+
+.edit-application-unsaved-label {
+    color: #a46d13;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+.edit-application-save-changes-button {
+    padding: 11px 20px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #AB3130;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.edit-application-save-changes-button:hover:not(:disabled) {
+    filter: brightness(0.94);
+}
+
+
+.edit-application-save-changes-button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.edit-application-panel,
+.edit-application-builder-section {
+    max-width: 1200px;
+
+    margin: 0 auto 24px;
+
+    padding: 26px 28px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e3e3e3;
+    border-radius: 14px;
+
+    background: white;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.035);
+}
+
+
+.edit-application-recruitment-panel {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+
+.edit-application-panel-info {
+    flex: 1;
+}
+
+
+.edit-application-panel-title-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.edit-application-panel h2,
+.edit-application-builder-section h2 {
+    margin: 0;
+
+    color: #272727;
+
+    font-size: 1.2rem;
+}
+
+
+.edit-application-panel-info>p,
+.edit-application-section-header p,
+.edit-application-builder-header p {
+    margin: 7px 0 0;
+
+    color: #797979;
+
+    font-size: 0.9rem;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+.status-pill,
+.role-status,
+.permanent-section-badge,
+.draft-section-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 23px;
+
+    padding: 0 9px;
+
+    border-radius: 999px;
+
+    font-size: 0.68rem;
+    font-weight: 500;
+
+    letter-spacing: 0.04em;
+}
+
+
+.status-pill-open,
+.role-status-on {
+    background: #e7f6eb;
+
+    color: #258442;
+}
+
+
+.status-pill-closed,
+.role-status-off {
+    background: #eeeeee;
+
+    color: #727272;
+}
+
+
+.permanent-section-badge {
+    background: #f7e8e8;
+
+    color: #a52929;
+}
+
+
+.draft-section-badge {
+    background: #fff3d9;
+
+    color: #93620d;
+}
+
+
+/* =========================================================
+   LIVE WARNING
+   ========================================================= */
+
+.edit-application-live-note {
+    max-width: 1200px;
+
+    margin: -10px auto 24px;
+
+    padding: 11px 16px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e8d7ad;
+    border-radius: 9px;
+
+    background: #fff9e9;
+
+    color: #725b25;
+
+    font-size: 0.83rem;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.edit-application-alert {
+    max-width: 1200px;
+
+    margin: 0 auto 18px;
+
+    padding: 12px 14px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    border-radius: 9px;
+
+    font-size: 0.88rem;
+}
+
+
+.edit-application-alert button {
+    display: flex;
+
+    border: none;
+
+    background: transparent;
+
+    cursor: pointer;
+}
+
+
+.edit-application-alert-error {
+    border: 1px solid #efcccc;
+
+    background: #fff0f0;
+
+    color: #a12c2c;
+}
+
+
+.edit-application-alert-success {
+    border: 1px solid #cce7d3;
+
+    background: #edf8f0;
+
+    color: #27743d;
+}
+
+
+/* =========================================================
+   SWITCH
+   ========================================================= */
+
+.edit-application-switch {
+    position: relative;
+
+    display: inline-block;
+
+    width: 54px;
+    height: 29px;
+
+    flex-shrink: 0;
+}
+
+
+.edit-application-switch-small {
+    width: 46px;
+    height: 25px;
+}
+
+
+.edit-application-switch input {
+    width: 0;
+    height: 0;
+
+    opacity: 0;
+}
+
+
+.edit-application-switch-slider {
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 999px;
+
+    background: #c9c9c9;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+
+.edit-application-switch-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 21px;
+    height: 21px;
+
+    top: 4px;
+    left: 4px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 1px 5px rgba(0, 0, 0, 0.2);
+
+    transition: 0.2s;
+}
+
+
+.edit-application-switch-small .edit-application-switch-slider::before {
+    width: 17px;
+    height: 17px;
+}
+
+
+.edit-application-switch input:checked+.edit-application-switch-slider {
+    background: #ab3130;
+}
+
+
+.edit-application-switch input:checked+.edit-application-switch-slider::before {
+    transform: translateX(25px);
+}
+
+
+.edit-application-switch-small input:checked+.edit-application-switch-slider::before {
+    transform: translateX(21px);
+}
+
+
+.edit-application-switch input:disabled+.edit-application-switch-slider {
+    cursor: not-allowed;
+
+    opacity: 0.6;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.edit-application-section-header,
+.edit-application-builder-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.edit-application-primary-button {
+    min-height: 40px;
+
+    padding: 0 16px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px solid #ab3130;
+    border-radius: 8px;
+
+    background: #ab3130;
+
+    color: white;
+
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.edit-application-primary-button:hover {
+    background: #942827;
+
+    transform: translateY(-1px);
+}
+
+
+.edit-application-icon-text-button {
+    min-height: 38px;
+
+    padding: 0 12px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    border: 1px solid #d9d9d9;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #444;
+
+    font: inherit;
+    font-size: 0.8rem;
+
+    cursor: pointer;
+}
+
+
+.edit-application-icon-text-button:hover {
+    border-color: #aaa;
+
+    background: #fafafa;
+}
+
+
+.edit-application-danger-button {
+    color: #b12a2a;
+}
+
+
+.edit-application-danger-button:hover {
+    border-color: #e1b3b3;
+
+    background: #fff5f5;
+}
+
+
+.edit-application-icon-text-button:disabled,
+.edit-application-primary-button:disabled {
+    opacity: 0.5;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+
+
+.edit-application-role-select-wrapper {
+    position: relative;
+
+    width: min(420px, 100%);
+}
+
+
+.edit-application-role-select-wrapper select {
+    width: 100%;
+    height: 43px;
+
+    padding: 0 42px 0 13px;
+
+    border: 1px solid #d6d6d6;
+    border-radius: 8px;
+
+    background: white;
+
+    color: #292929;
+
+    font: inherit;
+    font-size: 0.9rem;
+
+    appearance: none;
+
+    outline: none;
+}
+
+
+.edit-application-role-select-wrapper select:focus {
+    border-color: #ab3130;
+
+    box-shadow:
+        0 0 0 3px rgba(171, 49, 48, 0.08);
+}
+
+
+.edit-application-role-select-wrapper svg {
+    position: absolute;
+
+    right: 13px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    pointer-events: none;
+
+    color: #777;
+}
+
+
+.edit-application-role-recruiting {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    flex-shrink: 0;
+
+    color: #555;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   BUILDER
+   ========================================================= */
+
+.edit-application-builder-section {
+    margin-top: 30px;
+}
+
+
+.edit-application-builder-label {
+    margin: 0 0 5px !important;
+
+    color: #ab3130 !important;
+
+    font-size: 0.68rem !important;
+    font-weight: 700;
+
+    letter-spacing: 0.14em;
+}
+
+
+.edit-application-sections {
+    margin-top: 26px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+/* =========================================================
+   SECTION CARD
+   ========================================================= */
+
+.edit-application-section-card {
+    overflow: hidden;
+
+    border: 1px solid #dfdfdf;
+    border-radius: 12px;
+
+    background: white;
+}
+
+
+.edit-application-section-card-header {
+    padding: 18px 20px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    background: #fafafa;
+
+    border-bottom: 1px solid #ececec;
+}
+
+
+.edit-application-section-number {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: #ab3130;
+
+    color: white;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+
+.edit-application-section-card-heading {
+    flex: 1;
+}
+
+
+.edit-application-section-title-row {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.edit-application-section-title-row h3 {
+    margin: 0;
+
+    font-size: 1rem;
+
+    color: #292929;
+}
+
+
+.edit-application-section-card-heading>p {
+    margin: 6px 0 0;
+
+    color: #777;
+
+    font-size: 0.84rem;
+
+    line-height: 1.45;
+}
+
+
+.shared-section-label {
+    display: inline-block;
+
+    margin-top: 7px;
+
+    color: #8a8a8a;
+
+    font-size: 0.74rem;
+}
+
+
+.edit-application-section-card-actions {
+    display: flex;
+
+    gap: 6px;
+}
+
+
+.edit-application-section-card-actions button,
+.edit-application-question-actions button {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #dedede;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #555;
+
+    cursor: pointer;
+}
+
+
+.edit-application-section-card-actions button:hover,
+.edit-application-question-actions button:hover {
+    border-color: #aaa;
+
+    background: #f6f6f6;
+}
+
+
+.edit-application-section-card-actions button.danger,
+.edit-application-question-actions button.danger {
+    color: #ad2929;
+}
+
+
+.edit-application-section-card-actions button.danger:hover,
+.edit-application-question-actions button.danger:hover {
+    border-color: #e8bbbb;
+
+    background: #fff3f3;
+}
+
+
+/* =========================================================
+   QUESTION LIST
+   ========================================================= */
+
+.edit-application-question-list {
+    padding: 8px 20px;
+}
+
+
+.edit-application-question-row {
+    min-height: 66px;
+
+    padding: 12px 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+
+.edit-application-question-row:last-child {
+    border-bottom: none;
+}
+
+
+.edit-application-question-number {
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #f0f0f0;
+
+    color: #777;
+
+    font-size: 0.72rem;
+}
+
+
+.edit-application-question-content {
+    flex: 1;
+}
+
+
+.edit-application-question-text {
+    margin: 0;
+
+    color: #303030;
+
+    font-size: 0.88rem;
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+
+.edit-application-question-meta {
+    margin-top: 6px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+
+.edit-application-question-meta span {
+    padding: 3px 7px;
+
+    border-radius: 5px;
+
+    background: #f1f1f1;
+
+    color: #737373;
+
+    font-size: 0.67rem;
+}
+
+
+.edit-application-question-meta .question-required {
+    background: #f8e9e9;
+
+    color: #a42e2e;
+}
+
+
+.edit-application-question-actions {
+    display: flex;
+
+    gap: 5px;
+}
+
+
+.edit-application-no-questions {
+    padding: 22px;
+
+    text-align: center;
+
+    color: #929292;
+
+    font-size: 0.82rem;
+}
+
+
+/* =========================================================
+   ADD QUESTION / SECTION
+   ========================================================= */
+
+.edit-application-add-question-button {
+    width: calc(100% - 40px);
+
+    min-height: 39px;
+
+    margin: 5px 20px 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px dashed #c8c8c8;
+    border-radius: 8px;
+
+    background: #fbfbfb;
+
+    color: #666;
+
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.edit-application-add-question-button:hover {
+    border-color: #ab3130;
+
+    background: #fff8f8;
+
+    color: #ab3130;
+}
+
+
+.edit-application-add-section-button {
+    width: 100%;
+
+    min-height: 48px;
+
+    margin-top: 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border: 1px dashed #ba8e8e;
+    border-radius: 10px;
+
+    background: rgba(171, 49, 48, 0.025);
+
+    color: #ab3130;
+
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.edit-application-add-section-button:hover {
+    background: rgba(171, 49, 48, 0.06);
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.edit-application-empty-state {
+    padding: 60px 20px 40px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.edit-application-empty-state h3 {
+    margin: 0;
+
+    color: #333;
+}
+
+
+.edit-application-empty-state p {
+    margin: 8px 0 20px;
+
+    color: #888;
+
+    font-size: 0.86rem;
+}
+
+
+/* =========================================================
+   DIALOG
+   ========================================================= */
+
+.edit-application-dialog-backdrop {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 5000;
+
+    padding: 25px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(15, 15, 15, 0.48);
+
+    backdrop-filter: blur(2px);
+}
+
+
+.edit-application-dialog {
+    width: min(560px, 100%);
+
+    max-height: calc(100vh - 50px);
+
+    overflow-y: auto;
+
+    border-radius: 14px;
+
+    background: white;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+
+.edit-application-dialog-header {
+    padding: 20px 22px;
+
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    border-bottom: 1px solid #ececec;
+}
+
+
+.edit-application-dialog-header h2 {
+    margin: 0;
+
+    font-size: 1.2rem;
+
+    color: #292929;
+}
+
+
+.edit-application-dialog-header p {
+    margin: 5px 0 0;
+
+    color: #818181;
+
+    font-size: 0.82rem;
+}
+
+
+.edit-application-dialog-header>button {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    color: #666;
+
+    cursor: pointer;
+}
+
+
+.edit-application-dialog-header>button:hover {
+    background: #f2f2f2;
+}
+
+
+/* =========================================================
+   DIALOG FORM
+   ========================================================= */
+
+.edit-application-dialog-form {
+    padding: 22px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+.edit-application-dialog-form>label {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    color: #333;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+.edit-application-dialog-form>label>span,
+.edit-application-dialog-field-label>span {
+    color: #c22e2d;
+}
+
+
+.edit-application-dialog-form input[type="text"],
+.edit-application-dialog-form textarea,
+.edit-application-dialog-form select {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d5d5d5;
+    border-radius: 8px;
+
+    background: white;
+
+    color: #2c2c2c;
+
+    font: inherit;
+    font-size: 0.88rem;
+
+    outline: none;
+}
+
+
+.edit-application-dialog-form input[type="text"],
+.edit-application-dialog-form select {
+    height: 43px;
+
+    padding: 0 12px;
+}
+
+
+.edit-application-dialog-form textarea {
+    padding: 11px 12px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+
+.edit-application-dialog-form input:focus,
+.edit-application-dialog-form textarea:focus,
+.edit-application-dialog-form select:focus {
+    border-color: #ab3130;
+
+    box-shadow:
+        0 0 0 3px rgba(171, 49, 48, 0.07);
+}
+
+
+/* =========================================================
+   SECTION ROLE CHECKBOXES
+   ========================================================= */
+
+.edit-application-dialog-field-label {
+    margin: 0 0 8px;
+
+    color: #333;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+.edit-application-role-checkboxes {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+
+.edit-application-checkbox-option {
+    min-height: 40px;
+
+    padding: 7px 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e1e1e1;
+    border-radius: 7px;
+
+    color: #555;
+
+    font-size: 0.8rem;
+
+    cursor: pointer;
+}
+
+
+.edit-application-checkbox-option:hover {
+    border-color: #c9a6a6;
+
+    background: #fffafa;
+}
+
+
+.edit-application-checkbox-option input {
+    accent-color: #ab3130;
+}
+
+
+/* =========================================================
+   REQUIRED QUESTION ROW
+   ========================================================= */
+
+.edit-application-required-row {
+    flex-direction: row !important;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 14px;
+
+    border: 1px solid #e1e1e1;
+    border-radius: 9px;
+
+    background: #fafafa;
+}
+
+
+.edit-application-required-row strong {
+    color: #333;
+
+    font-size: 0.83rem;
+}
+
+
+.edit-application-required-row p {
+    margin: 4px 0 0;
+
+    color: #838383;
+
+    font-size: 0.73rem;
+    font-weight: 400;
+}
+
+
+.edit-application-options-editor {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.edit-application-options-editor-header {
+    margin-bottom: 2px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+.edit-application-options-editor-header>span {
+    color: #333;
+
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+
+.edit-application-options-editor-header button {
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #ab3130;
+
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.edit-application-option-editor-row {
+    display: grid;
+
+    grid-template-columns:
+        25px 1fr 34px;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.edit-application-option-editor-row>span {
+    color: #9b9b9b;
+
+    font-size: 0.72rem;
+
+    text-align: center;
+}
+
+
+.edit-application-option-editor-row button {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 6px;
+
+    background: #fff1f1;
+
+    color: #ad2d2d;
+
+    cursor: pointer;
+}
+
+
+.edit-application-dialog-actions {
+    margin-top: 4px;
+
+    padding-top: 17px;
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    border-top: 1px solid #ececec;
+}
+
+
+.edit-application-dialog-actions button {
+    min-height: 40px;
+
+    padding: 0 16px;
+
+    border-radius: 8px;
+
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.edit-application-dialog-cancel {
+    border: 1px solid #d4d4d4;
+
+    background: white;
+
+    color: #555;
+}
+
+
+.edit-application-dialog-submit {
+    border: 1px solid #ab3130;
+
+    background: #ab3130;
+
+    color: white;
+}
+
+
+.edit-application-dialog-submit:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+strong {
+    font-weight: bold;
+}
+
+.edit-application-role-list {
+    margin-top: 22px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+.edit-application-role-card {
+    padding: 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+
+    background: #fafafa;
+}
+
+
+.edit-application-role-card-info {
+    flex: 1;
+}
+
+
+.edit-application-role-card-info p {
+    max-width: 650px;
+
+    margin: 7px 0 0;
+
+    color: #747474;
+
+    font-size: 0.85rem;
+
+    line-height: 1.5;
+}
+
+
+.edit-application-role-card-controls {
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    flex-shrink: 0;
+}
+
+
+.edit-application-role-icon-actions {
+    display: flex;
+
+    gap: 6px;
+}
+
+
+.edit-application-role-icon-actions button {
+    width: 35px;
+    height: 35px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #dedede;
+    border-radius: 7px;
+
+    background: white;
+
+    color: #555;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+
+.edit-application-role-icon-actions button:hover {
+    border-color: #aaa;
+
+    background: #f4f4f4;
+}
+
+
+.edit-application-role-icon-actions button.danger {
+    color: #ad2929;
+}
+
+.edit-application-role-title-row {
+    h3 {
+        display: inline;
+        margin-right: 10px;
+    }
+}
+
+.edit-application-role-icon-actions button.danger:hover {
+    border-color: #e8bbbb;
+
+    background: #fff3f3;
+}
+
+
+.edit-application-role-icon-actions button:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+}
+
+.edit-application-builder-role-picker {
+    padding-bottom: 22px;
+    margin-bottom: 24px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    border-bottom: 1px solid #e7e7e7;
+}
+
+
+.edit-application-builder-role-picker>div:first-child {
+    flex: 1;
+}
+
+
+.edit-application-builder-role-picker .edit-application-role-select-wrapper {
+    width: min(360px, 100%);
+
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+
+    .edit-application-form-page {
+        padding:
+            32px 28px 70px;
+    }
+
+
+    .edit-application-selected-role {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .edit-application-role-recruiting {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+    .edit-application-form-page {
+        padding:
+            24px 14px 55px;
+    }
+
+
+    .edit-application-panel,
+    .edit-application-builder-section {
+        padding:
+            20px 16px;
+    }
+
+
+    .edit-application-recruitment-panel,
+    .edit-application-section-header,
+    .edit-application-builder-header,
+
+
+    .edit-application-role-select-wrapper {
+        width: 100%;
+    }
+
+
+
+    .edit-application-section-card-header {
+        flex-wrap: wrap;
+    }
+
+
+    .edit-application-section-card-actions {
+        margin-left: 45px;
+    }
+
+
+    .edit-application-question-row {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+
+    .edit-application-question-content {
+        min-width: calc(100% - 45px);
+    }
+
+
+    .edit-application-question-actions {
+        margin-left: 38px;
+    }
+
+
+    .edit-application-role-checkboxes {
+        grid-template-columns: 1fr;
+    }
+
+
+    .edit-application-dialog-backdrop {
+        padding: 12px;
+    }
+
+
+    .edit-application-dialog-form {
+        padding: 18px;
+    }
+
+}

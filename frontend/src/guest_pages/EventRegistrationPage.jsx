@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useBlocker, useNavigate } from "react-router-dom";
 import { getRegistrationForm, submitRegistration } from "../api/Registration.js";
 import useDocumentTitle from "../hooks/useDocumentTitle.js";
+import BackToVSAButton from "../components/BackToVSAButton.jsx";
 import registrationBackground from "../assets/guest/event-registration-background-img.png"
 import "./EventRegistrationPage.css";
 
@@ -42,7 +43,6 @@ const EventRegistrationPage = () => {
         if (!isSubmitted || !verificationResult) {
             return;
         }
-
         navigate(`/events/${eventId}/registration/verify/${verificationResult.verificationId}`,
             {
                 state: {
@@ -419,6 +419,7 @@ const EventRegistrationPage = () => {
     return (
         <>
             <main className="event-registration-page" style={{ backgroundImage: `url(${registrationBackground})` }}>
+                {/* <BackToVSAButton/> */}
                 <div className="registration-form-div">
                     <div className="registration-form-header">
                         <div className="watermark">
@@ -516,7 +517,7 @@ const EventRegistrationPage = () => {
                     </form>
                 </div>
             </main>
-            {/* {renderToTheWebsiteButton()} */}
+            {renderToTheWebsiteButton()}
             {blocker.state === "blocked" && (
                 <div className="leave-warning-overlay">
                     <div className="leave-warning-modal">

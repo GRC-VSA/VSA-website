@@ -101,6 +101,13 @@
     }
 }
 
+.vsa-intro:not(.vsa-intro--fonts-ready) .vsa-intro__tagline,
+.vsa-intro:not(.vsa-intro--fonts-ready) .vsa-intro__vsa,
+.vsa-intro:not(.vsa-intro--fonts-ready) .vsa-intro__grc {
+    visibility: hidden;
+    animation: none;
+}
+
 @media (max-width: 450px) {
     .vsa-intro__tagline {
         position: absolute;
@@ -109,9 +116,11 @@
         font-size: 18px;
         width: 65.29vw;
     }
-    .vsa-intro__vsa{
+
+    .vsa-intro__vsa {
         top: 41.50vh;
     }
+
     .vsa-intro__grc {
         top: 51.50vh;
     }

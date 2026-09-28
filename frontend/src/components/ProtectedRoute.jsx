@@ -3,8 +3,11 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, authLoading } = useAuth();
 
+  if (authLoading) {
+    return null;
+  }
   if (!isAuthenticated) {
     return <Navigate to="/sign-in" replace />;
   }

@@ -1,17 +1,17 @@
 package com.vsa.repository;
 
-import com.vsa.model.ApplicationRole;
-import com.vsa.model.ApplicationRoleStatus;
 import java.util.List;
-import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ApplicationRoleRepository extends JpaRepository<ApplicationRole, Long> {
-  boolean existsByNameIgnoreCase(String name);
+import com.vsa.model.ApplicationRole;
 
-  List<ApplicationRole> findAllByOrderByCreatedAtAsc();
+public interface ApplicationRoleRepository
+        extends JpaRepository<ApplicationRole, Long> {
 
-  List<ApplicationRole> findByRecruitingTrueAndStatusOrderByCreatedAtAsc(ApplicationRoleStatus status);
+    boolean existsByNameIgnoreCase(String name);
 
-  Optional<ApplicationRole> findBySectionsSectionId(Long sectionId);
+    List<ApplicationRole> findAllByOrderByCreatedAtAsc();
+
+    List<ApplicationRole> findByRecruitingTrueOrderByCreatedAtAsc();
 }

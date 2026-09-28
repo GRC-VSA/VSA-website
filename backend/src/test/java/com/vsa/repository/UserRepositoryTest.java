@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.vsa.model.User;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -29,15 +30,26 @@ class UserRepositoryTest {
     }
 
     @Test
-    void findByVerificationToken_ReturnsUser() {
+    void findByVerificationId_ReturnsUser() {
+        UUID verificationId = UUID.randomUUID();
         User user = createUser("verify@vsa.com");
-        user.setVerificationToken("vToken123");
+        user.setVerificationId(verificationId);
         userRepository.save(user);
 
-        Optional<User> found = userRepository.findByVerificationToken("vToken123");
+        Optional<User> found = userRepository.findByVerificationId(verificationId);
 
         assertTrue(found.isPresent());
         assertEquals("verify@vsa.com", found.get().getEmail());
+    }
+
+    @Test
+    void findByEmailIgnoreCase_ReturnsUserRegardlessOfCase() {
+        userRepository.save(createUser("Mixed@vsa.com"));
+
+        Optional<User> found = userRepository.findByEmailIgnoreCase("mixed@vsa.com");
+
+        assertTrue(found.isPresent());
+        assertEquals("Mixed@vsa.com", found.get().getEmail());
     }
 
     @Test

@@ -59,7 +59,7 @@ const WhoWeAreSection = () => {
             <span className="letter-accent">A</span>ssociation&rdquo; -{" "}
             <strong className="text-accent">VSA</strong>.
           </p>
-          <button type="button" className="pill-button" onClick={() => navigate("/officers")}>
+          <button type="button" className="pill-button" onClick={() => navigate("/our-team")}>
             Learn More About Our Team
             <span aria-hidden="true">→</span>
           </button>

@@ -1,0 +1,60 @@
+.back-to-vsa-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 18px;
+
+    border: 1.5px solid #AB3130;
+    border-radius: 8px;
+
+    background-color: white;
+    color: #AB3130;
+
+    font-size:  1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+    
+    svg {
+        scale: 1.1;
+    }
+}
+
+.back-to-vsa-button:hover {
+    background-color: #AB3130;
+    color: white;
+    box-shadow: 0 4px 10px rgba(171, 49, 48, 0.18);
+    svg {
+        fill: white;
+    }
+}
+
+.back-to-vsa-button:active {
+    box-shadow: none;
+}
+
+.back-to-vsa-button:focus-visible {
+    outline: 3px solid rgba(194, 46, 45, 0.25);
+    outline-offset: 3px;
+}
+
+.back-to-vsa-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+
+    transform: none;
+    box-shadow: none;
+}
+@media (max-width: 465px) {
+    .back-to-vsa-button {
+        padding: 10px 18px;
+    }
+}
