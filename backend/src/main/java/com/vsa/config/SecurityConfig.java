@@ -98,23 +98,33 @@ public class SecurityConfig {
                                             "/uploads/**")
                                     .permitAll()
 
-                    // ── Officer recruitment builder ─────────────────
-                    .requestMatchers("/api/application-roles/**")
-                    .hasAnyAuthority("officer", "president")
+                                    // ── Officer recruitment builder ─────────────────
+                                    .requestMatchers("/api/application-roles/**")
+                                    .hasAnyAuthority("officer", "president")
 
-                    // ── Student application submission and self-service ─
-                    .requestMatchers(HttpMethod.POST, "/api/applications")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
-                    .hasAuthority("student")
-                    .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
-                    .hasAuthority("student")
+                                    // ── Student application submission and self-service ─
+                                    .requestMatchers(HttpMethod.POST, "/api/applications")
+                                    .hasAuthority("student")
+                                    .requestMatchers(HttpMethod.GET, "/api/applications/mine/**")
+                                    .hasAuthority("student")
+                                    .requestMatchers(HttpMethod.PUT, "/api/applications/mine/**")
+                                    .hasAuthority("student")
+                                    .requestMatchers(HttpMethod.DELETE, "/api/applications/mine/**")
+                                    .hasAuthority("student")
 
-                    // ── Officer application review ──────────────────
-                    .requestMatchers("/api/applications/**")
-                    .hasAnyAuthority("officer", "president")
+                                    // ── Officer application review ──────────────────
+                                    .requestMatchers("/api/applications/**")
+                                    .hasAnyAuthority("officer", "president")
+
+                                    // ── Availability sheets. The guest invite rule must come
+                                    //    first: /api/availability/** would otherwise catch
+                                    //    invite links and demand an officer login. Kept out
+                                    //    of /api/events/** on purpose, since every GET there
+                                    //    is public ────────────────────────────────────────
+                                    .requestMatchers("/api/availability/invite/**")
+                                    .permitAll()
+                                    .requestMatchers("/api/availability/**")
+                                    .hasAnyAuthority("officer", "president")
 
                                     // ── Question type lookup (read-only, used by both
                                     //    officers building questions and guests answering

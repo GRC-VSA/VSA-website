@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 @Setter
 public class EmailOutbox {
 
-    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION}
+    /*
+     * AVAILABILITY_EDIT_LINK was added after the table existed. Hibernate's original CHECK on
+     * email_type does not include it; availability_schema.sql replaces that constraint.
+     */
+    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, AVAILABILITY_EDIT_LINK}
 
     public enum Status {PENDING, PROCESSING, SENT,  FAILED}
 
@@ -21,7 +25,8 @@ public class EmailOutbox {
     private Long outboxId;
 
     /*
-     * Registration this email belongs to.
+     * Registration this email belongs to. Null for emails that aren't about a registration
+     * (e.g. availability edit links).
      *
      * This is intentionally just an ID rather than a JPA relationship.
      * The outbox should remain independent from Registration.

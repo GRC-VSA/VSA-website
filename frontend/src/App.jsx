@@ -21,6 +21,7 @@ import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
 import ProductsPage from "./guest_pages/ProductsPage.jsx";
 import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
 import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
+import AvailabilityInvitePage from "./guest_pages/AvailabilityInvitePage.jsx";
 
 import OverallBoard from "./officer_pages/dashboard/OverallBoard.jsx";
 import BudgetBoard from "./officer_pages/dashboard/BudgetBoard.jsx";
@@ -50,48 +51,51 @@ function App() {
   }, []);
 
   return (
-    <EventsProvider>
-      <IntroLoader ready={appReady} />
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<GuestLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="sign-in" element={<SignInPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify" element={<VerifyEmailPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          {/* <Route path="old-events" element={<OldEventsPage />} /> */}
-          <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
-          <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-        </Route>
+      <EventsProvider>
+        <IntroLoader ready={appReady} />
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<GuestLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="sign-in" element={<SignInPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify" element={<VerifyEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/events" element={<EventsPage />} />
+            {/* <Route path="old-events" element={<OldEventsPage />} /> */}
+            <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
+            <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            {/* Invite link for people outside VSA. Keep in sync with inviteUrl() in api/Availability.js
+              and AvailabilityGuestService.editPath on the backend. */}
+            <Route path="availability/invite/:token" element={<AvailabilityInvitePage />} />
+          </Route>
 
 
-        <Route
-          path="/officer"
-          element={
-            //Add and configure roles heree ----|------------|
-            //                                  V            V
-            <ProtectedRoute allowedRoles={["officer", "president"]}>
-              <OfficerLayout />
-            </ProtectedRoute>
-          }>
-          <Route index element={<OverallBoard />} />
-          <Route path="dashboard/budget-board" element={<BudgetBoard />} />
-          <Route path="dashboard/event-board" element={<EventBoard />} />
-          <Route path="availability" element={<AvailabilityListPage />} />
-          <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
-          <Route path="availability/:id" element={<AvailabilityDetailPage />} />
-          <Route path="todo-list" element={<ToDoPage />} />
-          <Route path="events/create-event" element={<CreateEventPage />} />
-          <Route path="events/manage-event" element={<ManageEventPage />} />
-          <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
-        </Route>
-      </Routes>
-    </EventsProvider>
+          <Route
+              path="/officer"
+              element={
+                //Add and configure roles heree ----|------------|
+                //                                  V            V
+                <ProtectedRoute allowedRoles={["officer", "president"]}>
+                  <OfficerLayout />
+                </ProtectedRoute>
+              }>
+            <Route index element={<OverallBoard />} />
+            <Route path="dashboard/budget-board" element={<BudgetBoard />} />
+            <Route path="dashboard/event-board" element={<EventBoard />} />
+            <Route path="availability" element={<AvailabilityListPage />} />
+            <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
+            <Route path="availability/:id" element={<AvailabilityDetailPage />} />
+            <Route path="todo-list" element={<ToDoPage />} />
+            <Route path="events/create-event" element={<CreateEventPage />} />
+            <Route path="events/manage-event" element={<ManageEventPage />} />
+            <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
+          </Route>
+        </Routes>
+      </EventsProvider>
   );
 }
 

@@ -34,36 +34,36 @@ public class EmailOutboxProcessor {
     public void processPendingEmails() {
 
         /*
-        * If a backend instance crashed after claiming an email,
-        * return that email to PENDING after the timeout.
-        */
+         * If a backend instance crashed after claiming an email,
+         * return that email to PENDING after the timeout.
+         */
         LocalDateTime cutoff =
-            LocalDateTime.now()
-                    .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
+                LocalDateTime.now()
+                        .minusMinutes(PROCESSING_TIMEOUT_MINUTES);
 
         emailOutboxRepository.recoverStaleProcessingEmails(
-            EmailOutbox.Status.PROCESSING,
-            EmailOutbox.Status.PENDING,
-            cutoff
+                EmailOutbox.Status.PROCESSING,
+                EmailOutbox.Status.PENDING,
+                cutoff
         );
 
         List<EmailOutbox> pendingEmails =
-            emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
-                    EmailOutbox.Status.PENDING
-            );
+                emailOutboxRepository.findByStatusOrderByCreatedAtAsc(
+                        EmailOutbox.Status.PENDING
+                );
 
         for (EmailOutbox outbox : pendingEmails) {
 
             int claimed =
-                emailOutboxRepository.claimPendingEmail(
-                        outbox.getOutboxId(),
-                        EmailOutbox.Status.PENDING,
-                        EmailOutbox.Status.PROCESSING
-                );
+                    emailOutboxRepository.claimPendingEmail(
+                            outbox.getOutboxId(),
+                            EmailOutbox.Status.PENDING,
+                            EmailOutbox.Status.PROCESSING
+                    );
 
             /*
-            * Another backend instance already claimed this email.
-            */
+             * Another backend instance already claimed this email.
+             */
             if (claimed == 0) {
                 continue;
             }
@@ -76,8 +76,8 @@ public class EmailOutboxProcessor {
 
         try {
             Map<String, Object> payload = objectMapper.readValue(
-                outbox.getPayload(), 
-                new TypeReference<Map<String, Object>>() {}
+                    outbox.getPayload(),
+                    new TypeReference<Map<String, Object>>() {}
             );
 
             switch (outbox.getEmailType()) {
@@ -85,6 +85,8 @@ public class EmailOutboxProcessor {
                 case REGISTRATION_VERIFICATION -> sendRegistrationVerificationEmail(outbox, payload);
 
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
+
+                case AVAILABILITY_EDIT_LINK -> sendAvailabilityEditLinkEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -108,18 +110,18 @@ public class EmailOutboxProcessor {
             outbox.setLastError(getErrorMessage(ex));
 
             /*
-            * This processing attempt is over.
-            */
+             * This processing attempt is over.
+             */
             outbox.setProcessingStartedAt(null);
-            
+
             if (attempts >= MAX_ATTEMPTS) {
                 outbox.setStatus(EmailOutbox.Status.FAILED);
             }
             else {
                 /*
-                * SMTP failed, so make the email available
-                * for another retry on the next processor cycle.
-                */
+                 * SMTP failed, so make the email available
+                 * for another retry on the next processor cycle.
+                 */
                 outbox.setStatus(EmailOutbox.Status.PENDING);
             }
         }
@@ -133,6 +135,16 @@ public class EmailOutboxProcessor {
                 outbox.getRecipientEmail(),
                 (String) payload.get("eventName"),
                 (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendAvailabilityEditLinkEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendAvailabilityEditLinkEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("guestName"),
+                (String) payload.get("sheetTitle"),
+                (String) payload.get("editPath")
         );
     }
 

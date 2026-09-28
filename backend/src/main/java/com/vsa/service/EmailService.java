@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Service class for sending HTML emails to users.
@@ -61,37 +62,37 @@ public class EmailService {
     String verifyUrl = buildFrontendUrl("/verify?token=" + token);
 
     String body =
-        """
-            %s
-            <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
-                <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Welcome, %s!</h3>
-                <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Thank you for joining the GRC Vietnamese Student Association! Please verify your email to complete your registration and unlock all features.</p>
-                <div style="text-align: center; margin: 24px 0;">
-                    <a href="%s" style="
-                        display: inline-block;
-                        background-color: %s;
-                        color: %s;
-                        padding: 14px 40px;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        font-size: 15px;
-                        transition: background-color 0.2s;
-                    ">Verify My Email</a>
-                </div>
-                <p style="color: %s; font-size: 13px; margin: 0;">This link will expire in 24 hours.</p>
-            </div>
             """
-            .formatted(
-                getEmailHeader("Welcome to VSA!"),
-                ACCENT_COLOR,
-                PRIMARY_COLOR,
-                firstName,
-                TEXT_DARK,
-                verifyUrl,
-                PRIMARY_COLOR,
-                TEXT_LIGHT,
-                TEXT_MUTED);
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Welcome, %s!</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Thank you for joining the GRC Vietnamese Student Association! Please verify your email to complete your registration and unlock all features.</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="%s" style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 14px 40px;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 15px;
+                            transition: background-color 0.2s;
+                        ">Verify My Email</a>
+                    </div>
+                    <p style="color: %s; font-size: 13px; margin: 0;">This link will expire in 24 hours.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Welcome to VSA!"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            firstName,
+                            TEXT_DARK,
+                            verifyUrl,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Verify Your Email", body);
   }
@@ -109,100 +110,100 @@ public class EmailService {
    */
   public void sendEventRegistrationVerificationEmail(String toEmail, String eventName, String verificationCode) {
     String body =
-      """
-          %s
-
-          <div style="
-              background-color: %s;
-              padding: 24px 20px;
-              border-radius: 12px;
-              margin: 24px 0;
-          ">
-
-              <h3 style="
-                  color: %s;
-                  margin: 0 0 12px 0;
-                  font-weight: 600;
-              ">
-                  Verify Your Event Registration
-              </h3>
-
-              <p style="
-                  color: %s;
-                  margin: 0 0 12px 0;
-                  line-height: 1.6;
-              ">
-                  You submitted a registration for:
-              </p>
-
-              <p style="
-                  color: %s;
-                  font-weight: 600;
-                  margin: 0 0 24px 0;
-              ">
-                  %s
-              </p>
-
-              <p style="
-                  color: %s;
-                  margin: 0 0 16px 0;
-                  line-height: 1.6;
-              ">
-                  Enter the verification code below on the registration verification page:
-              </p>
-
-              <div style="
-                  text-align: center;
-                  margin: 24px 0;
-              ">
-                  <div style="
-                      display: inline-block;
-                      background-color: %s;
-                      color: %s;
-                      padding: 16px 28px;
-                      border-radius: 8px;
-                      font-size: 28px;
-                      font-weight: 700;
-                      letter-spacing: 6px;
-                  ">
-                      %s
-                  </div>
-              </div>
-
-              <p style="
-                  color: %s;
-                  font-size: 13px;
-                  margin: 20px 0 0 0;
-              ">
-                  This verification code expires in 10 minutes.
-              </p>
-
-              <p style="
-                  color: %s;
-                  font-size: 13px;
-                  margin: 8px 0 0 0;
-              ">
-                  If you did not submit this event registration, you can safely ignore this email.
-              </p>
-
-          </div>
-          """
-          .formatted(
-              getEmailHeader("Event Registration Verification"),
-              ACCENT_COLOR,
-              PRIMARY_COLOR,
-              TEXT_DARK,
-              PRIMARY_COLOR,
-              eventName,
-              TEXT_DARK,
-              PRIMARY_COLOR,
-              TEXT_LIGHT,
-              verificationCode,
-              TEXT_MUTED,
-              TEXT_MUTED);
+            """
+                %s
+      
+                <div style="
+                    background-color: %s;
+                    padding: 24px 20px;
+                    border-radius: 12px;
+                    margin: 24px 0;
+                ">
+      
+                    <h3 style="
+                        color: %s;
+                        margin: 0 0 12px 0;
+                        font-weight: 600;
+                    ">
+                        Verify Your Event Registration
+                    </h3>
+      
+                    <p style="
+                        color: %s;
+                        margin: 0 0 12px 0;
+                        line-height: 1.6;
+                    ">
+                        You submitted a registration for:
+                    </p>
+      
+                    <p style="
+                        color: %s;
+                        font-weight: 600;
+                        margin: 0 0 24px 0;
+                    ">
+                        %s
+                    </p>
+      
+                    <p style="
+                        color: %s;
+                        margin: 0 0 16px 0;
+                        line-height: 1.6;
+                    ">
+                        Enter the verification code below on the registration verification page:
+                    </p>
+      
+                    <div style="
+                        text-align: center;
+                        margin: 24px 0;
+                    ">
+                        <div style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 16px 28px;
+                            border-radius: 8px;
+                            font-size: 28px;
+                            font-weight: 700;
+                            letter-spacing: 6px;
+                        ">
+                            %s
+                        </div>
+                    </div>
+      
+                    <p style="
+                        color: %s;
+                        font-size: 13px;
+                        margin: 20px 0 0 0;
+                    ">
+                        This verification code expires in 10 minutes.
+                    </p>
+      
+                    <p style="
+                        color: %s;
+                        font-size: 13px;
+                        margin: 8px 0 0 0;
+                    ">
+                        If you did not submit this event registration, you can safely ignore this email.
+                    </p>
+      
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Event Registration Verification"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            TEXT_DARK,
+                            PRIMARY_COLOR,
+                            eventName,
+                            TEXT_DARK,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            verificationCode,
+                            TEXT_MUTED,
+                            TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Verify Your Registration: " + eventName, body);
-}
+  }
 
   /**
    * Sends event registration confirmation email to a user.
@@ -217,52 +218,52 @@ public class EmailService {
    * @param location Location of the event
    */
   public void sendEventRegistrationEmail(
-      String toEmail,
-      String firstName,
-      String eventName,
-      String eventDate,
-      String startTime,
-      String location) {
+          String toEmail,
+          String firstName,
+          String eventName,
+          String eventDate,
+          String startTime,
+          String location) {
     String body =
-        """
-            %s
-            <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
-                <h3 style="color: %s; margin: 0 0 16px 0; font-weight: 600;">Hi %s, You're Registered!</h3>
-                <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Your spot has been secured for the upcoming event. Here are the details:</p>
-
-                <div style="
-                    background-color: %s;
-                    border-left: 5px solid %s;
-                    padding: 18px 20px;
-                    margin: 20px 0;
-                    border-radius: 8px;
-                ">
-                    <h4 style="color: %s; margin: 0 0 14px 0; font-weight: 600; font-size: 16px;">%s</h4>
-                    <div style="color: %s; font-size: 14px; line-height: 1.8;">
-                        <p style="margin: 6px 0;"><strong>📅 Date:</strong> %s</p>
-                        <p style="margin: 6px 0;"><strong>⏰ Time:</strong> %s</p>
-                        <p style="margin: 6px 0;"><strong>📍 Location:</strong> %s</p>
-                    </div>
-                </div>
-
-                <p style="color: %s; margin: 0 0 8px 0; line-height: 1.6;">We're excited to see you there! If you need to make any changes to your registration, please contact us as soon as possible.</p>
-            </div>
             """
-            .formatted(
-                getEmailHeader("Event Registration Confirmed"),
-                ACCENT_COLOR,
-                PRIMARY_COLOR,
-                firstName,
-                TEXT_DARK,
-                "#fafafa",
-                PRIMARY_COLOR,
-                PRIMARY_COLOR,
-                eventName,
-                TEXT_DARK,
-                eventDate,
-                startTime,
-                location,
-                TEXT_MUTED);
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 16px 0; font-weight: 600;">Hi %s, You're Registered!</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Your spot has been secured for the upcoming event. Here are the details:</p>
+    
+                    <div style="
+                        background-color: %s;
+                        border-left: 5px solid %s;
+                        padding: 18px 20px;
+                        margin: 20px 0;
+                        border-radius: 8px;
+                    ">
+                        <h4 style="color: %s; margin: 0 0 14px 0; font-weight: 600; font-size: 16px;">%s</h4>
+                        <div style="color: %s; font-size: 14px; line-height: 1.8;">
+                            <p style="margin: 6px 0;"><strong>📅 Date:</strong> %s</p>
+                            <p style="margin: 6px 0;"><strong>⏰ Time:</strong> %s</p>
+                            <p style="margin: 6px 0;"><strong>📍 Location:</strong> %s</p>
+                        </div>
+                    </div>
+    
+                    <p style="color: %s; margin: 0 0 8px 0; line-height: 1.6;">We're excited to see you there! If you need to make any changes to your registration, please contact us as soon as possible.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Event Registration Confirmed"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            firstName,
+                            TEXT_DARK,
+                            "#fafafa",
+                            PRIMARY_COLOR,
+                            PRIMARY_COLOR,
+                            eventName,
+                            TEXT_DARK,
+                            eventDate,
+                            startTime,
+                            location,
+                            TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Event Registration Confirmed: " + eventName, body);
   }
@@ -280,39 +281,39 @@ public class EmailService {
    */
   public void sendOfficerApplicationEmail(String toEmail, String firstName, String positionRole) {
     String body =
-        """
-            %s
-            <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
-                <h3 style="color: %s; margin: 0 0 16px 0; font-weight: 600;">Thanks for Applying, %s!</h3>
-                <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Thank you for your interest in joining the VSA Officer Board. We're thrilled by your enthusiasm and commitment!</p>
-
-                <div style="
-                    background-color: %s;
-                    border-left: 5px solid %s;
-                    padding: 18px 20px;
-                    margin: 20px 0;
-                    border-radius: 8px;
-                    text-align: center;
-                ">
-                    <p style="color: %s; margin: 0; font-size: 14px;"><strong>Applied Position</strong></p>
-                    <p style="color: %s; margin: 8px 0 0 0; font-size: 18px; font-weight: 600;">%s</p>
-                </div>
-
-                <p style="color: %s; margin: 0 0 12px 0; line-height: 1.6;">Our team is currently reviewing all applications and we'll get back to you with updates soon. In the meantime, feel free to reach out if you have any questions about the role.</p>
-            </div>
             """
-            .formatted(
-                getEmailHeader("Officer Application Received"),
-                ACCENT_COLOR,
-                PRIMARY_COLOR,
-                firstName,
-                TEXT_DARK,
-                "#fafafa",
-                PRIMARY_COLOR,
-                TEXT_MUTED,
-                PRIMARY_COLOR,
-                positionRole,
-                TEXT_MUTED);
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 16px 0; font-weight: 600;">Thanks for Applying, %s!</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Thank you for your interest in joining the VSA Officer Board. We're thrilled by your enthusiasm and commitment!</p>
+    
+                    <div style="
+                        background-color: %s;
+                        border-left: 5px solid %s;
+                        padding: 18px 20px;
+                        margin: 20px 0;
+                        border-radius: 8px;
+                        text-align: center;
+                    ">
+                        <p style="color: %s; margin: 0; font-size: 14px;"><strong>Applied Position</strong></p>
+                        <p style="color: %s; margin: 8px 0 0 0; font-size: 18px; font-weight: 600;">%s</p>
+                    </div>
+    
+                    <p style="color: %s; margin: 0 0 12px 0; line-height: 1.6;">Our team is currently reviewing all applications and we'll get back to you with updates soon. In the meantime, feel free to reach out if you have any questions about the role.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Officer Application Received"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            firstName,
+                            TEXT_DARK,
+                            "#fafafa",
+                            PRIMARY_COLOR,
+                            TEXT_MUTED,
+                            PRIMARY_COLOR,
+                            positionRole,
+                            TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Officer Application Received: " + positionRole, body);
   }
@@ -332,44 +333,98 @@ public class EmailService {
     String resetUrl = buildFrontendUrl("/reset-password?token=" + token);
 
     String body =
-        """
-            %s
-            <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
-                <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, Reset Your Password</h3>
-                <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">We received a request to reset your password. Click the button below to set a new password.</p>
-                <div style="text-align: center; margin: 24px 0;">
-                    <a href="%s" style="
-                        display: inline-block;
-                        background-color: %s;
-                        color: %s;
-                        padding: 14px 40px;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        font-size: 15px;
-                        transition: background-color 0.2s;
-                    ">Reset Password</a>
-                </div>
-                <div style="background-color: #ffe6e6; border-left: 4px solid %s; padding: 14px 16px; border-radius: 6px; margin: 20px 0;">
-                    <p style="color: %s; margin: 0; font-size: 13px; font-weight: 500;">⏱️ This link expires in 30 minutes</p>
-                </div>
-                <p style="color: %s; font-size: 13px; margin: 0;">If you didn't request this reset, you can safely ignore this email.</p>
-            </div>
             """
-            .formatted(
-                getEmailHeader("Password Reset Request"),
-                ACCENT_COLOR,
-                PRIMARY_COLOR,
-                firstName,
-                TEXT_DARK,
-                resetUrl,
-                PRIMARY_COLOR,
-                TEXT_LIGHT,
-                PRIMARY_COLOR,
-                PRIMARY_COLOR,
-                TEXT_MUTED);
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, Reset Your Password</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">We received a request to reset your password. Click the button below to set a new password.</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="%s" style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 14px 40px;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 15px;
+                            transition: background-color 0.2s;
+                        ">Reset Password</a>
+                    </div>
+                    <div style="background-color: #ffe6e6; border-left: 4px solid %s; padding: 14px 16px; border-radius: 6px; margin: 20px 0;">
+                        <p style="color: %s; margin: 0; font-size: 13px; font-weight: 500;">⏱️ This link expires in 30 minutes</p>
+                    </div>
+                    <p style="color: %s; font-size: 13px; margin: 0;">If you didn't request this reset, you can safely ignore this email.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Password Reset Request"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            firstName,
+                            TEXT_DARK,
+                            resetUrl,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            PRIMARY_COLOR,
+                            PRIMARY_COLOR,
+                            TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Reset Your Password", body);
+  }
+
+  // ── Availability Emails ────────────────────────────────────
+
+  /**
+   * Sends a guest a fresh link for editing their availability entry.
+   *
+   * <p>Guest name and sheet title are typed by users, so they are HTML-escaped.
+   *
+   * @param toEmail Guest's email address
+   * @param guestName Name the guest entered
+   * @param sheetTitle Title of the availability sheet
+   * @param editPath Frontend path that opens the sheet with the new edit token
+   */
+  public void sendAvailabilityEditLinkEmail(
+          String toEmail, String guestName, String sheetTitle, String editPath) {
+    String editUrl = buildFrontendUrl(editPath);
+    String safeName = HtmlUtils.htmlEscape(guestName == null ? "" : guestName);
+    String safeTitle = HtmlUtils.htmlEscape(sheetTitle == null ? "" : sheetTitle);
+
+    String body =
+            """
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, here's your edit link</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Use the button below to change your availability for <strong>%s</strong>.</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="%s" style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 14px 40px;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 15px;
+                        ">Edit My Availability</a>
+                    </div>
+                    <p style="color: %s; font-size: 13px; margin: 0;">Any older edit link for this sheet no longer works. If you didn't ask for this, you can ignore this email.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Your Availability Edit Link"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            safeName,
+                            TEXT_DARK,
+                            safeTitle,
+                            editUrl,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            TEXT_MUTED);
+
+    sendEmail(toEmail, "VSA - Edit your availability: " + sheetTitle, body);
   }
 
   // ── Core Email Sending Method ──────────────────────────────
@@ -436,8 +491,8 @@ public class EmailService {
             ">%s</p>
         </div>
         """
-        .formatted(
-            PRIMARY_COLOR, "#8b2525", TEXT_LIGHT, FONT_FAMILY, ACCENT_COLOR, FONT_FAMILY, title);
+            .formatted(
+                    PRIMARY_COLOR, "#8b2525", TEXT_LIGHT, FONT_FAMILY, ACCENT_COLOR, FONT_FAMILY, title);
   }
 
   /**
@@ -449,9 +504,9 @@ public class EmailService {
       return path; // fallback, should not happen if property is set
     }
     String base =
-        frontendUrl.endsWith("/")
-            ? frontendUrl.substring(0, frontendUrl.length() - 1)
-            : frontendUrl;
+            frontendUrl.endsWith("/")
+                    ? frontendUrl.substring(0, frontendUrl.length() - 1)
+                    : frontendUrl;
     return base + (path.startsWith("/") ? path : ("/" + path));
   }
 }
