@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+
+  // Vitest 1.x runs on its own Vite 5 (esbuild), which defaults to the classic JSX transform and
+  // would need `import React` in every component. Use the automatic runtime under tests only.
+  ...(mode === 'test' ? { esbuild: { jsx: 'automatic' } } : {}),
 
   assetsInclude: [
     '**/*.JPG',
@@ -24,4 +28,4 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
   },
-});
+}));
