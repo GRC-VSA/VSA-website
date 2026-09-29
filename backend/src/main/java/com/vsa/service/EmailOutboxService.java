@@ -168,6 +168,7 @@ public class EmailOutboxService {
 
         saveOutboxEntry(
                 null,
+                null,
                 EmailOutbox.EmailType.AVAILABILITY_EDIT_LINK,
                 recipientEmail,
                 payload
