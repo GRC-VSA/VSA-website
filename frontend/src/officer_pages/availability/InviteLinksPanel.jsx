@@ -65,16 +65,21 @@ export default function InviteLinksPanel({ sheetId, canManage }) {
     }
 
     if (invites === null && !error) {
-        return <p className="av-hint">Loading links…</p>;
+        return (
+            <section className="av-card">
+                <p className="av-hint">Loading links…</p>
+            </section>
+        );
     }
 
     const shown = (invites ?? []).filter((i) => i.active || canManage);
 
     return (
-        <section aria-label="Links for people outside VSA">
-            <p className="av-panel-title">Links for people outside VSA</p>
-            <p className="av-panel-sub">
-                Anyone with a link can add their times without an account. They see the group heatmap, never names.
+        <section className="av-card" aria-labelledby="av-links-title">
+            <h2 className="av-card-title" id="av-links-title">People outside VSA</h2>
+            <p className="av-card-sub">
+                Send a link to collaborators or volunteers. They add their times without an account and see the group
+                heatmap, never names.
             </p>
 
             {error && <div className="av-error">{error}</div>}
@@ -90,18 +95,18 @@ export default function InviteLinksPanel({ sheetId, canManage }) {
                     {invite.active && (
                         <>
                             <input
-                                className="av-invite-url"
+                                className="av-input av-invite-url"
                                 readOnly
                                 value={inviteUrl(invite.token)}
                                 onFocus={(e) => e.target.select()}
                                 aria-label={`Link for ${invite.label}`}
                             />
-                            <button type="button" className="av-btn av-btn--quiet av-btn--small" onClick={() => handleCopy(invite)}>
+                            <button type="button" className="av-btn av-btn--secondary av-btn--small" onClick={() => handleCopy(invite)}>
                                 {copiedId === invite.inviteId ? "Copied" : "Copy link"}
                             </button>
                         </>
                     )}
-                    <span className="av-hint">
+                    <span className="av-pill">
                         {invite.useCount} {invite.useCount === 1 ? "response" : "responses"}
                         {invite.maxUses ? ` of ${invite.maxUses}` : ""}
                     </span>
@@ -114,7 +119,7 @@ export default function InviteLinksPanel({ sheetId, canManage }) {
             ))}
 
             {canManage && (
-                <form className="av-inline" style={{ marginTop: 14 }} onSubmit={handleCreate}>
+                <form className="av-invite" style={{ borderTop: shown.length ? undefined : "none" }} onSubmit={handleCreate}>
                     <input
                         className="av-input"
                         placeholder="Who is it for? e.g. ISA collaborators"
@@ -122,10 +127,10 @@ export default function InviteLinksPanel({ sheetId, canManage }) {
                         maxLength={100}
                         onChange={(e) => setLabel(e.target.value)}
                         aria-label="Who the new link is for"
-                        style={{ flex: "1 1 220px" }}
+                        style={{ flex: "1 1 240px", width: "auto" }}
                     />
-                    <button type="submit" className="av-btn av-btn--quiet av-btn--small" disabled={busy}>
-                        {busy ? "Creating…" : "Create link"}
+                    <button type="submit" className="av-btn av-btn--primary av-btn--small" disabled={busy}>
+                        {busy ? "Creating…" : "New link"}
                     </button>
                 </form>
             )}

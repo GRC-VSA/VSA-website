@@ -31,13 +31,40 @@ export function applyRectangle(baseSelection, slotStarts, from, to, mode) {
     return next;
 }
 
-/** Heatmap colour: light grey for nobody, deepening green as more people are free. */
+/** Heatmap colour: light grey for nobody, deepening to the site's navy as more people are free. */
 export function heatColor(count, max) {
-    if (!count || !max) return "#f2f2f2";
+    if (!count || !max) return "#f1f1f4";
     const t = count / max;
-    // interpolate #DDF3EA -> #1D9E75
-    const from = [0xdd, 0xf3, 0xea];
-    const to = [0x1d, 0x9e, 0x75];
+    // interpolate #DAD8EE (one person) -> #302B63 (everyone who answered)
+    const from = [0xda, 0xd8, 0xee];
+    const to = [0x30, 0x2b, 0x63];
     const mix = from.map((c, i) => Math.round(c + (to[i] - c) * t));
     return `rgb(${mix[0]}, ${mix[1]}, ${mix[2]})`;
+}
+
+/**
+ * The best times to meet: runs of back-to-back slots on the same day where the same number of
+ * people are free, most people first, then longest. Returns [{ day, startRow, endRow, count }].
+ */
+export function bestWindows(grid, heatmap, limit = 3) {
+    if (!heatmap || !heatmap.visible || !heatmap.maxCount) return [];
+    const windows = [];
+    grid.slotStarts.forEach((column, day) => {
+        let row = 0;
+        while (row < column.length) {
+            const count = heatmap.counts[day][row];
+            let end = row;
+            while (end + 1 < column.length && heatmap.counts[day][end + 1] === count) end++;
+            if (count > 0) windows.push({ day, startRow: row, endRow: end, count });
+            row = end + 1;
+        }
+    });
+    windows.sort(
+        (a, b) =>
+            b.count - a.count ||
+            b.endRow - b.startRow - (a.endRow - a.startRow) ||
+            a.day - b.day ||
+            a.startRow - b.startRow
+    );
+    return windows.slice(0, limit);
 }

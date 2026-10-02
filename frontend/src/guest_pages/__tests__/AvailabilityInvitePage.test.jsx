@@ -43,9 +43,9 @@ describe("AvailabilityInvitePage", () => {
             expect(await screen.findByText("Board meeting")).toBeInTheDocument();
             expect(api.getGuestSheet).toHaveBeenCalledWith("tok", null);
             expect(screen.getByText(/Organized by Carol Chan for ISA/)).toBeInTheDocument();
-            expect(screen.getByText(/Location: SH 152/)).toBeInTheDocument();
-            expect(screen.getByText(/heatmap shows up once 3 people have responded \(1 so far\)/)).toBeInTheDocument();
-            expect(screen.getByText("Add availability ⊕")).toBeInTheDocument();
+            expect(screen.getByText("SH 152")).toBeInTheDocument();
+            expect(screen.getByText("Group view unlocks at 3 responses")).toBeInTheDocument();
+            expect(screen.getByText("+ Add my availability")).toBeInTheDocument();
             expect(screen.getByText("Already answered but lost your edit link?")).toBeInTheDocument();
         });
 
@@ -53,15 +53,15 @@ describe("AvailabilityInvitePage", () => {
             api.getGuestSheet.mockResolvedValue(guestView({ inviteLabel: "", sheet: sheetInfo({ location: null, closesAt: new Date(2030, 0, 3, 17, 0).toISOString() }) }));
             renderPage();
             expect(await screen.findByText(/for guests/)).toBeInTheDocument();
-            expect(screen.getByText(/Closes Jan 3, 5 PM/)).toBeInTheDocument();
+            expect(screen.getByText("Jan 3, 5 PM")).toBeInTheDocument();
         });
 
-        it("closed sheets have a chip and no add button", async () => {
+        it("closed sheets have a pill and no add button", async () => {
             api.getGuestSheet.mockResolvedValue(guestView({ sheet: sheetInfo({ open: false, closesAt: new Date(2030, 0, 3, 9, 0).toISOString() }) }));
             renderPage();
-            expect(await screen.findByText("Closed", { selector: ".av-chip" })).toBeInTheDocument();
-            expect(screen.queryByText(/Add availability/)).not.toBeInTheDocument();
-            expect(screen.getByText(/Closed Jan 3, 9 AM/)).toBeInTheDocument();
+            expect(await screen.findByText("Closed", { selector: ".av-pill" })).toBeInTheDocument();
+            expect(screen.queryByText(/Add my availability/)).not.toBeInTheDocument();
+            expect(screen.getByText("Status")).toBeInTheDocument();
         });
 
         it("shows the heatmap legend when visible", async () => {
@@ -69,7 +69,7 @@ describe("AvailabilityInvitePage", () => {
             renderPage();
             await screen.findByText("Board meeting");
             expect(screen.getByText("3 of 4 free")).toBeInTheDocument();
-            expect(screen.queryByText(/heatmap shows up once/)).not.toBeInTheDocument();
+            expect(screen.queryByText(/Group view unlocks/)).not.toBeInTheDocument();
         });
 
         it("explains an invalid or expired link (404) and shows other errors verbatim", async () => {
@@ -89,7 +89,7 @@ describe("AvailabilityInvitePage", () => {
             localStorage.setItem(KEY, "saved");
             api.getGuestSheet.mockResolvedValue(guestView({ myEntry: entry() }));
             renderPage();
-            expect(await screen.findByText("Edit my availability ⊕")).toBeInTheDocument();
+            expect(await screen.findByText("Edit my availability")).toBeInTheDocument();
             expect(api.getGuestSheet).toHaveBeenCalledWith("tok", "saved");
             expect(screen.queryByText("Already answered but lost your edit link?")).not.toBeInTheDocument();
         });
@@ -97,7 +97,7 @@ describe("AvailabilityInvitePage", () => {
         it("stores a token from ?edit= and uses it", async () => {
             api.getGuestSheet.mockResolvedValue(guestView({ myEntry: entry() }));
             renderPage("/availability/invite/tok?edit=fromurl");
-            await screen.findByText("Edit my availability ⊕");
+            await screen.findByText("Edit my availability");
             expect(localStorage.getItem(KEY)).toBe("fromurl");
             expect(api.getGuestSheet).toHaveBeenCalledWith("tok", "fromurl");
         });
@@ -125,7 +125,7 @@ describe("AvailabilityInvitePage", () => {
         async function openForm() {
             api.getGuestSheet.mockResolvedValue(guestView());
             renderPage();
-            fireEvent.click(await screen.findByText("Add availability ⊕"));
+            fireEvent.click(await screen.findByText("+ Add my availability"));
         }
 
         it("requires a name, then an email", async () => {
@@ -133,11 +133,11 @@ describe("AvailabilityInvitePage", () => {
             expect(screen.getByLabelText("Email")).not.toBeDisabled();
             expect(screen.getByText(/only used to keep one answer per person/)).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             expect(screen.getByRole("alert")).toHaveTextContent("Enter your name.");
 
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             expect(screen.getByRole("alert")).toHaveTextContent("Enter your email.");
             expect(api.submitGuestEntry).not.toHaveBeenCalled();
         });
@@ -149,8 +149,8 @@ describe("AvailabilityInvitePage", () => {
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: " Bob " } });
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: " bob@x.com " } });
             fireEvent.change(screen.getByLabelText(/Anything the organizer should know/), { target: { value: " hi " } });
-            fireEvent.keyDown(screen.getByRole("grid"), { key: " " });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.keyDown(screen.getByRole("grid", { name: /Your availability/ }), { key: " " });
+            fireEvent.click(screen.getByText("Save"));
 
             await waitFor(() =>
                 expect(api.submitGuestEntry).toHaveBeenCalledWith("tok", { name: "Bob", slots: [SLOTS[0][0]], note: "hi", email: "bob@x.com" })
@@ -158,7 +158,7 @@ describe("AvailabilityInvitePage", () => {
             expect(await screen.findByLabelText("Your personal edit link")).toHaveValue("https://vsa.test/availability/invite/tok?edit=new-edit");
             expect(localStorage.getItem(KEY)).toBe("new-edit");
             expect(screen.getByRole("status")).toHaveTextContent("Saved.");
-            expect(screen.getByText("Edit my availability ⊕")).toBeInTheDocument();
+            expect(screen.getByText("Edit my availability")).toBeInTheDocument();
         });
 
         it("sends a null note when it is blank", async () => {
@@ -166,7 +166,7 @@ describe("AvailabilityInvitePage", () => {
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: "b@x.com" } });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             await waitFor(() => expect(api.submitGuestEntry).toHaveBeenCalled());
             expect(api.submitGuestEntry.mock.calls[0][1].note).toBeNull();
         });
@@ -176,15 +176,15 @@ describe("AvailabilityInvitePage", () => {
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: "o@x.com" } });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             expect(await screen.findByRole("alert")).toHaveTextContent("VSA officer account");
-            expect(screen.getByText("Save ✓")).not.toBeDisabled();
+            expect(screen.getByText("Save")).not.toBeDisabled();
         });
 
         it("Cancel returns to the heatmap view", async () => {
             await openForm();
-            fireEvent.click(screen.getByText("Cancel ⊗"));
-            expect(screen.getByText("Add availability ⊕")).toBeInTheDocument();
+            fireEvent.click(screen.getByText("Cancel"));
+            expect(screen.getByText("+ Add my availability")).toBeInTheDocument();
             expect(api.submitGuestEntry).not.toHaveBeenCalled();
         });
 
@@ -202,7 +202,7 @@ describe("AvailabilityInvitePage", () => {
 
         async function openForm() {
             renderPage();
-            fireEvent.click(await screen.findByText("Edit my availability ⊕"));
+            fireEvent.click(await screen.findByText("Edit my availability"));
         }
 
         it("prefills the form and locks the email", async () => {
@@ -218,7 +218,7 @@ describe("AvailabilityInvitePage", () => {
             api.updateGuestEntry.mockResolvedValue(guestView({ myEntry: entry({ name: "Robert" }) }));
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Robert" } });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             await waitFor(() =>
                 expect(api.updateGuestEntry).toHaveBeenCalledWith("tok", "mine", { name: "Robert", slots: [SLOTS[0][0]], note: "hi" })
             );
@@ -228,7 +228,7 @@ describe("AvailabilityInvitePage", () => {
         it("forgets the token on a 403 and shows the message", async () => {
             api.updateGuestEntry.mockRejectedValue(err("Your edit link is no longer valid.", 403));
             await openForm();
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             expect(await screen.findByRole("alert")).toHaveTextContent("no longer valid");
             expect(localStorage.getItem(KEY)).toBeNull();
         });
@@ -236,7 +236,7 @@ describe("AvailabilityInvitePage", () => {
         it("keeps the token on other errors", async () => {
             api.updateGuestEntry.mockRejectedValue(err("This availability sheet is closed", 409));
             await openForm();
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
             await screen.findByRole("alert");
             expect(localStorage.getItem(KEY)).toBe("mine");
         });
@@ -256,7 +256,7 @@ describe("AvailabilityInvitePage", () => {
             expect(await screen.findByText("Your response was removed.")).toBeInTheDocument();
             expect(localStorage.getItem(KEY)).toBeNull();
             expect(api.getGuestSheet).toHaveBeenLastCalledWith("tok", null);
-            expect(screen.getByText("Add availability ⊕")).toBeInTheDocument();
+            expect(screen.getByText("+ Add my availability")).toBeInTheDocument();
         });
 
         it("shows an error when withdrawing fails", async () => {

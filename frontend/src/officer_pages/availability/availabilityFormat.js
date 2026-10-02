@@ -151,3 +151,43 @@ export function sortSheets(sheets) {
     const closed = sheets.filter((s) => !s.open).sort((a, b) => deadlineOf(b) - deadlineOf(a));
     return [...open, ...closed];
 }
+
+/** What the list and badges call each sheet type. GENERAL is no longer offered when creating. */
+export function categoryLabel(sheetType) {
+    if (sheetType === "EVENT") return "Event";
+    if (sheetType === "GENERAL") return "Weekly availability";
+    return "General meeting";
+}
+
+/**
+ * Splits sheets into the list's sections: open event sheets, open general meetings (older
+ * "whole quarter" sheets go here too), and closed sheets. Each section keeps sortSheets order.
+ */
+export function groupSheets(sheets) {
+    const sorted = sortSheets(sheets);
+    return {
+        events: sorted.filter((s) => s.open && s.sheetType === "EVENT"),
+        meetings: sorted.filter((s) => s.open && s.sheetType !== "EVENT"),
+        closed: sorted.filter((s) => !s.open),
+    };
+}
+
+/** Column heading for a grid day: { day: "Mon", date: "Oct 12" } (no date for weekly sheets). */
+export function columnLabel(isoDate, sheetType) {
+    return {
+        day: weekdayShort(isoDate),
+        date: sheetType === "GENERAL" ? null : formatShortDate(isoDate),
+    };
+}
+
+/** "Mon, Oct 12" (or just "Monday" on weekly sheets). */
+export function dayLabel(isoDate, sheetType) {
+    return sheetType === "GENERAL" ? weekdayLong(isoDate) : `${weekdayShort(isoDate)}, ${formatShortDate(isoDate)}`;
+}
+
+/** "Mon, Oct 12 · 11 AM - 12:30 PM" for a run of rows. */
+export function describeWindow(grid, sheet, window) {
+    const start = timeToMinutes(grid.times[window.startRow]);
+    const end = timeToMinutes(grid.times[window.endRow]) + sheet.slotMinutes;
+    return `${dayLabel(grid.dates[window.day], sheet.sheetType)} · ${formatTime(start)} - ${formatTime(end)}`;
+}
