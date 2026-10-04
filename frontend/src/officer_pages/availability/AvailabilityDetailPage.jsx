@@ -1,184 +1,263 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { deleteSheet, listSheets } from "../../api/Availability.js";
-import { dateBadge, describeDeadline, groupSheets } from "./availabilityFormat.js";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+    closeSheet,
+    deleteMyEntry,
+    deleteSheet,
+    getSheet,
+    removeEntry,
+    reopenSheet,
+    saveMyEntry,
+} from "../../api/Availability.js";
+import AvailabilityGrid, { GroupHeatmap } from "./AvailabilityGrid.jsx";
+import RespondersPanel from "./RespondersPanel.jsx";
+import InviteLinksPanel from "./InviteLinksPanel.jsx";
 import PageHeader from "./PageHeader.jsx";
+import { bestWindows } from "./gridSelection.js";
+import {
+    browserTimeZone,
+    describeDeadline,
+    describeSheetTimes,
+    describeWindow,
+    timeZoneName,
+} from "./availabilityFormat.js";
 import "./Availability.css";
 
 /*
-    Every availability sheet, grouped into Events and General meetings, with closed sheets folded
-    away at the bottom. Within a group, the closest deadline comes first.
+    One sheet: the anonymous heatmap and responder list, and "Add my availability" to
+    drag-select your own times. Saving replaces your whole selection (one entry per person per sheet).
 */
-export default function AvailabilityListPage() {
+export default function AvailabilityDetailPage() {
+    const { id } = useParams();
     const navigate = useNavigate();
-    const [sheets, setSheets] = useState(null);
-    const [error, setError] = useState("");
-    const [deleting, setDeleting] = useState(false);
-    const [showClosed, setShowClosed] = useState(false);
+    const location = useLocation();
+
+    const [detail, setDetail] = useState(null);
+    const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState(location.state?.createError ?? "");
+    const [mode, setMode] = useState("view");
+    const [draft, setDraft] = useState(new Set());
+    const [note, setNote] = useState("");
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         let ignore = false;
-        listSheets()
-            .then((data) => !ignore && setSheets(data))
-            .catch((err) => !ignore && setError(err.message));
+        getSheet(id)
+            .then((data) => !ignore && setDetail(data))
+            .catch((err) => !ignore && setLoadError(err.status === 404 ? "This sheet doesn't exist anymore." : err.message));
         return () => {
             ignore = true;
         };
-    }, []);
+    }, [id]);
 
-    async function handleDelete(sheet) {
-        if (!window.confirm(`Delete "${sheet.title}" and everyone's responses? This can't be undone.`)) return;
-        setError("");
+    const mySaved = useMemo(() => new Set(detail?.myEntry?.slots ?? []), [detail]);
+
+    const goBack = () => navigate("/officer/availability");
+
+    if (loadError) {
+        return (
+            <main className="av-page">
+                <PageHeader title="Availability" onBack={goBack} />
+                <div className="av-error" role="alert">{loadError}</div>
+            </main>
+        );
+    }
+    if (!detail) {
+        return (
+            <main className="av-page">
+                <PageHeader title="Availability" onBack={goBack} />
+                <p className="av-loading">Loading…</p>
+            </main>
+        );
+    }
+
+    const { sheet, grid, heatmap, responders, myEntry, canManage } = detail;
+    const viewerZone = browserTimeZone();
+    const deadline = describeDeadline(sheet.closesAt);
+    const best = bestWindows(grid, heatmap);
+    const twoUp = grid.dates.length <= 7;
+
+    function startEditing() {
+        setDraft(new Set(myEntry?.slots ?? []));
+        setNote(myEntry?.note ?? "");
+        setActionError("");
+        setMode("edit");
+    }
+
+    async function run(action) {
+        setActionError("");
         try {
-            await deleteSheet(sheet.sheetId);
-            setSheets((prev) => prev.filter((s) => s.sheetId !== sheet.sheetId));
+            await action();
         } catch (err) {
-            setError(err.message);
+            setActionError(err.message);
         }
     }
 
-    const groups = sheets ? groupSheets(sheets) : null;
-    const canDeleteAny = (sheets ?? []).some((s) => s.canManage);
-    const startNew = () => navigate("collect");
+    async function handleSave() {
+        setSaving(true);
+        await run(async () => {
+            const updated = await saveMyEntry(sheet.sheetId, [...draft], note.trim() || null);
+            setDetail(updated);
+            setMode("view");
+        });
+        setSaving(false);
+    }
 
-    const renderCards = (list) => (
-        <div className="av-list">
-            {list.map((sheet) => (
-                <SheetCard
-                    key={sheet.sheetId}
-                    sheet={sheet}
-                    deleting={deleting}
-                    onOpen={() => navigate(`${sheet.sheetId}`)}
-                    onDelete={() => handleDelete(sheet)}
-                />
-            ))}
-        </div>
-    );
+    const handleWithdraw = () =>
+        run(async () => {
+            if (!window.confirm("Remove your response from this sheet?")) return;
+            await deleteMyEntry(sheet.sheetId);
+            setDetail(await getSheet(sheet.sheetId));
+            setMode("view");
+        });
+
+    const handleClose = () => run(async () => setDetail(await closeSheet(sheet.sheetId)));
+    const handleReopen = () => run(async () => setDetail(await reopenSheet(sheet.sheetId)));
+
+    const handleDelete = () =>
+        run(async () => {
+            if (!window.confirm(`Delete "${sheet.title}" and everyone's responses? This can't be undone.`)) return;
+            await deleteSheet(sheet.sheetId);
+            goBack();
+        });
+
+    const handleRemovePerson = (person) =>
+        run(async () => {
+            if (!window.confirm(`Remove ${person.name}'s response?`)) return;
+            await removeEntry(person.participantId);
+            setDetail(await getSheet(sheet.sheetId));
+        });
 
     return (
         <main className="av-page">
-            <PageHeader title="Availability" subtitle="Find times that work for the board and the people we work with" />
+            <PageHeader title={sheet.title} subtitle={sheet.description} onBack={goBack} />
 
-            <div className="av-toolbar">
-                {canDeleteAny && (
-                    <button
-                        type="button"
-                        className="av-btn av-btn--ghost"
-                        aria-pressed={deleting}
-                        onClick={() => setDeleting((d) => !d)}
-                    >
-                        {deleting ? "Done" : "Delete sheets"}
-                    </button>
-                )}
-                <button type="button" className="av-btn av-btn--primary" onClick={startNew}>
-                    + Collect availability
-                </button>
-            </div>
+            {actionError && <div className="av-error" role="alert">{actionError}</div>}
 
-            {error && <div className="av-error" role="alert">{error}</div>}
-            {sheets === null && !error && <p className="av-loading">Loading…</p>}
-
-            {sheets && sheets.length === 0 && (
-                <div className="av-card av-empty">
-                    <h2>No availability sheets yet</h2>
-                    <p>Start one to find a time that works for everyone.</p>
-                    <button type="button" className="av-btn av-btn--primary" onClick={startNew}>
-                        + Collect availability
-                    </button>
+            <section className="av-card">
+                <div className="av-detail-head">
+                    <div className="av-detail-pills" style={{ marginTop: 0 }}>
+                        {!sheet.open && <span className="av-pill av-pill--red">Closed</span>}
+                        {myEntry && <span className="av-pill av-pill--gold">✓ You answered</span>}
+                    </div>
+                    {mode === "view" && sheet.open && (
+                        <button type="button" className="av-btn av-btn--primary" onClick={startEditing}>
+                            {myEntry ? "Edit my availability" : "+ Add my availability"}
+                        </button>
+                    )}
                 </div>
-            )}
+                <div className="av-facts">
+                    <Fact label="When" value={describeSheetTimes(sheet)} />
+                    {sheet.location && <Fact label="Location" value={sheet.location} />}
+                    <Fact label={sheet.open ? "Closes" : "Status"} value={sheet.open ? deadline || "When the organizer closes it" : "Closed"} />
+                </div>
+                {viewerZone && viewerZone !== sheet.timezone && (
+                    <p className="av-hint" style={{ marginTop: 12 }}>All times are in {timeZoneName(sheet.timezone)}.</p>
+                )}
+            </section>
 
-            {groups && groups.events.length > 0 && (
-                <section className="av-group" aria-labelledby="av-group-events">
-                    <h2 className="av-group-title" id="av-group-events">
-                        Events <span>{groups.events.length} open</span>
-                    </h2>
-                    {renderCards(groups.events)}
-                </section>
-            )}
+            <section className="av-card">
+                {mode === "edit" ? (
+                    <>
+                        <h2 className="av-card-title">{myEntry ? "Edit my availability" : "Add my availability"}</h2>
+                        <div className={twoUp ? "av-edit-cols" : undefined}>
+                            <div>
+                                <p className="av-edit-col-title">Your times</p>
+                                <p className="av-edit-col-sub">Click or drag across the times you're free. Drag over filled cells to clear them.</p>
+                                <AvailabilityGrid grid={grid} sheetType={sheet.sheetType} mode="edit" heatmap={heatmap} selection={draft} onSelectionChange={setDraft} minColumn={twoUp ? 52 : 72} />
+                            </div>
+                            {twoUp && (
+                                <div>
+                                    <p className="av-edit-col-title">Everyone so far</p>
+                                    <p className="av-edit-col-sub">Darker means more people are free.</p>
+                                    <GroupHeatmap grid={grid} sheetType={sheet.sheetType} heatmap={heatmap} mySlots={new Set()} minColumn={52} showReadout={false} />
+                                </div>
+                            )}
+                        </div>
 
-            {groups && groups.meetings.length > 0 && (
-                <section className="av-group" aria-labelledby="av-group-meetings">
-                    <h2 className="av-group-title" id="av-group-meetings">
-                        General meetings <span>{groups.meetings.length} open</span>
-                    </h2>
-                    {renderCards(groups.meetings)}
-                </section>
-            )}
+                        <hr className="av-divider" />
 
-            {groups && groups.closed.length > 0 && (
-                <section className="av-group">
-                    <button
-                        type="button"
-                        className="av-closed-toggle"
-                        aria-expanded={showClosed}
-                        onClick={() => setShowClosed((s) => !s)}
-                    >
-                        {showClosed ? "▾" : "▸"} Closed <span>{groups.closed.length}</span>
-                    </button>
-                    {showClosed && renderCards(groups.closed)}
+                        <div className="av-field">
+                            <label htmlFor="av-note" className="av-label">Anything the organizer should know? (optional)</label>
+                            <textarea id="av-note" className="av-textarea" maxLength={1000} placeholder="e.g. I can only stay until 8 PM" value={note} onChange={(e) => setNote(e.target.value)} />
+                        </div>
+
+                        <div className="av-form-actions" style={{ justifyContent: "space-between", alignItems: "center" }}>
+                            <span>
+                                {myEntry && (
+                                    <button type="button" className="av-link-btn" onClick={handleWithdraw}>
+                                        Remove my response
+                                    </button>
+                                )}
+                            </span>
+                            <span style={{ display: "flex", gap: 10 }}>
+                                <button type="button" className="av-btn av-btn--ghost" onClick={() => setMode("view")} disabled={saving}>
+                                    Cancel
+                                </button>
+                                <button type="button" className="av-btn av-btn--primary" onClick={handleSave} disabled={saving}>
+                                    {saving ? "Saving…" : "Save"}
+                                </button>
+                            </span>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className="av-card-title" style={{ marginBottom: 16 }}>Group availability</h2>
+                        {best.length > 0 && (
+                            <>
+                                <p className="av-label" style={{ marginBottom: 8 }}>Best times</p>
+                                <div className="av-best">
+                                    {best.map((w) => (
+                                        <div key={`${w.day}-${w.startRow}`} className="av-best-item">
+                                            <div className="av-best-when">{describeWindow(grid, sheet, w)}</div>
+                                            <div className="av-best-count">{w.count} of {heatmap.responderCount} free</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                        <GroupHeatmap grid={grid} sheetType={sheet.sheetType} heatmap={heatmap} mySlots={mySaved} />
+                    </>
+                )}
+            </section>
+
+            <RespondersPanel responders={responders} canManage={canManage} onRemove={handleRemovePerson} />
+
+            <InviteLinksPanel sheetId={sheet.sheetId} canManage={canManage} />
+
+            {canManage && (
+                <section className="av-card">
+                    <h2 className="av-card-title">Manage this sheet</h2>
+                    <p className="av-card-sub">
+                        {sheet.open
+                            ? "Closing stops new answers. Everyone can still see the results."
+                            : "Reopening lets people answer again."}
+                    </p>
+                    <div className="av-form-actions">
+                        {sheet.open ? (
+                            <button type="button" className="av-btn av-btn--secondary" onClick={handleClose}>
+                                Close sheet
+                            </button>
+                        ) : (
+                            <button type="button" className="av-btn av-btn--secondary" onClick={handleReopen}>
+                                Reopen sheet
+                            </button>
+                        )}
+                        <button type="button" className="av-btn av-btn--danger" onClick={handleDelete}>
+                            Delete sheet
+                        </button>
+                    </div>
                 </section>
             )}
         </main>
     );
 }
 
-function SheetCard({ sheet, deleting, onOpen, onDelete }) {
-    const badge = dateBadge(sheet);
-    const deadline = describeDeadline(sheet.closesAt);
-
+function Fact({ label, value }) {
     return (
-        <div
-            className={`av-sheet-card${sheet.open ? "" : " is-closed"}`}
-            role="link"
-            tabIndex={0}
-            onClick={onOpen}
-            onKeyDown={(e) => {
-                if (e.key === "Enter") onOpen();
-            }}
-        >
-            <div className="av-badge" aria-hidden="true">
-                <span className="av-badge-month">{badge.month}</span>
-                <span className="av-badge-days">{badge.days}</span>
-            </div>
-
-            <div className="av-sheet-main">
-                <p className="av-sheet-title">{sheet.title}</p>
-                {sheet.description && <p className="av-sheet-desc">{sheet.description}</p>}
-                <div className="av-sheet-meta">
-                    {!sheet.open ? (
-                        <span className="av-pill">Closed</span>
-                    ) : sheet.answeredByMe ? (
-                        <span className="av-pill av-pill--gold">✓ You answered</span>
-                    ) : (
-                        <span className="av-pill av-pill--red">Needs your answer</span>
-                    )}
-                    <span className="av-pill">
-                        {sheet.responseCount} {sheet.responseCount === 1 ? "response" : "responses"}
-                    </span>
-                    {sheet.open && deadline && <span className="av-pill">Closes {deadline}</span>}
-                </div>
-            </div>
-
-            {sheet.location && !deleting && (
-                <div className="av-sheet-side">
-                    <p className="av-sheet-side-label">Location</p>
-                    <p className="av-sheet-side-value">{sheet.location}</p>
-                </div>
-            )}
-
-            {deleting && sheet.canManage && (
-                <button
-                    type="button"
-                    className="av-btn av-btn--danger av-btn--small"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete();
-                    }}
-                >
-                    Delete
-                </button>
-            )}
+        <div>
+            <p className="av-fact-label">{label}</p>
+            <p className="av-fact-value">{value}</p>
         </div>
     );
 }

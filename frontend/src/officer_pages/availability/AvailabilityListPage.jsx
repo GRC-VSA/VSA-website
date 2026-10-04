@@ -40,7 +40,7 @@ export default function AvailabilityListPage() {
 
     const groups = sheets ? groupSheets(sheets) : null;
     const canDeleteAny = (sheets ?? []).some((s) => s.canManage);
-    const startNew = () => navigate("collect");
+    const startNew = () => navigate("/officer/availability/collect");
 
     const renderCards = (list) => (
         <div className="av-list">
@@ -49,7 +49,7 @@ export default function AvailabilityListPage() {
                     key={sheet.sheetId}
                     sheet={sheet}
                     deleting={deleting}
-                    onOpen={() => navigate(`${sheet.sheetId}`)}
+                    onOpen={() => navigate(`/officer/availability/${sheet.sheetId}`)}
                     onDelete={() => handleDelete(sheet)}
                 />
             ))}
