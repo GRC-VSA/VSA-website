@@ -235,7 +235,17 @@ export default function AvailabilityInvitePage() {
             <section className="av-card">
                 {mode === "edit" ? (
                     <form onSubmit={handleSave}>
-                        <h2 className="av-card-title">{myEntry ? "Edit my availability" : "Add my availability"}</h2>
+                        <div className="av-grid-head" style={{ marginBottom: 4 }}>
+                            <h2 className="av-card-title">{myEntry ? "Edit my availability" : "Add my availability"}</h2>
+                            <div style={{ display: "flex", gap: 10 }}>
+                                <button type="button" className="av-btn av-btn--ghost" onClick={() => setMode("view")} disabled={saving}>
+                                    Cancel
+                                </button>
+                                <button type="submit" className="av-btn av-btn--primary" disabled={saving}>
+                                    {saving ? "Saving…" : "Save"}
+                                </button>
+                            </div>
+                        </div>
                         <p className="av-card-sub">
                             {myEntry
                                 ? "Change your times and save."

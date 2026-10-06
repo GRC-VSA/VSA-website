@@ -618,7 +618,12 @@
 
 /* ── Guest page ──────────────────────────────────────────── */
 
-.av-guest { background: #f5f6f8; min-height: 100vh; padding-top: 90px; }
+/*
+    The site footer is pulled up over the page (.home-footer has margin-top: -235px, plus a
+    floating logo above it), so it covers the bottom of whatever is above it. Leave room for it
+    or it hides the Save button.
+*/
+.av-guest { background: #f5f6f8; min-height: 100vh; padding: 90px 0 340px; }
 
 /* ── Smaller screens ─────────────────────────────────────── */
 
