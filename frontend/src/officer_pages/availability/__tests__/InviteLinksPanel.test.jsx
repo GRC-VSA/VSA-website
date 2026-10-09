@@ -30,7 +30,7 @@ describe("InviteLinksPanel", () => {
         expect(screen.getByText("1 response")).toBeInTheDocument();
         expect(screen.getByText("2 responses of 5")).toBeInTheDocument();
         expect(api.listInvites).toHaveBeenCalledWith(5);
-        expect(screen.queryByText("Create link")).not.toBeInTheDocument();
+        expect(screen.queryByText("New link")).not.toBeInTheDocument();
         expect(screen.queryByText("Turn off")).not.toBeInTheDocument();
     });
 
@@ -100,12 +100,12 @@ describe("InviteLinksPanel", () => {
 
         const field = screen.getByLabelText("Who the new link is for");
         fireEvent.change(field, { target: { value: "  ISA  " } });
-        fireEvent.click(screen.getByText("Create link"));
+        fireEvent.click(screen.getByText("New link"));
         expect(await screen.findByLabelText("Link for ISA")).toBeInTheDocument();
         expect(api.createInvite).toHaveBeenLastCalledWith(5, { label: "ISA" });
         expect(field).toHaveValue("");
 
-        fireEvent.click(screen.getByText("Create link"));
+        fireEvent.click(screen.getByText("New link"));
         await screen.findByLabelText("Link for Guest");
         expect(api.createInvite).toHaveBeenLastCalledWith(5, { label: undefined });
     });
@@ -115,9 +115,9 @@ describe("InviteLinksPanel", () => {
         api.createInvite.mockRejectedValue(new Error("nope"));
         render(<InviteLinksPanel sheetId={5} canManage />);
         await screen.findByText("No links yet.");
-        fireEvent.click(screen.getByText("Create link"));
+        fireEvent.click(screen.getByText("New link"));
         expect(await screen.findByText("nope")).toBeInTheDocument();
-        expect(screen.getByText("Create link")).not.toBeDisabled();
+        expect(screen.getByText("New link")).not.toBeDisabled();
     });
 
     it("turns a link off after confirmation", async () => {

@@ -133,11 +133,11 @@ describe("AvailabilityInvitePage", () => {
             expect(screen.getByLabelText("Email")).not.toBeDisabled();
             expect(screen.getByText(/only used to keep one answer per person/)).toBeInTheDocument();
 
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             expect(screen.getByRole("alert")).toHaveTextContent("Enter your name.");
 
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             expect(screen.getByRole("alert")).toHaveTextContent("Enter your email.");
             expect(api.submitGuestEntry).not.toHaveBeenCalled();
         });
@@ -150,7 +150,7 @@ describe("AvailabilityInvitePage", () => {
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: " bob@x.com " } });
             fireEvent.change(screen.getByLabelText(/Anything the organizer should know/), { target: { value: " hi " } });
             fireEvent.keyDown(screen.getByRole("grid", { name: /Your availability/ }), { key: " " });
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
 
             await waitFor(() =>
                 expect(api.submitGuestEntry).toHaveBeenCalledWith("tok", { name: "Bob", slots: [SLOTS[0][0]], note: "hi", email: "bob@x.com" })
@@ -166,7 +166,7 @@ describe("AvailabilityInvitePage", () => {
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: "b@x.com" } });
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             await waitFor(() => expect(api.submitGuestEntry).toHaveBeenCalled());
             expect(api.submitGuestEntry.mock.calls[0][1].note).toBeNull();
         });
@@ -176,14 +176,14 @@ describe("AvailabilityInvitePage", () => {
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Bob" } });
             fireEvent.change(screen.getByLabelText("Email"), { target: { value: "o@x.com" } });
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             expect(await screen.findByRole("alert")).toHaveTextContent("VSA officer account");
-            expect(screen.getByText("Save")).not.toBeDisabled();
+            screen.getAllByText("Save").forEach((b) => expect(b).not.toBeDisabled());
         });
 
         it("Cancel returns to the heatmap view", async () => {
             await openForm();
-            fireEvent.click(screen.getByText("Cancel"));
+            fireEvent.click(screen.getAllByText("Cancel")[0]);
             expect(screen.getByText("+ Add my availability")).toBeInTheDocument();
             expect(api.submitGuestEntry).not.toHaveBeenCalled();
         });
@@ -218,7 +218,7 @@ describe("AvailabilityInvitePage", () => {
             api.updateGuestEntry.mockResolvedValue(guestView({ myEntry: entry({ name: "Robert" }) }));
             await openForm();
             fireEvent.change(screen.getByLabelText("Your name"), { target: { value: "Robert" } });
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             await waitFor(() =>
                 expect(api.updateGuestEntry).toHaveBeenCalledWith("tok", "mine", { name: "Robert", slots: [SLOTS[0][0]], note: "hi" })
             );
@@ -228,7 +228,7 @@ describe("AvailabilityInvitePage", () => {
         it("forgets the token on a 403 and shows the message", async () => {
             api.updateGuestEntry.mockRejectedValue(err("Your edit link is no longer valid.", 403));
             await openForm();
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             expect(await screen.findByRole("alert")).toHaveTextContent("no longer valid");
             expect(localStorage.getItem(KEY)).toBeNull();
         });
@@ -236,7 +236,7 @@ describe("AvailabilityInvitePage", () => {
         it("keeps the token on other errors", async () => {
             api.updateGuestEntry.mockRejectedValue(err("This availability sheet is closed", 409));
             await openForm();
-            fireEvent.click(screen.getByText("Save"));
+            fireEvent.click(screen.getAllByText("Save")[0]); // the form has Save at the top and bottom
             await screen.findByRole("alert");
             expect(localStorage.getItem(KEY)).toBe("mine");
         });

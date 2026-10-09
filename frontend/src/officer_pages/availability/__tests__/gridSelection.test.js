@@ -33,14 +33,14 @@ describe("gridSelection", () => {
 
     describe("heatColor", () => {
         it("is light grey for nobody or no max", () => {
-            expect(heatColor(0, 5)).toBe("#f2f2f2");
-            expect(heatColor(undefined, 5)).toBe("#f2f2f2");
-            expect(heatColor(3, 0)).toBe("#f2f2f2");
+            expect(heatColor(0, 5)).toBe("#f1f1f4");
+            expect(heatColor(undefined, 5)).toBe("#f1f1f4");
+            expect(heatColor(3, 0)).toBe("#f1f1f4");
         });
-        it("interpolates between the light and dark green", () => {
-            expect(heatColor(4, 4)).toBe("rgb(29, 158, 117)");
-            // halfway between #DDF3EA (221, 243, 234) and #1D9E75 (29, 158, 117)
-            expect(heatColor(2, 4)).toBe("rgb(125, 201, 176)");
+        it("interpolates between the light and dark indigo", () => {
+            expect(heatColor(4, 4)).toBe("rgb(48, 43, 99)");
+            // halfway between #DAD8EE (218, 216, 238) and #302B63 (48, 43, 99)
+            expect(heatColor(2, 4)).toBe("rgb(133, 130, 169)");
         });
     });
 });

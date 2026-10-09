@@ -19,12 +19,12 @@ const iso = (d) => `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2
 
 const renderFlow = () => render(<MemoryRouter><CollectAvailabilityFlow /></MemoryRouter>);
 
-async function pickDays(from, to) {
+function pickDays(from, to) {
     fireEvent.click(dayButton(from));
     fireEvent.click(dayButton(to));
 }
-const next = () => fireEvent.click(screen.getByText("Continue →"));
-const collect = () => fireEvent.click(screen.getByText("Collect →"));
+const start = () => fireEvent.click(screen.getByText("Start collecting"));
+const nameField = () => screen.getByLabelText("Name");
 
 describe("CollectAvailabilityFlow", () => {
     beforeEach(() => {
@@ -34,12 +34,13 @@ describe("CollectAvailabilityFlow", () => {
         api.createInvite.mockResolvedValue({});
     });
 
-    describe("step 1", () => {
-        it("requires at least one day", async () => {
+    describe("choosing days", () => {
+        it("requires at least one day", () => {
             renderFlow();
             expect(screen.getByText("No days selected yet.")).toBeInTheDocument();
-            next();
-            expect(screen.getByRole("alert")).toHaveTextContent("Pick at least one day.");
+            start();
+            expect(screen.getByRole("alert")).toHaveTextContent("Pick at least one day on the calendar.");
+            expect(api.createSheet).not.toHaveBeenCalled();
         });
 
         it("selects a range (either click order) and reports the length", () => {
@@ -68,117 +69,114 @@ describe("CollectAvailabilityFlow", () => {
         it("browses months", () => {
             renderFlow();
             const label = () => document.querySelector(".av-cal-month").textContent;
-            const start = label();
+            const first = label();
             fireEvent.click(screen.getByLabelText("Next month"));
-            expect(label()).not.toBe(start);
+            expect(label()).not.toBe(first);
             fireEvent.click(screen.getByLabelText("Previous month"));
+            expect(label()).toBe(first);
             fireEvent.click(screen.getByLabelText("Previous month"));
-            expect(label()).not.toBe(start);
+            expect(label()).not.toBe(first);
         });
 
-        it("Return goes back to the list", () => {
+        it("the back link and Cancel both return to the list", () => {
             renderFlow();
-            fireEvent.click(screen.getByText("Return ↩"));
+            fireEvent.click(screen.getByRole("button", { name: /Back to availability/ }));
+            expect(navigate).toHaveBeenLastCalledWith("/officer/availability");
+            navigate.mockClear();
+            fireEvent.click(screen.getByText("Cancel"));
             expect(navigate).toHaveBeenCalledWith("/officer/availability");
-        });
-
-        it("whole-quarter mode selects a full Sunday-Saturday week from any click", () => {
-            renderFlow();
-            fireEvent.click(screen.getByText("Whole quarter"));
-            expect(screen.getByText("Pick a sample week")).toBeInTheDocument();
-            fireEvent.click(dayButton(10));
-            expect(screen.getByText(/\(7 days\)/)).toBeInTheDocument();
-        });
-
-        it("switching type clears the selection", () => {
-            renderFlow();
-            fireEvent.click(dayButton(3));
-            fireEvent.click(screen.getByText("Event"));
-            expect(screen.getByText("No days selected yet.")).toBeInTheDocument();
-        });
-
-        describe("event mode", () => {
-            const events = [
-                { eventId: 2, title: "Later", eventDate: "2099-03-01" },
-                { eventId: 1, eventName: "Sooner", eventDate: "2099-02-01" },
-                { eventId: 3, title: "Past", eventDate: "2001-01-01" },
-                { eventId: 4, title: "Undated" },
-            ];
-
-            it("lists upcoming events soonest first and requires a choice", async () => {
-                eventsApi.getEvents.mockResolvedValue(events);
-                renderFlow();
-                fireEvent.click(screen.getByText("Event"));
-                await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(3));
-                expect(screen.getAllByRole("option").map((o) => o.textContent)).toEqual([
-                    "Choose an upcoming event", "Sooner (Feb 1)", "Later (Mar 1)",
-                ]);
-
-                next();
-                expect(screen.getByRole("alert")).toHaveTextContent("Pick the event first.");
-            });
-
-            it("choosing an event fills its date and prefills the title on step 2", async () => {
-                eventsApi.getEvents.mockResolvedValue(events);
-                renderFlow();
-                fireEvent.click(screen.getByText("Event"));
-                await screen.findByText("Sooner (Feb 1)");
-                fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "1" } });
-                expect(screen.getByText("Selected: Feb 1")).toBeInTheDocument();
-                next();
-                expect(screen.getByLabelText("Event name")).toHaveValue("Sooner");
-            });
-
-            it("shows a hint when there are no events or loading fails", async () => {
-                eventsApi.getEvents.mockRejectedValue(new Error("down"));
-                renderFlow();
-                fireEvent.click(screen.getByText("Event"));
-                expect(await screen.findByText("No upcoming events found.")).toBeInTheDocument();
-                fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "" } });
-            });
         });
     });
 
-    describe("step 2", () => {
-        async function toStep2(type) {
-            renderFlow();
-            if (type === "GENERAL") {
-                fireEvent.click(screen.getByText("Whole quarter"));
-                fireEvent.click(dayButton(10));
-            } else {
-                await pickDays(3, 4);
-            }
-            next();
-        }
+    describe("event mode", () => {
+        const events = [
+            { eventId: 2, title: "Later", eventDate: "2099-03-01" },
+            { eventId: 1, eventName: "Sooner", eventDate: "2099-02-01" },
+            { eventId: 3, title: "Past", eventDate: "2001-01-01" },
+            { eventId: 4, title: "Undated" },
+        ];
 
-        it("Return goes back to step 1", async () => {
-            await toStep2("MEETING");
-            expect(screen.getByLabelText("Meeting name")).toBeInTheDocument();
-            fireEvent.click(screen.getByText("Return ↩"));
-            expect(screen.getByText("What are you collecting availability for?")).toBeInTheDocument();
-            expect(navigate).not.toHaveBeenCalled();
+        it("General meeting is the default and offers no event picker", () => {
+            renderFlow();
+            expect(screen.getByRole("button", { name: /General meeting/ })).toHaveAttribute("aria-pressed", "true");
+            expect(screen.queryByLabelText("Which event?")).not.toBeInTheDocument();
         });
 
-        it("validates the name, outside-collaborators answer and deadline", async () => {
-            await toStep2("MEETING");
-            collect();
+        it("lists upcoming events soonest first and requires a choice", async () => {
+            eventsApi.getEvents.mockResolvedValue(events);
+            renderFlow();
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            const picker = screen.getByLabelText("Which event?");
+            await waitFor(() => expect(within(picker).getAllByRole("option")).toHaveLength(3));
+            expect(within(picker).getAllByRole("option").map((o) => o.textContent)).toEqual([
+                "Choose an upcoming event", "Sooner · Feb 1", "Later · Mar 1",
+            ]);
+
+            start();
+            expect(screen.getByRole("alert")).toHaveTextContent("Pick the event this is for.");
+            expect(api.createSheet).not.toHaveBeenCalled();
+        });
+
+        it("choosing an event fills its date and prefills the name", async () => {
+            eventsApi.getEvents.mockResolvedValue(events);
+            renderFlow();
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            await screen.findByText("Sooner · Feb 1");
+            fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "1" } });
+            expect(screen.getByText("Selected: Feb 1")).toBeInTheDocument();
+            expect(nameField()).toHaveValue("Sooner availability");
+        });
+
+        it("keeps a name the user already typed when an event is chosen", async () => {
+            eventsApi.getEvents.mockResolvedValue(events);
+            renderFlow();
+            fireEvent.change(nameField(), { target: { value: "My own name" } });
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            await screen.findByText("Sooner · Feb 1");
+            fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "1" } });
+            expect(nameField()).toHaveValue("My own name");
+        });
+
+        it("switching back to a general meeting drops the chosen event", async () => {
+            eventsApi.getEvents.mockResolvedValue(events);
+            renderFlow();
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            await screen.findByText("Sooner · Feb 1");
+            fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "1" } });
+
+            fireEvent.click(screen.getByRole("button", { name: /General meeting/ }));
+            expect(screen.queryByLabelText("Which event?")).not.toBeInTheDocument();
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            expect(screen.getByLabelText("Which event?")).toHaveValue("");
+        });
+
+        it("shows a hint when there are no events or loading fails", async () => {
+            eventsApi.getEvents.mockRejectedValue(new Error("down"));
+            renderFlow();
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            expect(await screen.findByText(/No upcoming events/)).toBeInTheDocument();
+        });
+    });
+
+    describe("submitting", () => {
+        it("validates the name and the deadline", () => {
+            renderFlow();
+            pickDays(3, 4);
+            start();
             expect(screen.getByRole("alert")).toHaveTextContent("Give the sheet a name.");
 
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            collect();
-            expect(screen.getByRole("alert")).toHaveTextContent("Say whether people outside VSA are joining.");
-
-            fireEvent.click(screen.getByLabelText("No"));
-            fireEvent.change(screen.getByLabelText(/Stop collecting answers on/), { target: { value: "2000-01-01T10:00" } });
-            collect();
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            fireEvent.change(screen.getByLabelText(/Stop collecting on/), { target: { value: "2000-01-01T10:00" } });
+            start();
             expect(screen.getByRole("alert")).toHaveTextContent("deadline has to be in the future");
             expect(api.createSheet).not.toHaveBeenCalled();
         });
 
-        it("keeps the end time valid when the start time moves", async () => {
-            await toStep2("MEETING");
-            const from = screen.getByLabelText("From");
-            const to = screen.getByLabelText("To");
+        it("keeps the end time valid when the start time moves", () => {
+            renderFlow();
+            const from = screen.getByLabelText("Earliest time");
+            const to = screen.getByLabelText("Latest time");
+            expect(screen.getByText(/14 hours a day/)).toBeInTheDocument();
 
             fireEvent.change(from, { target: { value: "10:00" } });
             expect(to).toHaveValue("22:00"); // still valid, kept
@@ -196,12 +194,12 @@ describe("CollectAvailabilityFlow", () => {
         });
 
         it("creates a meeting sheet without an outside link", async () => {
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "  Sync  " } });
-            fireEvent.change(screen.getByLabelText("What's it about?"), { target: { value: "Weekly sync" } });
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "  Sync  " } });
+            fireEvent.change(screen.getByLabelText("Description (optional)"), { target: { value: " Weekly sync " } });
             fireEvent.change(screen.getByLabelText(/Location/), { target: { value: " SH 152 " } });
-            fireEvent.click(screen.getByLabelText("No"));
-            collect();
+            start();
 
             await waitFor(() => expect(navigate).toHaveBeenCalledWith("/officer/availability/42", { state: { createError: "" } }));
             expect(api.createSheet).toHaveBeenCalledWith({
@@ -223,11 +221,11 @@ describe("CollectAvailabilityFlow", () => {
         });
 
         it("sends blank optional fields as null and a deadline as an ISO instant", async () => {
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            fireEvent.click(screen.getByLabelText("No"));
-            fireEvent.change(screen.getByLabelText(/Stop collecting answers on/), { target: { value: "2099-05-06T14:30" } });
-            collect();
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            fireEvent.change(screen.getByLabelText(/Stop collecting on/), { target: { value: "2099-05-06T14:30" } });
+            start();
             await waitFor(() => expect(api.createSheet).toHaveBeenCalled());
             const body = api.createSheet.mock.calls[0][0];
             expect(body.description).toBeNull();
@@ -235,30 +233,42 @@ describe("CollectAvailabilityFlow", () => {
             expect(body.closesAt).toBe(new Date("2099-05-06T14:30").toISOString());
         });
 
-        it("also creates an invite link when outside collaborators are joining", async () => {
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            fireEvent.click(screen.getByLabelText("Yes"));
+        it("also creates an invite link when people outside VSA are included", async () => {
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            fireEvent.click(screen.getByRole("button", { name: /Also people outside VSA/ }));
             fireEvent.change(screen.getByLabelText("Who are they?"), { target: { value: " ISA " } });
-            collect();
+            start();
             await waitFor(() => expect(navigate).toHaveBeenCalled());
             expect(api.createInvite).toHaveBeenCalledWith(42, { label: "ISA" });
         });
 
+        it("hides the label field again for officers only", () => {
+            renderFlow();
+            expect(screen.queryByLabelText("Who are they?")).not.toBeInTheDocument();
+            fireEvent.click(screen.getByRole("button", { name: /Also people outside VSA/ }));
+            expect(screen.getByLabelText("Who are they?")).toBeInTheDocument();
+            fireEvent.click(screen.getByRole("button", { name: /Officers only/ }));
+            expect(screen.queryByLabelText("Who are they?")).not.toBeInTheDocument();
+        });
+
         it("uses no label when none is typed", async () => {
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            fireEvent.click(screen.getByLabelText("Yes"));
-            collect();
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            fireEvent.click(screen.getByRole("button", { name: /Also people outside VSA/ }));
+            start();
             await waitFor(() => expect(api.createInvite).toHaveBeenCalledWith(42, { label: undefined }));
         });
 
         it("still opens the sheet when only the invite link fails, and passes the reason along", async () => {
             api.createInvite.mockRejectedValue(new Error("link limit"));
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            fireEvent.click(screen.getByLabelText("Yes"));
-            collect();
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            fireEvent.click(screen.getByRole("button", { name: /Also people outside VSA/ }));
+            start();
             await waitFor(() => expect(navigate).toHaveBeenCalled());
             const [path, opts] = navigate.mock.calls[0];
             expect(path).toBe("/officer/availability/42");
@@ -267,55 +277,38 @@ describe("CollectAvailabilityFlow", () => {
 
         it("shows the server error and stays put when the sheet can't be created", async () => {
             api.createSheet.mockRejectedValue(new Error("Slots must be 30 or 60 minutes long"));
-            await toStep2("MEETING");
-            fireEvent.change(screen.getByLabelText("Meeting name"), { target: { value: "Sync" } });
-            fireEvent.click(screen.getByLabelText("No"));
-            collect();
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            start();
             expect(await screen.findByRole("alert")).toHaveTextContent("Slots must be 30");
             expect(navigate).not.toHaveBeenCalled();
-            expect(screen.getByText("Collect →")).not.toBeDisabled();
+            expect(screen.getByText("Start collecting")).not.toBeDisabled();
+        });
+
+        it("disables the button while creating", async () => {
+            let finish;
+            api.createSheet.mockReturnValue(new Promise((resolve) => (finish = resolve)));
+            renderFlow();
+            pickDays(3, 4);
+            fireEvent.change(nameField(), { target: { value: "Sync" } });
+            start();
+            expect(await screen.findByText("Creating…")).toBeDisabled();
+            finish({ sheet: { sheetId: 42 } });
+            await waitFor(() => expect(navigate).toHaveBeenCalled());
         });
 
         it("event sheets send the event id", async () => {
             eventsApi.getEvents.mockResolvedValue([{ eventId: 8, title: "Gala", eventDate: "2099-02-01" }]);
             renderFlow();
-            fireEvent.click(screen.getByText("Event"));
-            await screen.findByText("Gala (Feb 1)");
+            fireEvent.click(screen.getByRole("button", { name: /^Event/ }));
+            await screen.findByText("Gala · Feb 1");
             fireEvent.change(screen.getByLabelText("Which event?"), { target: { value: "8" } });
-            next();
-            fireEvent.click(screen.getByLabelText("No"));
-            collect();
+            start();
             await waitFor(() => expect(api.createSheet).toHaveBeenCalled());
-            expect(api.createSheet.mock.calls[0][0]).toMatchObject({ sheetType: "EVENT", eventId: 8, title: "Gala", dateStart: "2099-02-01", dateEnd: "2099-02-01" });
-        });
-
-        it("whole-quarter sheets default the quarter and send it", async () => {
-            await toStep2("GENERAL");
-            const start = screen.getByLabelText("Quarter starts");
-            const end = screen.getByLabelText("Quarter ends");
-            expect(start.value).not.toBe("");
-            expect(end.value).not.toBe("");
-            expect(screen.getByLabelText("Sheet name")).toBeInTheDocument();
-
-            fireEvent.change(screen.getByLabelText("Sheet name"), { target: { value: "Fall week" } });
-            fireEvent.click(screen.getByLabelText("No"));
-            collect();
-            await waitFor(() => expect(api.createSheet).toHaveBeenCalled());
-            const body = api.createSheet.mock.calls[0][0];
-            expect(body.sheetType).toBe("GENERAL");
-            expect(body.quarterStart).toBe(start.value);
-            expect(body.quarterEnd).toBe(end.value);
-            expect(body.eventId).toBeNull();
-        });
-
-        it("whole-quarter sheets need both quarter dates", async () => {
-            await toStep2("GENERAL");
-            fireEvent.change(screen.getByLabelText("Sheet name"), { target: { value: "Fall week" } });
-            fireEvent.click(screen.getByLabelText("No"));
-            fireEvent.change(screen.getByLabelText("Quarter ends"), { target: { value: "" } });
-            collect();
-            expect(screen.getByRole("alert")).toHaveTextContent("when the quarter starts and ends");
-            expect(api.createSheet).not.toHaveBeenCalled();
+            expect(api.createSheet.mock.calls[0][0]).toMatchObject({
+                sheetType: "EVENT", eventId: 8, title: "Gala availability", dateStart: "2099-02-01", dateEnd: "2099-02-01",
+            });
         });
     });
 });

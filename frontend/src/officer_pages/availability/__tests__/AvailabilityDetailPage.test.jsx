@@ -20,7 +20,8 @@ function renderPage(state) {
     );
 }
 
-const grid = () => screen.getByRole("grid");
+const editGrid = () => screen.getByRole("grid", { name: /Your availability/ });
+const back = () => screen.getByRole("button", { name: /Back to availability/ });
 
 describe("AvailabilityDetailPage", () => {
     beforeEach(() => {
@@ -36,13 +37,15 @@ describe("AvailabilityDetailPage", () => {
         expect(await screen.findByText("Board meeting")).toBeInTheDocument();
         expect(api.getSheet).toHaveBeenCalledWith("5");
         expect(screen.getByText("Pick a time")).toBeInTheDocument();
-        expect(screen.getByText(/Location: SH 152/)).toBeInTheDocument();
-        expect(screen.getByText(/Closes Jan 3, 5 PM/)).toBeInTheDocument();
+        expect(screen.getByText("Location")).toBeInTheDocument();
+        expect(screen.getByText("SH 152")).toBeInTheDocument();
+        expect(screen.getByText("Closes")).toBeInTheDocument();
+        expect(screen.getByText("Jan 3, 5 PM")).toBeInTheDocument();
         expect(screen.getByText("Jan 7 - Jan 8, 9 AM - 10:30 AM")).toBeInTheDocument();
-        expect(screen.getByText(/Times are in/)).toBeInTheDocument();
-        expect(screen.getByText(/heatmap shows up once 3 people have responded/)).toBeInTheDocument();
+        expect(screen.getByText(/All times are in/)).toBeInTheDocument();
+        expect(screen.getByText("Group view unlocks at 3 responses")).toBeInTheDocument();
         expect(screen.getByText("Amy Lee")).toBeInTheDocument();
-        expect(screen.getByText("Add availability ⊕")).toBeInTheDocument();
+        expect(screen.getByText("+ Add my availability")).toBeInTheDocument();
         expect(screen.queryByText("Manage this sheet")).not.toBeInTheDocument();
     });
 
@@ -50,7 +53,7 @@ describe("AvailabilityDetailPage", () => {
         api.getSheet.mockResolvedValue(detail());
         renderPage();
         await screen.findByText("Board meeting");
-        fireEvent.click(screen.getByText("Return ↩"));
+        fireEvent.click(back());
         expect(navigate).toHaveBeenCalledWith("/officer/availability");
     });
 
@@ -58,7 +61,7 @@ describe("AvailabilityDetailPage", () => {
         api.getSheet.mockRejectedValueOnce(Object.assign(new Error("x"), { status: 404 }));
         const { unmount } = renderPage();
         expect(await screen.findByText("This sheet doesn't exist anymore.")).toBeInTheDocument();
-        fireEvent.click(screen.getByText("Return ↩"));
+        fireEvent.click(back());
         expect(navigate).toHaveBeenCalledWith("/officer/availability");
         unmount();
 
@@ -77,18 +80,19 @@ describe("AvailabilityDetailPage", () => {
         api.getSheet.mockResolvedValue(detail({ heatmap: visibleHeatmap, myEntry: { slots: [SLOTS[0][0]], note: null } }));
         renderPage();
         await screen.findByText("Board meeting");
-        expect(screen.queryByText(/heatmap shows up once/)).not.toBeInTheDocument();
-        expect(screen.getByText("3 of 4 free")).toBeInTheDocument();
+        expect(screen.queryByText(/Group view unlocks/)).not.toBeInTheDocument();
+        expect(screen.getByText("Most free (3 of 4)")).toBeInTheDocument();
         expect(screen.getByText("Your times")).toBeInTheDocument();
-        expect(screen.getByText("Edit my availability ⊕")).toBeInTheDocument();
+        expect(screen.getByText("Edit my availability")).toBeInTheDocument();
     });
 
-    it("closed sheet: shows chip, no add button, 'Closed' deadline wording", async () => {
+    it("closed sheet: shows the pill, no add button and a Closed status", async () => {
         api.getSheet.mockResolvedValue(detail({ sheet: sheetInfo({ open: false, status: "CLOSED", closesAt: new Date(2030, 0, 3, 9, 0).toISOString(), location: null }) }));
         renderPage();
-        expect(await screen.findByText("Closed", { selector: ".av-chip" })).toBeInTheDocument();
-        expect(screen.queryByText(/Add availability/)).not.toBeInTheDocument();
-        expect(screen.getByText(/Closed Jan 3, 9 AM/)).toBeInTheDocument();
+        expect(await screen.findByText("Closed", { selector: ".av-pill" })).toBeInTheDocument();
+        expect(screen.queryByText(/Add my availability/)).not.toBeInTheDocument();
+        expect(screen.getByText("Status")).toBeInTheDocument();
+        expect(screen.queryByText("Closes")).not.toBeInTheDocument();
     });
 
     it("hides the timezone note when the viewer is in the sheet's zone", async () => {
@@ -96,7 +100,7 @@ describe("AvailabilityDetailPage", () => {
         api.getSheet.mockResolvedValue(detail({ sheet: sheetInfo({ timezone: viewerZone }) }));
         renderPage();
         await screen.findByText("Board meeting");
-        expect(screen.queryByText(/Times are in/)).not.toBeInTheDocument();
+        expect(screen.queryByText(/All times are in/)).not.toBeInTheDocument();
     });
 
     describe("editing my availability", () => {
@@ -105,49 +109,49 @@ describe("AvailabilityDetailPage", () => {
             const updated = detail({ myEntry: { slots: [SLOTS[0][0]], note: "hi" } });
             api.saveMyEntry.mockResolvedValue(updated);
             renderPage();
-            fireEvent.click(await screen.findByText("Add availability ⊕"));
+            fireEvent.click(await screen.findByText("+ Add my availability"));
 
             expect(screen.getByText(/Click or drag across the times/)).toBeInTheDocument();
-            expect(screen.queryByText(/heatmap shows up once/)).not.toBeInTheDocument();
+            expect(screen.getByText("Everyone so far")).toBeInTheDocument();
             expect(screen.queryByText("Remove my response")).not.toBeInTheDocument();
 
-            fireEvent.keyDown(grid(), { key: " " });
+            fireEvent.keyDown(editGrid(), { key: " " });
             fireEvent.change(screen.getByLabelText(/Anything the organizer should know/), { target: { value: "  hi  " } });
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(screen.getByText("Save"));
 
             await waitFor(() => expect(api.saveMyEntry).toHaveBeenCalledWith(5, [SLOTS[0][0]], "hi"));
-            expect(await screen.findByText("Edit my availability ⊕")).toBeInTheDocument();
+            expect(await screen.findByText("Edit my availability")).toBeInTheDocument();
         });
 
         it("saves an empty selection with a null note", async () => {
             api.getSheet.mockResolvedValue(detail());
             api.saveMyEntry.mockResolvedValue(detail());
             renderPage();
-            fireEvent.click(await screen.findByText("Add availability ⊕"));
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(await screen.findByText("+ Add my availability"));
+            fireEvent.click(screen.getByText("Save"));
             await waitFor(() => expect(api.saveMyEntry).toHaveBeenCalledWith(5, [], null));
         });
 
         it("starts from the saved entry and Cancel discards edits", async () => {
             api.getSheet.mockResolvedValue(detail({ myEntry: { slots: [SLOTS[0][0]], note: "old note" } }));
             renderPage();
-            fireEvent.click(await screen.findByText("Edit my availability ⊕"));
+            fireEvent.click(await screen.findByText("Edit my availability"));
 
             expect(screen.getByLabelText(/Anything the organizer should know/)).toHaveValue("old note");
-            expect(grid().querySelector(".is-selected")).not.toBeNull();
-            fireEvent.click(screen.getByText("Cancel ⊗"));
+            expect(editGrid().querySelector(".is-selected")).not.toBeNull();
+            fireEvent.click(screen.getByText("Cancel"));
             expect(api.saveMyEntry).not.toHaveBeenCalled();
-            expect(screen.getByText("Edit my availability ⊕")).toBeInTheDocument();
+            expect(screen.getByText("Edit my availability")).toBeInTheDocument();
         });
 
         it("shows the error and stays in edit mode when saving fails", async () => {
             api.getSheet.mockResolvedValue(detail());
             api.saveMyEntry.mockRejectedValue(new Error("This availability sheet is closed"));
             renderPage();
-            fireEvent.click(await screen.findByText("Add availability ⊕"));
-            fireEvent.click(screen.getByText("Save ✓"));
+            fireEvent.click(await screen.findByText("+ Add my availability"));
+            fireEvent.click(screen.getByText("Save"));
             expect(await screen.findByRole("alert")).toHaveTextContent("sheet is closed");
-            expect(screen.getByText("Save ✓")).not.toBeDisabled();
+            expect(screen.getByText("Save")).not.toBeDisabled();
         });
 
         it("can withdraw my response after confirming", async () => {
@@ -156,14 +160,14 @@ describe("AvailabilityDetailPage", () => {
             api.deleteMyEntry.mockResolvedValue(null);
             vi.spyOn(window, "confirm").mockReturnValueOnce(false).mockReturnValueOnce(true);
             renderPage();
-            fireEvent.click(await screen.findByText("Edit my availability ⊕"));
+            fireEvent.click(await screen.findByText("Edit my availability"));
 
             fireEvent.click(screen.getByText("Remove my response"));
             expect(api.deleteMyEntry).not.toHaveBeenCalled();
 
             fireEvent.click(screen.getByText("Remove my response"));
             await waitFor(() => expect(api.deleteMyEntry).toHaveBeenCalledWith(5));
-            expect(await screen.findByText("Add availability ⊕")).toBeInTheDocument();
+            expect(await screen.findByText("+ Add my availability")).toBeInTheDocument();
             expect(api.getSheet).toHaveBeenCalledTimes(2);
         });
     });
