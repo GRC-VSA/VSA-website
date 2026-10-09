@@ -21,7 +21,7 @@ spring:
     name: backend
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://ep-curly-pine-ahtlwzfe-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require}
+    url: ${DB_URL:jdbc:postgresql://ep-old-king-ahyd2wvc-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channelBinding=require}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver

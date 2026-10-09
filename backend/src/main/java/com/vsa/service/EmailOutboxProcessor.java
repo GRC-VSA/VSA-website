@@ -86,6 +86,8 @@ public class EmailOutboxProcessor {
 
                 case REGISTRATION_CONFIRMATION -> sendRegistrationConfirmationEmail(outbox, payload);
 
+                case AVAILABILITY_EDIT_LINK -> sendAvailabilityEditLinkEmail(outbox, payload);
+
                 case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
 
                 case EMAIL_CHANGE_VERIFICATION -> sendEmailChangeVerificationEmail(outbox, payload);
@@ -139,6 +141,16 @@ public class EmailOutboxProcessor {
                 outbox.getRecipientEmail(),
                 (String) payload.get("eventName"),
                 (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendAvailabilityEditLinkEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendAvailabilityEditLinkEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("guestName"),
+                (String) payload.get("sheetTitle"),
+                (String) payload.get("editPath")
         );
     }
 

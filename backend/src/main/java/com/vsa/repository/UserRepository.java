@@ -1,6 +1,8 @@
 package com.vsa.repository;
 
 import com.vsa.model.User;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -63,4 +65,14 @@ public interface UserRepository extends JpaRepository<User, String> {
    * @return true if a user with this email exists, false otherwise
    */
   boolean existsByEmail(String email);
+
+  /**
+   * Finds every user whose role is in the given set.
+   *
+   * <p>Used by availability sheets to list the officers expected to respond.
+   *
+   * @param roles Role names, e.g. "officer" and "president"
+   * @return Matching users
+   */
+  List<User> findByRoleIn(Collection<String> roles);
 }

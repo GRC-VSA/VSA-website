@@ -19,7 +19,7 @@ import lombok.Setter;
 @Setter
 public class EmailOutbox {
 
-    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, ACCOUNT_VERIFICATION, EMAIL_CHANGE_VERIFICATION}
+    public enum EmailType {REGISTRATION_VERIFICATION, REGISTRATION_CONFIRMATION, ACCOUNT_VERIFICATION, EMAIL_CHANGE_VERIFICATION, AVAILABILITY_EDIT_LINK}
 
     public enum Status {PENDING, PROCESSING, SENT,  FAILED}
 
@@ -29,7 +29,8 @@ public class EmailOutbox {
     private Long outboxId;
 
     /*
-     * Registration this email belongs to.
+     * Registration this email belongs to. Null for emails that aren't about a registration
+     * (e.g. availability edit links).
      *
      * This is intentionally just an ID rather than a JPA relationship.
      * The outbox should remain independent from Registration.

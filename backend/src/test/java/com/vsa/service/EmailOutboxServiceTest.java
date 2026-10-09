@@ -217,4 +217,23 @@ class EmailOutboxServiceTest {
                         .contains("ABCDEFG2")
         );
     }
+
+    @Test
+    void queueAvailabilityEditLinkEmail_savesPendingOutboxWithPayload() {
+        emailOutboxService.queueAvailabilityEditLinkEmail(
+                "guest@x.com", "Bob", "Planning", "/availability/invite/t?edit=e");
+
+        ArgumentCaptor<EmailOutbox> captor = ArgumentCaptor.forClass(EmailOutbox.class);
+        verify(emailOutboxRepository).save(captor.capture());
+        EmailOutbox saved = captor.getValue();
+
+        assertEquals(EmailOutbox.EmailType.AVAILABILITY_EDIT_LINK, saved.getEmailType());
+        assertEquals("guest@x.com", saved.getRecipientEmail());
+        assertEquals(EmailOutbox.Status.PENDING, saved.getStatus());
+        assertNull(saved.getRegistrationId());
+        assertNull(saved.getUserUid());
+        assertTrue(saved.getPayload().contains("\"guestName\":\"Bob\""));
+        assertTrue(saved.getPayload().contains("\"sheetTitle\":\"Planning\""));
+        assertTrue(saved.getPayload().contains("edit=e"));
+    }
 }
