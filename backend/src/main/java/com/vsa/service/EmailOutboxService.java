@@ -146,6 +146,35 @@ public class EmailOutboxService {
         );
     }
 
+    /**
+     * Queues an email with a guest's new availability edit link.
+     *
+     * @param recipientEmail Guest's email
+     * @param guestName Name the guest entered
+     * @param sheetTitle Title of the availability sheet
+     * @param editPath Frontend path (starting with '/') that opens the sheet in edit mode
+     */
+    public void queueAvailabilityEditLinkEmail(
+            String recipientEmail,
+            String guestName,
+            String sheetTitle,
+            String editPath
+    ) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("guestName", guestName);
+        payload.put("sheetTitle", sheetTitle);
+        payload.put("editPath", editPath);
+
+        saveOutboxEntry(
+                null,
+                null,
+                EmailOutbox.EmailType.AVAILABILITY_EDIT_LINK,
+                recipientEmail,
+                payload
+        );
+    }
+
     private void saveOutboxEntry(
             Long registrationId,
             String userUid,

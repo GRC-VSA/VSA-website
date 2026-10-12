@@ -1,134 +1,185 @@
 // src/officer_pages/availability/AvailabilityListPage.jsx
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { deleteSheet, listSheets } from "../../api/Availability.js";
+import { dateBadge, describeDeadline, groupSheets } from "./availabilityFormat.js";
+import PageHeader from "./PageHeader.jsx";
+import "./Availability.css";
 
-const MOCK_AVAILABILITIES = [
-    {
-        id: 1,
-        month: "SEPT",
-        days: "16, 17, 18",
-        title: "Discussing format for Badminton Tournament",
-        subtitle: "Event team discussing the tournament format",
-        location: "SH 152",
-    },
-    {
-        id: 2,
-        month: "AUG",
-        days: "6, 7",
-        title: "Shooting for Miss Boba Music Video",
-        subtitle: "I need the whole club availability to meet and shoot MV for Miss Boba",
-        location: "485 Rainier Ave S, Suite B Renton, WA 98057",
-    },
-    {
-        id: 3,
-        month: "OCT",
-        days: "12",
-        title: "Badminton Tournament",
-        subtitle: "Fill out your availability for the official date of the Badminton Tournament",
-        location: "RAC - Green River College",
-    },
-];
-
+/*
+    Every availability sheet, grouped into Events and General meetings, with closed sheets folded
+    away at the bottom. Within a group, the closest deadline comes first.
+*/
 export default function AvailabilityListPage() {
     const navigate = useNavigate();
+    const [sheets, setSheets] = useState(null);
+    const [error, setError] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const [showClosed, setShowClosed] = useState(false);
+
+    useEffect(() => {
+        let ignore = false;
+        listSheets()
+            .then((data) => !ignore && setSheets(data))
+            .catch((err) => !ignore && setError(err.message));
+        return () => {
+            ignore = true;
+        };
+    }, []);
+
+    async function handleDelete(sheet) {
+        if (!window.confirm(`Delete "${sheet.title}" and everyone's responses? This can't be undone.`)) return;
+        setError("");
+        try {
+            await deleteSheet(sheet.sheetId);
+            setSheets((prev) => prev.filter((s) => s.sheetId !== sheet.sheetId));
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
+    const groups = sheets ? groupSheets(sheets) : null;
+    const canDeleteAny = (sheets ?? []).some((s) => s.canManage);
+    const startNew = () => navigate("/officer/availability/collect");
+
+    const renderCards = (list) => (
+        <div className="av-list">
+            {list.map((sheet) => (
+                <SheetCard
+                    key={sheet.sheetId}
+                    sheet={sheet}
+                    deleting={deleting}
+                    onOpen={() => navigate(`/officer/availability/${sheet.sheetId}`)}
+                    onDelete={() => handleDelete(sheet)}
+                />
+            ))}
+        </div>
+    );
 
     return (
-        <div style={s.card}>
-            <div style={s.headerRow}>
-                <h2 style={s.title}>Availabilities</h2>
-                <div style={{ display: "flex", gap: "10px" }}>
-                    <button style={s.btnOutline}>Delete availability</button>
-                    <button style={s.btnPrimary} onClick={() => navigate("collect")}>
-                        Collect new availability
+        <main className="av-page">
+            <PageHeader title="Availability" subtitle="Find times that work for the board and the people we work with" />
+
+            <div className="av-toolbar">
+                {canDeleteAny && (
+                    <button
+                        type="button"
+                        className="av-btn av-btn--ghost"
+                        aria-pressed={deleting}
+                        onClick={() => setDeleting((d) => !d)}
+                    >
+                        {deleting ? "Done" : "Delete sheets"}
                     </button>
-                </div>
+                )}
+                <button type="button" className="av-btn av-btn--primary" onClick={startNew}>
+                    + Collect availability
+                </button>
             </div>
 
-            <div style={s.list}>
-                {MOCK_AVAILABILITIES.map((item) => (
-                    <div
-                        key={item.id}
-                        style={s.row}
-                        onClick={() => navigate(`${item.id}`)}
+            {error && <div className="av-error" role="alert">{error}</div>}
+            {sheets === null && !error && <p className="av-loading">Loading…</p>}
+
+            {sheets && sheets.length === 0 && (
+                <div className="av-card av-empty">
+                    <h2>No availability sheets yet</h2>
+                    <p>Start one to find a time that works for everyone.</p>
+                    <button type="button" className="av-btn av-btn--primary" onClick={startNew}>
+                        + Collect availability
+                    </button>
+                </div>
+            )}
+
+            {groups && groups.events.length > 0 && (
+                <section className="av-group" aria-labelledby="av-group-events">
+                    <h2 className="av-group-title" id="av-group-events">
+                        Events <span>{groups.events.length} open</span>
+                    </h2>
+                    {renderCards(groups.events)}
+                </section>
+            )}
+
+            {groups && groups.meetings.length > 0 && (
+                <section className="av-group" aria-labelledby="av-group-meetings">
+                    <h2 className="av-group-title" id="av-group-meetings">
+                        General meetings <span>{groups.meetings.length} open</span>
+                    </h2>
+                    {renderCards(groups.meetings)}
+                </section>
+            )}
+
+            {groups && groups.closed.length > 0 && (
+                <section className="av-group">
+                    <button
+                        type="button"
+                        className="av-closed-toggle"
+                        aria-expanded={showClosed}
+                        onClick={() => setShowClosed((s) => !s)}
                     >
-                        <div style={s.dateBadge}>
-                            <span style={s.dateMonth}>{item.month}</span>
-                            <span style={s.dateDays}>{item.days}</span>
-                        </div>
-                        <div style={s.rowText}>
-                            <p style={s.rowTitle}>{item.title}</p>
-                            <p style={s.rowSubtitle}>{item.subtitle}</p>
-                        </div>
-                        <div style={s.locationBlock}>
-                            <p style={s.locationLabel}>Location</p>
-                            <p style={s.locationValue}>{item.location}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+                        {showClosed ? "▾" : "▸"} Closed <span>{groups.closed.length}</span>
+                    </button>
+                    {showClosed && renderCards(groups.closed)}
+                </section>
+            )}
+        </main>
     );
 }
 
-const s = {
-    card: {
-        background: "#f7f7f8",
-        borderRadius: "12px",
-        padding: "24px 28px",
-        minHeight: "480px",
-    },
-    headerRow: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "24px",
-    },
-    title: { fontSize: "20px", fontWeight: 600, margin: 0, color: "#1a1a1a" },
-    btnOutline: {
-        background: "#fff",
-        border: "1px solid #ddd",
-        borderRadius: "8px",
-        padding: "8px 16px",
-        fontSize: "13px",
-        fontWeight: 500,
-        cursor: "pointer",
-    },
-    btnPrimary: {
-        background: "#c0392b",
-        color: "#fff",
-        border: "none",
-        borderRadius: "8px",
-        padding: "8px 16px",
-        fontSize: "13px",
-        fontWeight: 500,
-        cursor: "pointer",
-    },
-    list: { display: "flex", flexDirection: "column", gap: "14px" },
-    row: {
-        background: "#fff",
-        borderRadius: "10px",
-        padding: "16px 20px",
-        display: "flex",
-        alignItems: "center",
-        gap: "18px",
-        cursor: "pointer",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-    },
-    dateBadge: {
-        background: "#1a1a1a",
-        color: "#fff",
-        borderRadius: "8px",
-        padding: "8px 14px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        minWidth: "64px",
-    },
-    dateMonth: { fontSize: "10px", fontWeight: 600, letterSpacing: "0.5px" },
-    dateDays: { fontSize: "13px", fontWeight: 600 },
-    rowText: { flex: 1 },
-    rowTitle: { fontSize: "14px", fontWeight: 600, margin: "0 0 4px", color: "#1a1a1a" },
-    rowSubtitle: { fontSize: "12px", color: "#888", margin: 0 },
-    locationBlock: { textAlign: "right", minWidth: "160px" },
-    locationLabel: { fontSize: "11px", color: "#aaa", margin: "0 0 2px" },
-    locationValue: { fontSize: "12px", color: "#555", margin: 0, lineHeight: 1.4 },
-};
+function SheetCard({ sheet, deleting, onOpen, onDelete }) {
+    const badge = dateBadge(sheet);
+    const deadline = describeDeadline(sheet.closesAt);
+
+    return (
+        <div
+            className={`av-sheet-card${sheet.open ? "" : " is-closed"}`}
+            role="link"
+            tabIndex={0}
+            onClick={onOpen}
+            onKeyDown={(e) => {
+                if (e.key === "Enter") onOpen();
+            }}
+        >
+            <div className="av-badge" aria-hidden="true">
+                <span className="av-badge-month">{badge.month}</span>
+                <span className="av-badge-days">{badge.days}</span>
+            </div>
+
+            <div className="av-sheet-main">
+                <p className="av-sheet-title">{sheet.title}</p>
+                {sheet.description && <p className="av-sheet-desc">{sheet.description}</p>}
+                <div className="av-sheet-meta">
+                    {!sheet.open ? (
+                        <span className="av-pill">Closed</span>
+                    ) : sheet.answeredByMe ? (
+                        <span className="av-pill av-pill--gold">✓ You answered</span>
+                    ) : (
+                        <span className="av-pill av-pill--red">Needs your answer</span>
+                    )}
+                    <span className="av-pill">
+                        {sheet.responseCount} {sheet.responseCount === 1 ? "response" : "responses"}
+                    </span>
+                    {sheet.open && deadline && <span className="av-pill">Closes {deadline}</span>}
+                </div>
+            </div>
+
+            {sheet.location && !deleting && (
+                <div className="av-sheet-side">
+                    <p className="av-sheet-side-label">Location</p>
+                    <p className="av-sheet-side-value">{sheet.location}</p>
+                </div>
+            )}
+
+            {deleting && sheet.canManage && (
+                <button
+                    type="button"
+                    className="av-btn av-btn--danger av-btn--small"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                >
+                    Delete
+                </button>
+            )}
+        </div>
+    );
+}

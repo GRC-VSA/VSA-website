@@ -68,4 +68,17 @@ class EmailServiceTest {
                 RuntimeException.class,
                 () -> emailService.sendAccountVerificationCodeEmail("user@vsa.com", "John", "ABCDEFG2"));
     }
+
+    @Test
+    void sendAvailabilityEditLinkEmail_TriggersMailSender() {
+        emailService.sendAvailabilityEditLinkEmail(
+                "guest@x.com", "Bob", "Planning", "/availability/invite/t?edit=e");
+        verify(javaMailSender).send(any(MimeMessage.class));
+    }
+
+    @Test
+    void sendAvailabilityEditLinkEmail_HandlesNullNameAndTitle() {
+        emailService.sendAvailabilityEditLinkEmail("guest@x.com", null, null, "/p");
+        verify(javaMailSender).send(any(MimeMessage.class));
+    }
 }

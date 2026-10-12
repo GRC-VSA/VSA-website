@@ -46,23 +46,23 @@ import com.vsa.security.JwtFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-  // ── Dependencies ──────────────────────────────────────────
-  private final JwtFilter jwtFilter;
-  private final IpRateLimitFilter ipRateLimitFilter;
+    // ── Dependencies ──────────────────────────────────────────
+    private final JwtFilter jwtFilter;
+    private final IpRateLimitFilter ipRateLimitFilter;
 
     @Value("${frontend.url}")
     private String frontendUrl;
 
-  /**
-   * Constructs SecurityConfig with required dependencies.
-   *
-   * @param jwtFilter Filter for JWT token validation
-   * @param ipRateLimitFilter Filter for per-IP rate limiting on sensitive endpoints
-   */
-  public SecurityConfig(JwtFilter jwtFilter, IpRateLimitFilter ipRateLimitFilter) {
-    this.jwtFilter = jwtFilter;
-    this.ipRateLimitFilter = ipRateLimitFilter;
-  }
+    /**
+     * Constructs SecurityConfig with required dependencies.
+     *
+     * @param jwtFilter Filter for JWT token validation
+     * @param ipRateLimitFilter Filter for per-IP rate limiting on sensitive endpoints
+     */
+    public SecurityConfig(JwtFilter jwtFilter, IpRateLimitFilter ipRateLimitFilter) {
+        this.jwtFilter = jwtFilter;
+        this.ipRateLimitFilter = ipRateLimitFilter;
+    }
 
     // ── Bean Definitions ──────────────────────────────────────
     /**
@@ -96,13 +96,13 @@ public class SecurityConfig {
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth
-                        -> auth
+                                -> auth
                                 // ── Fully public endpoints ────────────────────────
                                 .requestMatchers(
                                         "/api/users/register",
                                         "/api/users/login",
                                         "/api/users/verify",
-                                            "/api/users/resend-verification",
+                                        "/api/users/resend-verification",
                                         "/api/users/forgot-password",
                                         "/api/users/reset-password",
                                         "/api/application-roles/open",
@@ -123,6 +123,15 @@ public class SecurityConfig {
                                 .authenticated()
                                 // ── Officer application review ──────────────────
                                 .requestMatchers("/api/applications/**")
+                                .hasAnyAuthority("officer", "president")
+                                // ── Availability sheets. The guest invite rule must come
+                                //    first: /api/availability/** would otherwise catch
+                                //    invite links and demand an officer login. Kept out
+                                //    of /api/events/** on purpose, since every GET there
+                                //    is public ────────────────────────────────────────
+                                .requestMatchers("/api/availability/invite/**")
+                                .permitAll()
+                                .requestMatchers("/api/availability/**")
                                 .hasAnyAuthority("officer", "president")
                                 // ── Question type lookup (read-only, used by both
                                 //    officers building questions and guests answering
@@ -166,7 +175,7 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(ipRateLimitFilter, JwtFilter.class);
+                .addFilterBefore(ipRateLimitFilter, JwtFilter.class);
         return http.build();
     }
 

@@ -23,6 +23,7 @@ import ResetPasswordPage from "./guest_pages/ResetPasswordPage.jsx";
 import ProductsPage from "./guest_pages/ProductsPage.jsx";
 import EventRegistrationPage from "./guest_pages/EventRegistrationPage.jsx";
 import RegistrationVerificationPage from "./guest_pages/RegistrationVerificationPage.jsx";
+import AvailabilityInvitePage from "./guest_pages/AvailabilityInvitePage.jsx";
 import SponsorsPage from "./guest_pages/SponsorsPage.jsx";
 import ApplyPage from "./guest_pages/ApplyPage.jsx";
 import MyApplicationsPage from "./guest_pages/MyApplications.jsx";
@@ -46,75 +47,78 @@ import CollectAvailabilityFlow from "./officer_pages/availability/CollectAvailab
 import IntroLoader from "./components/IntroLoader.jsx";
 
 function App() {
-  const [appReady, setAppReady] = useState(false);
+    const [appReady, setAppReady] = useState(false);
 
-  useEffect(() => {
-    if (document.readyState === "complete") {
-      setAppReady(true);
-      return;
-    }
-    const handleLoad = () => setAppReady(true);
-    window.addEventListener("load", handleLoad);
-    return () => window.removeEventListener("load", handleLoad);
-  }, []);
+    useEffect(() => {
+        if (document.readyState === "complete") {
+            setAppReady(true);
+            return;
+        }
+        const handleLoad = () => setAppReady(true);
+        window.addEventListener("load", handleLoad);
+        return () => window.removeEventListener("load", handleLoad);
+    }, []);
 
-  return (
-    <EventsProvider>
-      <IntroLoader ready={appReady} />
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<GuestLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="sign-in" element={<SignInPage />} />
-          <Route path="register" element={<RegisterPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/verify" element={<VerifyEmailPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/events" element={<EventsPage />} />
-          <Route path="/our-team" element={<OurTeamPage />} />
-          {/* <Route path="old-events" element={<OldEventsPage />} /> */}
-          <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
-          <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/sponsors" element={<SponsorsPage />} />
-          <Route element={<MyApplicationsProvider />}>
-            <Route path="/apply" element={<ApplyPage />} />
-            <Route path="/my-applications" element={<MyApplicationsPage />} />
-            <Route path="/my-applications/:applicationId" element={<MyApplicationDetail />} />
-          </Route>
-          <Route path="/profile" element={<ProfilePage/>}/>
-        </Route>
+    return (
+        <EventsProvider>
+            <IntroLoader ready={appReady} />
+            <ScrollToTop />
+            <Routes>
+                <Route path="/" element={<GuestLayout />}>
+                    <Route index element={<HomePage />} />
+                    <Route path="sign-in" element={<SignInPage />} />
+                    <Route path="register" element={<RegisterPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/verify" element={<VerifyEmailPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/events" element={<EventsPage />} />
+                    <Route path="/our-team" element={<OurTeamPage />} />
+                    {/* <Route path="old-events" element={<OldEventsPage />} /> */}
+                    <Route path="events/:eventId/registration-form" element={<EventRegistrationPage />} />
+                    <Route path="events/:eventId/registration/verify/:verificationId" element={<RegistrationVerificationPage />} />
+                    <Route path="/products" element={<ProductsPage />} />
+                    <Route path="/sponsors" element={<SponsorsPage />} />
+                    {/* Invite link for people outside VSA. Keep in sync with inviteUrl() in api/Availability.js
+              and AvailabilityGuestService.editPath on the backend. */}
+                    <Route path="availability/invite/:token" element={<AvailabilityInvitePage />} />
+                    <Route element={<MyApplicationsProvider />}>
+                        <Route path="/apply" element={<ApplyPage />} />
+                        <Route path="/my-applications" element={<MyApplicationsPage />} />
+                        <Route path="/my-applications/:applicationId" element={<MyApplicationDetail />} />
+                    </Route>
+                    <Route path="/profile" element={<ProfilePage/>}/>
+                </Route>
 
-        <Route
-          path="/officer"
-          element={
-            //Add and configure roles heree ----|------------|
-            //                                  V            V
-            <ProtectedRoute allowedRoles={["officer", "president"]}>
-              <RecruitmentApplicantsProvider>
-                <OfficerLayout />
-              </RecruitmentApplicantsProvider>
-            </ProtectedRoute>
-          }>
-          <Route index element={<OverallBoard />} />
-          <Route path="dashboard/budget-board" element={<BudgetBoard />} />
-          <Route path="dashboard/event-board" element={<EventBoard />} />
-          <Route path="availability" element={<AvailabilityListPage />} />
-          <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
-          <Route path="availability/:id" element={<AvailabilityDetailPage />} />
-          <Route path="todo-list" element={<ToDoPage />} />
-          <Route path="events/create-event" element={<CreateEventPage />} />
-          <Route path="events/manage-event" element={<ManageEventPage />} />
-          <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
-          <Route path="recruitment/applicants/:applicationId" element={<ApplicantDetail />} />
-          <Route path="recruitment/applicants" element={<ViewApplicants />} />
-          <Route path="recruitment/edit-form" element={<EditApplicationForm />} />
-        </Route>
+                <Route
+                    path="/officer"
+                    element={
+                        //Add and configure roles heree ----|------------|
+                        //                                  V            V
+                        <ProtectedRoute allowedRoles={["officer", "president"]}>
+                            <RecruitmentApplicantsProvider>
+                                <OfficerLayout />
+                            </RecruitmentApplicantsProvider>
+                        </ProtectedRoute>
+                    }>
+                    <Route index element={<OverallBoard />} />
+                    <Route path="dashboard/budget-board" element={<BudgetBoard />} />
+                    <Route path="dashboard/event-board" element={<EventBoard />} />
+                    <Route path="availability" element={<AvailabilityListPage />} />
+                    <Route path="availability/collect" element={<CollectAvailabilityFlow />} />
+                    <Route path="availability/:id" element={<AvailabilityDetailPage />} />
+                    <Route path="todo-list" element={<ToDoPage />} />
+                    <Route path="events/create-event" element={<CreateEventPage />} />
+                    <Route path="events/manage-event" element={<ManageEventPage />} />
+                    <Route path="events/:eventId/create-registration-form" element={<CreateRegistrationPage />} />
+                    <Route path="recruitment/applicants/:applicationId" element={<ApplicantDetail />} />
+                    <Route path="recruitment/applicants" element={<ViewApplicants />} />
+                    <Route path="recruitment/edit-form" element={<EditApplicationForm />} />
+                </Route>
 
-      </Routes>
-    </EventsProvider>
-  );
+            </Routes>
+        </EventsProvider>
+    );
 }
 
 export default App;

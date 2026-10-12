@@ -428,4 +428,30 @@ class EmailOutboxProcessorTest {
 
         return outbox;
     }
+
+    @Test
+    void processPendingEmails_availabilityEditLink_sendsEmailAndMarksSent() {
+        EmailOutbox outbox = new EmailOutbox();
+        outbox.setOutboxId(30L);
+        outbox.setEmailType(EmailOutbox.EmailType.AVAILABILITY_EDIT_LINK);
+        outbox.setRecipientEmail("guest@x.com");
+        outbox.setPayload(
+                "{\"guestName\":\"Bob\",\"sheetTitle\":\"Planning\",\"editPath\":\"/availability/invite/t?edit=e\"}");
+        outbox.setStatus(EmailOutbox.Status.PENDING);
+
+        when(emailOutboxRepository.findByStatusOrderByCreatedAtAsc(EmailOutbox.Status.PENDING))
+                .thenReturn(List.of(outbox));
+        when(emailOutboxRepository.claimPendingEmail(
+                        30L, EmailOutbox.Status.PENDING, EmailOutbox.Status.PROCESSING))
+                .thenReturn(1);
+
+        emailOutboxProcessor.processPendingEmails();
+
+        verify(emailService)
+                .sendAvailabilityEditLinkEmail(
+                        "guest@x.com", "Bob", "Planning", "/availability/invite/t?edit=e");
+        ArgumentCaptor<EmailOutbox> captor = ArgumentCaptor.forClass(EmailOutbox.class);
+        verify(emailOutboxRepository).save(captor.capture());
+        assertEquals(EmailOutbox.Status.SENT, captor.getValue().getStatus());
+    }
 }

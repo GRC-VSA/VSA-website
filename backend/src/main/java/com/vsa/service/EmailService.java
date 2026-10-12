@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Service class for sending HTML emails to users.
@@ -433,6 +434,60 @@ public class EmailService {
                             TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Reset Your Password", body);
+  }
+
+  // ── Availability Emails ────────────────────────────────────
+
+  /**
+   * Sends a guest a fresh link for editing their availability entry.
+   *
+   * <p>Guest name and sheet title are typed by users, so they are HTML-escaped.
+   *
+   * @param toEmail Guest's email address
+   * @param guestName Name the guest entered
+   * @param sheetTitle Title of the availability sheet
+   * @param editPath Frontend path that opens the sheet with the new edit token
+   */
+  public void sendAvailabilityEditLinkEmail(
+          String toEmail, String guestName, String sheetTitle, String editPath) {
+    String editUrl = buildFrontendUrl(editPath);
+    String safeName = HtmlUtils.htmlEscape(guestName == null ? "" : guestName);
+    String safeTitle = HtmlUtils.htmlEscape(sheetTitle == null ? "" : sheetTitle);
+
+    String body =
+            """
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, here's your edit link</h3>
+                    <p style="color: %s; margin: 0 0 20px 0; line-height: 1.6;">Use the button below to change your availability for <strong>%s</strong>.</p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="%s" style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 14px 40px;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 15px;
+                        ">Edit My Availability</a>
+                    </div>
+                    <p style="color: %s; font-size: 13px; margin: 0;">Any older edit link for this sheet no longer works. If you didn't ask for this, you can ignore this email.</p>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("Your Availability Edit Link"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            safeName,
+                            TEXT_DARK,
+                            safeTitle,
+                            editUrl,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT,
+                            TEXT_MUTED);
+
+    sendEmail(toEmail, "VSA - Edit your availability: " + sheetTitle, body);
   }
 
   // ── Core Email Sending Method ──────────────────────────────
