@@ -104,7 +104,8 @@ public class EmailOutboxProcessor {
              */
             if (outbox.getEmailType() == EmailOutbox.EmailType.REGISTRATION_VERIFICATION
                     || outbox.getEmailType() == EmailOutbox.EmailType.ACCOUNT_VERIFICATION
-                    || outbox.getEmailType() == EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION) {
+                    || outbox.getEmailType() == EmailOutbox.EmailType.EMAIL_CHANGE_VERIFICATION
+                    || outbox.getEmailType() == EmailOutbox.EmailType.AVAILABILITY_EDIT_LINK) {
                 outbox.setPayload("{}");
             }
 
