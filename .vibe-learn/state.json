@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "profile": {
+    "level": "intermediate",
+    "density": "normal",
+    "interview": false,
+    "focus": null,
+    "goal": null
+  },
+  "concepts": {
+    "mock-api-seam": {
+      "name": "Mock API seam",
+      "stack": "react",
+      "first_seen": "2026-11-26",
+      "last_seen": "2026-11-26",
+      "next_review": "2026-11-27",
+      "interval_days": 1,
+      "times_taught": 1,
+      "times_quizzed": 0,
+      "last_result": null,
+      "shaky": false,
+      "related": [],
+      "notes": [
+        "Keep a fake API module's function names and return shapes identical to the real one so swapping in fetch calls doesn't touch the pages."
+      ]
+    },
+    "stale-response-guard-in-useeffect": {
+      "name": "Stale response guard in useEffect",
+      "stack": "react",
+      "first_seen": "2026-11-26",
+      "last_seen": "2026-11-26",
+      "next_review": "2026-11-27",
+      "interval_days": 1,
+      "times_taught": 1,
+      "times_quizzed": 0,
+      "last_result": null,
+      "shaky": false,
+      "related": [],
+      "notes": [
+        "An ignore flag set in the effect cleanup stops a slow, outdated request from overwriting state after the input changed or the component unmounted."
+      ]
+    },
+    "plain-date-strings-for-due-dates": {
+      "name": "Plain date strings for due dates",
+      "stack": "javascript",
+      "first_seen": "2026-11-26",
+      "last_seen": "2026-11-26",
+      "next_review": "2026-11-27",
+      "interval_days": 1,
+      "times_taught": 1,
+      "times_quizzed": 0,
+      "last_result": null,
+      "shaky": false,
+      "related": [],
+      "notes": [
+        "Storing due dates as YYYY-MM-DD strings and comparing them to today's local date avoids time zone bugs that come with Date objects."
+      ]
+    },
+    "router-state-handoff": {
+      "name": "Router state handoff",
+      "stack": "react-router",
+      "first_seen": "2026-11-26",
+      "last_seen": "2026-11-26",
+      "next_review": "2026-11-27",
+      "interval_days": 1,
+      "times_taught": 1,
+      "times_quizzed": 0,
+      "last_result": null,
+      "shaky": false,
+      "related": [],
+      "notes": [
+        "navigate(path, { state }) passes one-time data like a new task's id to the next page without putting it in the URL."
+      ]
+    }
+  },
+  "mistake_patterns": {},
+  "sessions": [
+    {
+      "date": "2026-11-26",
+      "concepts": [
+        "mock-api-seam",
+        "stale-response-guard-in-useeffect",
+        "plain-date-strings-for-due-dates",
+        "router-state-handoff"
+      ],
+      "shaky": []
+    }
+  ]
+}

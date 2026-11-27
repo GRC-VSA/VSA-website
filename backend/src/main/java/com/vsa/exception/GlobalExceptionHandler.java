@@ -3,6 +3,7 @@ package com.vsa.exception;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.ResponseEntity;
@@ -141,6 +142,23 @@ public class GlobalExceptionHandler {
                     ? "You already have an entry on this availability sheet"
                     : "This change conflicts with existing data";
     return errorBody(HttpStatus.CONFLICT, message);
+  }
+
+  /**
+   * Handles optimistic-lock failures (409 Conflict).
+   *
+   * <p>Thrown when an entity with a {@code @Version} column (e.g. Task) was updated by someone else
+   * between this request reading it and writing it: Hibernate's {@code UPDATE ... WHERE version =
+   * ?} matched no row. Without this it would surface as a 500.
+   *
+   * @param ex The exception thrown on flush
+   * @return ResponseEntity with 409 status and a readable message
+   */
+  @ExceptionHandler(OptimisticLockingFailureException.class)
+  public ResponseEntity<Map<String, Object>> handleOptimisticLock(
+          OptimisticLockingFailureException ex) {
+    return errorBody(
+            HttpStatus.CONFLICT, "This was changed by someone else. Reload it and try again.");
   }
 
   /**

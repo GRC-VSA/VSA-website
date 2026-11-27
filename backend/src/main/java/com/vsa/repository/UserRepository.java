@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -75,4 +76,14 @@ public interface UserRepository extends JpaRepository<User, String> {
    * @return Matching users
    */
   List<User> findByRoleIn(Collection<String> roles);
+
+  /**
+   * Same as {@link #findByRoleIn} but with each user's team fetched in the same query, for the
+   * to-do "assign to" picker (which shows every member's team).
+   *
+   * @param roles Role names, e.g. "officer" and "president"
+   * @return Matching users with {@code team} loaded
+   */
+  @EntityGraph(attributePaths = "team")
+  List<User> findWithTeamByRoleIn(Collection<String> roles);
 }

@@ -8,6 +8,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -68,6 +71,16 @@ public class User {
   /** CloudFront/S3 URL of the user's avatar, or null if they haven't set one. */
   @Column(name = "profile_image_url")
   private String profileImageUrl;
+
+  /**
+   * The officer team this user belongs to, or null. Set by the president through {@code
+   * /api/teams/{teamId}/members/{uid}}. LAZY so loading a user never drags its team along unless
+   * asked; JsonIgnore so a User entity serialized anywhere never exposes a Hibernate proxy.
+   */
+  @JsonIgnore
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "team_id")
+  private Team team;
 
   /** Officer applications submitted by this user. */
   @JsonIgnore

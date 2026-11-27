@@ -91,6 +91,8 @@ public class EmailOutboxProcessor {
                 case ACCOUNT_VERIFICATION -> sendAccountVerificationEmail(outbox, payload);
 
                 case EMAIL_CHANGE_VERIFICATION -> sendEmailChangeVerificationEmail(outbox, payload);
+
+                case TASK_ASSIGNED -> sendTaskAssignedEmail(outbox, payload);
             }
 
             outbox.setStatus(EmailOutbox.Status.SENT);
@@ -142,6 +144,19 @@ public class EmailOutboxProcessor {
                 outbox.getRecipientEmail(),
                 (String) payload.get("eventName"),
                 (String) payload.get("verificationCode")
+        );
+    }
+
+    private void sendTaskAssignedEmail(EmailOutbox outbox, Map<String, Object> payload) {
+
+        emailService.sendTaskAssignedEmail(
+                outbox.getRecipientEmail(),
+                (String) payload.get("firstName"),
+                (String) payload.get("taskTitle"),
+                (String) payload.get("assignedByName"),
+                (String) payload.get("dueDate"),
+                (String) payload.get("priority"),
+                (String) payload.get("taskPath")
         );
     }
 

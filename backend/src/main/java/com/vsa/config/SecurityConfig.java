@@ -133,6 +133,17 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/api/availability/**")
                                 .hasAnyAuthority("officer", "president")
+                                // ── Officer to-do list and teams. Reading teams is
+                                //    open to officers; changing them is president-only,
+                                //    so the GET rule must come before the catch-all
+                                //    team rule. Per-task rules (who may edit/delete
+                                //    THIS task) live in TaskService ─────────────────
+                                .requestMatchers("/api/tasks", "/api/tasks/**")
+                                .hasAnyAuthority("officer", "president")
+                                .requestMatchers(HttpMethod.GET, "/api/teams", "/api/teams/**")
+                                .hasAnyAuthority("officer", "president")
+                                .requestMatchers("/api/teams", "/api/teams/**")
+                                .hasAuthority("president")
                                 // ── Question type lookup (read-only, used by both
                                 //    officers building questions and guests answering
                                 //    them) ────────────────────────────────────────
