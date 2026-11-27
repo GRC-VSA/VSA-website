@@ -175,6 +175,49 @@ public class EmailOutboxService {
         );
     }
 
+    /**
+     * Queues a "you have a new task" email for the officer it was assigned to.
+     *
+     * <p>Called inside TaskService's transaction, so the outbox row commits together with the task
+     * (or not at all). Nothing secret is in the payload, so it is kept after sending.
+     *
+     * @param recipientEmail Assignee's email
+     * @param userUid Assignee's user id
+     * @param firstName Assignee's first name
+     * @param taskTitle Title of the task
+     * @param assignedByName Full name of whoever assigned it
+     * @param dueDate ISO date (yyyy-MM-dd)
+     * @param priority LOW, MEDIUM or HIGH
+     * @param taskPath Frontend path (starting with '/') of the task's detail page
+     */
+    public void queueTaskAssignedEmail(
+            String recipientEmail,
+            String userUid,
+            String firstName,
+            String taskTitle,
+            String assignedByName,
+            String dueDate,
+            String priority,
+            String taskPath
+    ) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+
+        payload.put("firstName", firstName);
+        payload.put("taskTitle", taskTitle);
+        payload.put("assignedByName", assignedByName);
+        payload.put("dueDate", dueDate);
+        payload.put("priority", priority);
+        payload.put("taskPath", taskPath);
+
+        saveOutboxEntry(
+                null,
+                userUid,
+                EmailOutbox.EmailType.TASK_ASSIGNED,
+                recipientEmail,
+                payload
+        );
+    }
+
     private void saveOutboxEntry(
             Long registrationId,
             String userUid,

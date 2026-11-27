@@ -2,6 +2,9 @@ package com.vsa.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -488,6 +491,80 @@ public class EmailService {
                             TEXT_MUTED);
 
     sendEmail(toEmail, "VSA - Edit your availability: " + sheetTitle, body);
+  }
+
+  /**
+   * Tells an officer they have been assigned a task, with a button to open it.
+   *
+   * <p>Title and names are typed by users, so they are HTML-escaped.
+   *
+   * @param toEmail Assignee's email address
+   * @param firstName Assignee's first name
+   * @param taskTitle Title of the task
+   * @param assignedByName Full name of whoever assigned it
+   * @param dueDate ISO date (yyyy-MM-dd)
+   * @param priority LOW, MEDIUM or HIGH
+   * @param taskPath Frontend path of the task's detail page
+   */
+  public void sendTaskAssignedEmail(
+          String toEmail,
+          String firstName,
+          String taskTitle,
+          String assignedByName,
+          String dueDate,
+          String priority,
+          String taskPath) {
+    String taskUrl = buildFrontendUrl(taskPath);
+    String safeName = HtmlUtils.htmlEscape(firstName == null ? "" : firstName);
+    String safeTitle = HtmlUtils.htmlEscape(taskTitle == null ? "" : taskTitle);
+    String safeAssigner = HtmlUtils.htmlEscape(assignedByName == null ? "" : assignedByName);
+    String dueLabel =
+            LocalDate.parse(dueDate)
+                    .format(DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy", Locale.US));
+    String priorityLabel =
+            priority == null
+                    ? ""
+                    : priority.charAt(0) + priority.substring(1).toLowerCase(Locale.US);
+
+    String body =
+            """
+                %s
+                <div style="background-color: %s; padding: 24px 20px; border-radius: 12px; margin: 24px 0;">
+                    <h3 style="color: %s; margin: 0 0 12px 0; font-weight: 600;">Hi %s, you have a new task</h3>
+                    <p style="color: %s; margin: 0 0 16px 0; line-height: 1.6;"><strong>%s</strong> assigned you <strong>%s</strong>.</p>
+                    <p style="color: %s; margin: 0 0 4px 0;">Due: <strong>%s</strong></p>
+                    <p style="color: %s; margin: 0 0 20px 0;">Priority: <strong>%s</strong></p>
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="%s" style="
+                            display: inline-block;
+                            background-color: %s;
+                            color: %s;
+                            padding: 14px 40px;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-weight: 600;
+                            font-size: 15px;
+                        ">View Task</a>
+                    </div>
+                </div>
+                """
+                    .formatted(
+                            getEmailHeader("New Task Assigned"),
+                            ACCENT_COLOR,
+                            PRIMARY_COLOR,
+                            safeName,
+                            TEXT_DARK,
+                            safeAssigner,
+                            safeTitle,
+                            TEXT_DARK,
+                            dueLabel,
+                            TEXT_DARK,
+                            priorityLabel,
+                            taskUrl,
+                            PRIMARY_COLOR,
+                            TEXT_LIGHT);
+
+    sendEmail(toEmail, "VSA - New task: " + taskTitle, body);
   }
 
   // ── Core Email Sending Method ──────────────────────────────

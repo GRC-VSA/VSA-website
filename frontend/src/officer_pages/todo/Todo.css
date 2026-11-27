@@ -133,6 +133,29 @@
 .td-btn--cancel { min-width: 112px; }
 .td-btn--submit { min-width: 192px; }
 .td-btn--back-list { min-width: 224px; }
+.td-btn--danger { color: var(--td-red-deep); }
+.td-btn--danger:hover:not(:disabled) { background: var(--td-red-soft); }
+
+/* Status buttons on the task detail page. The current status is shown pressed. */
+.td-status-picker {
+    border: 0;
+    margin: 20px 0 0;
+    padding: 0;
+    min-width: 0;
+}
+.td-status-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+.td-status-option.is-current:disabled {
+    opacity: 1;
+    cursor: default;
+    background: var(--td-ink);
+    border-color: var(--td-ink);
+    color: #fff;
+}
 
 /* ── Cards and layout ───────────────────────────────────── */
 

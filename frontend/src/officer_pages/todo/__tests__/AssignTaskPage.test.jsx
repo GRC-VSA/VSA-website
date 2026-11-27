@@ -87,7 +87,7 @@ describe("AssignTaskPage", () => {
         expect(api.createTask).toHaveBeenCalledWith({
             title: "Prepare volunteer briefing",
             description: "Roles and arrival times",
-            assigneeId: 1,
+            assigneeId: "u-linh",
             dueDate: due,
             priority: "HIGH",
         });

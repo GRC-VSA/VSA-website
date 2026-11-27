@@ -19,6 +19,9 @@ export const PRIORITY_LABELS = {
     LOW: "Low",
 };
 
+/** Workflow order, the order the status buttons show them in. */
+export const STATUSES = ["TODO", "IN_PROGRESS", "COMPLETED"];
+
 /** Lowest to highest, the order the priority picker shows them in. */
 export const PRIORITIES = ["LOW", "MEDIUM", "HIGH"];
 

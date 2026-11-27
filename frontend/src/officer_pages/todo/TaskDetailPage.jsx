@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getTask } from "../../api/Tasks.js";
+import { deleteTask, getTask, updateTaskStatus } from "../../api/Tasks.js";
 import useDocumentTitle from "../../hooks/useDocumentTitle.js";
-import { PRIORITY_LABELS, STATUS_LABELS, dueState, formatDate, formatInstantDate, statusClass } from "./taskFormat.js";
+import { PRIORITY_LABELS, STATUS_LABELS, STATUSES, dueState, formatDate, formatInstantDate, statusClass } from "./taskFormat.js";
 import "./Todo.css";
 
 const LIST_PATH = "/officer/todo-list";
 
-/** One task: who owns it, when it's due, the full description, and its activity. */
+/**
+    One task: who owns it, when it's due, the full description, and its activity.
+
+    The status buttons and Delete only appear when the backend says this user may use them
+    (task.canChangeStatus / task.canEdit). The backend still checks every request; if it refuses
+    (e.g. a 403, or the task was deleted meanwhile) the message shows above the actions.
+*/
 export default function TaskDetailPage() {
     const { taskId } = useParams();
     const navigate = useNavigate();
@@ -16,6 +22,8 @@ export default function TaskDetailPage() {
     const current = loaded.taskId === taskId;
     const task = current ? loaded.task : null;
     const error = current ? loaded.error : "";
+    const [busy, setBusy] = useState(false);
+    const [actionError, setActionError] = useState("");
     useDocumentTitle(task ? task.title : "Task details");
 
     useEffect(() => {
@@ -29,6 +37,32 @@ export default function TaskDetailPage() {
     }, [taskId]);
 
     const backToList = () => navigate(LIST_PATH);
+
+    async function changeStatus(status) {
+        setBusy(true);
+        setActionError("");
+        try {
+            const updated = await updateTaskStatus(task.taskId, status);
+            setLoaded({ taskId, task: updated, error: "" });
+        } catch (err) {
+            setActionError(err.message);
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function handleDelete() {
+        if (!window.confirm(`Delete "${task.title}"? This can't be undone.`)) return;
+        setBusy(true);
+        setActionError("");
+        try {
+            await deleteTask(task.taskId);
+            navigate(LIST_PATH);
+        } catch (err) {
+            setActionError(err.message);
+            setBusy(false);
+        }
+    }
     const due = task ? dueState(task) : null;
     const assignedBy = task && [task.assignedByMe ? "Assigned by you" : task.assignedByName && `Assigned by ${task.assignedByName}`, task.assignedByRole]
         .filter(Boolean)
@@ -77,7 +111,34 @@ export default function TaskDetailPage() {
 
                         {assignedBy && <p className="td-detail-assigned-by">{assignedBy}</p>}
 
+                        {actionError && <div className="td-error" role="alert">{actionError}</div>}
+
+                        {task.canChangeStatus && (
+                            <fieldset className="td-status-picker" disabled={busy}>
+                                <legend className="td-label">Update status</legend>
+                                <div className="td-status-options">
+                                    {STATUSES.map((value) => (
+                                        <button
+                                            key={value}
+                                            type="button"
+                                            className={`td-btn td-btn--outline td-status-option${task.status === value ? " is-current" : ""}`}
+                                            aria-pressed={task.status === value}
+                                            disabled={task.status === value}
+                                            onClick={() => changeStatus(value)}
+                                        >
+                                            {STATUS_LABELS[value]}
+                                        </button>
+                                    ))}
+                                </div>
+                            </fieldset>
+                        )}
+
                         <div className="td-form-actions">
+                            {task.canEdit && (
+                                <button type="button" className="td-btn td-btn--outline td-btn--danger" disabled={busy} onClick={handleDelete}>
+                                    Delete task
+                                </button>
+                            )}
                             <button type="button" className="td-btn td-btn--primary td-btn--back-list" onClick={backToList}>
                                 Back to team tasks
                             </button>
@@ -90,6 +151,9 @@ export default function TaskDetailPage() {
                         <p className="td-side-item-text">{formatInstantDate(task.createdAt)}</p>
                         <p className="td-activity-text">Ownership and due date are set.</p>
                         <p className="td-activity-text">Status: {STATUS_LABELS[task.status]}</p>
+                        {task.completedAt && (
+                            <p className="td-activity-text">Completed {formatInstantDate(task.completedAt)}</p>
+                        )}
                     </aside>
                 </div>
             )}

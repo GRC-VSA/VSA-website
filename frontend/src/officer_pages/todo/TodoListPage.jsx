@@ -147,7 +147,7 @@ export default function TodoListPage() {
             )}
 
             <p className="td-footnote">
-                Only team leads and executive officers can assign tasks. Members can view and update their own tasks.
+                Any officer can assign a task. The assignee can update its status; the person who assigned it or the president can delete it.
             </p>
         </div>
     );

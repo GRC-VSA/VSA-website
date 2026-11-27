@@ -150,7 +150,7 @@ export default function AssignTaskPage() {
                         <div className="td-field">
                             <span className="td-label">Team</span>
                             <p className={`td-static-value${assignee ? "" : " is-placeholder"}`}>
-                                {assignee ? assignee.team : "Set by the member you choose"}
+                                {assignee ? assignee.team ?? "No team yet" : "Set by the member you choose"}
                             </p>
                         </div>
 
