@@ -21,3 +21,4 @@ certs/
 
 .deployed-sha
 /node_modules/
+.vibe-learn/progress.md
